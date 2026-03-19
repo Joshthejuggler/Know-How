@@ -1,0 +1,659 @@
+/* Quiz Funnel Styles */
+.mc-funnel-container {
+    max-width: 800px;
+    margin: 2em auto;
+    padding: 0 1rem;
+}
+
+/* Welcome (sosd) overrides — make steps compact, card-like, centered */
+.sosd-wrap .mc-funnel-container { max-width: 100%; margin: 0; padding: 0; }
+.sosd-wrap .mc-funnel-step { background: var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:0 1px 0 rgba(20,30,70,.02); }
+.sosd-wrap .mc-funnel-step.available { border-color: #cfd8ff; background:#ffffff; }
+.sosd-wrap .mc-funnel-step.completed { border-color:#b7f0cf; background:#ffffff; }
+.sosd-wrap .mc-funnel-step.locked { background:#ffffff; border-color: var(--line); filter:none; }
+.sosd-wrap .mc-funnel-step-content { padding:16px 18px; gap:12px; }
+.sosd-wrap .mc-funnel-step-icon { width:32px; height:32px; font-size:.9rem; }
+.sosd-wrap .mc-funnel-step-title { font-size:16px; line-height:24px; margin:0 0 2px; }
+.sosd-wrap .mc-funnel-step-description p { font-size:14px; line-height:20px; }
+.sosd-wrap .status-badge { font-size:12px; padding:4px 8px; }
+/* Hide status chips (Available/Locked/etc.) for logged-out welcome */
+.sosd-wrap .status-badge { display: none !important; }
+
+.mc-funnel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+}
+
+/* Funnel Step Base Styles */
+.mc-funnel-step {
+    position: relative;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.mc-funnel-step:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #cbd5e1, #94a3b8);
+    transition: all 0.3s ease;
+}
+
+/* Step States */
+.mc-funnel-step.available {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-color: #3b82f6;
+    cursor: pointer;
+    transform: scale(1);
+}
+
+.mc-funnel-step.available:before {
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+.mc-funnel-step.available:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+    border-color: #1d4ed8;
+}
+
+.mc-funnel-step.completed {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border-color: #22c55e;
+}
+
+.mc-funnel-step.completed:before {
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.mc-funnel-step.locked {
+    background: linear-gradient(135deg, #f8fafc 0%, #e5e7eb 100%);
+    border-color: #cbd5e1;
+    cursor: not-allowed;
+    filter: grayscale(0.15);
+}
+
+.mc-funnel-step.locked:before {
+    background: linear-gradient(90deg, #cbd5e1, #94a3b8);
+}
+
+.mc-funnel-step.placeholder {
+    border-style: dashed;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-color: #f59e0b;
+}
+
+.mc-funnel-step.placeholder:before {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+/* Step Content */
+.mc-funnel-step-content {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    gap: 1rem;
+}
+
+.mc-funnel-step-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.mc-funnel-step.available .mc-funnel-step-icon {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.mc-funnel-step.completed .mc-funnel-step-icon {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.mc-funnel-step.locked .mc-funnel-step-icon {
+    background: linear-gradient(135deg, #94a3b8, #64748b);
+    color: white;
+}
+
+.mc-funnel-step.placeholder .mc-funnel-step-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.mc-funnel-step-icon .checkmark {
+    font-size: 1.5rem;
+}
+
+.mc-funnel-step-icon .lock {
+    font-size: 1rem;
+}
+
+.mc-funnel-step-icon .number {
+    font-size: 1.25rem;
+}
+
+.mc-funnel-step-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mc-funnel-step-title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.3;
+}
+
+.mc-funnel-step.locked .mc-funnel-step-title { color: #475569; }
+
+.mc-funnel-step-description {
+    margin: 0.5rem 0;
+}
+
+.mc-funnel-step-description p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.mc-funnel-step.locked .mc-funnel-step-description p { color: #6b7280; }
+
+.mc-funnel-step-status {
+    margin-top: 0.75rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.status-badge.completed {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #22c55e;
+}
+
+.status-badge.available {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    border: 1px solid #3b82f6;
+}
+
+.status-badge.locked {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+}
+
+/* Johari-specific status badges */
+.status-badge.waiting {
+    background-color: #fef3c7;
+    color: #d97706;
+    border: 1px solid #f59e0b;
+}
+
+.status-badge.ready {
+    background-color: #e0e7ff;
+    color: #6366f1;
+    border: 1px solid #818cf8;
+}
+
+/* Johari step state styles */
+.mc-funnel-step.johari-waiting {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-color: #f59e0b;
+}
+
+.mc-funnel-step.johari-waiting:before {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.mc-funnel-step.johari-waiting .mc-funnel-step-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.mc-funnel-step.johari-ready {
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    border-color: #6366f1;
+    cursor: pointer;
+}
+
+.mc-funnel-step.johari-ready:before {
+    background: linear-gradient(90deg, #6366f1, #4f46e5);
+}
+
+.mc-funnel-step.johari-ready:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+    border-color: #4f46e5;
+}
+
+.mc-funnel-step.johari-ready .mc-funnel-step-icon {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Connector between steps */
+.mc-funnel-connector {
+    display: none; /* Hidden by default - can be shown with CSS customization */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .mc-funnel-container {
+        padding: 0 0.5rem;
+        margin: 1rem auto;
+    }
+    
+    .mc-funnel-step-content {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .mc-funnel-step-info {
+        text-align: center;
+    }
+    
+    .mc-funnel-step-title {
+        font-size: 1.1rem;
+    }
+    
+    .mc-funnel-step-description p {
+        font-size: 0.85rem;
+    }
+    
+    .mc-funnel-step:hover {
+        transform: none; /* Disable hover effects on touch devices */
+    }
+}
+
+@media (max-width: 480px) {
+    .mc-funnel-step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .mc-funnel-step-icon .checkmark {
+        font-size: 1.25rem;
+    }
+    
+    .mc-funnel-step-icon .number {
+        font-size: 1.1rem;
+    }
+    
+    .mc-funnel-step-title {
+        font-size: 1rem;
+    }
+    
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+}
+
+/* Alternative compact style */
+.mc-funnel-container[data-style="compact"] .mc-funnel-step {
+    margin-bottom: 4px;
+}
+
+.mc-funnel-container[data-style="compact"] .mc-funnel-step-content {
+    padding: 1rem;
+}
+
+.mc-funnel-container[data-style="compact"] .mc-funnel-step-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+}
+
+.mc-funnel-container[data-style="compact"] .mc-funnel-step-title {
+    font-size: 1.1rem;
+}
+
+/* Focus styles for accessibility */
+.mc-funnel-step.available:focus,
+.mc-funnel-step.available:focus-within {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .mc-funnel-step,
+    .mc-funnel-step-icon,
+    .mc-funnel-step:before {
+        transition: none;
+    }
+    
+    .mc-funnel-step.available:hover {
+        transform: none;
+    }
+}
+
+/* Dashboard-specific clean styling */
+.quiz-dashboard-funnel-section {
+    max-width: 600px;
+    margin: 2rem auto 3rem auto;
+    padding: 0 1rem;
+}
+
+.quiz-dashboard-funnel-section .mc-funnel-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.quiz-dashboard-funnel-section .mc-funnel {
+    gap: 12px;
+}
+
+/* Center the greeting text */
+.quiz-dashboard-hero {
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.quiz-dashboard-hero-greeting {
+    max-width: 600px;
+    margin: 0 auto;
+    padding-bottom: 1rem;
+    position: relative;
+}
+
+.quiz-dashboard-hero-greeting::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+    border-radius: 1px;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step {
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step:before {
+    display: none;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.available {
+    background: #ffffff;
+    border-color: #3b82f6;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.available:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.completed {
+    background: #ffffff;
+    border-color: #22c55e;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.locked {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    opacity: 0.7;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step-content {
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    border-radius: 6px;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.available .mc-funnel-step-icon {
+    background: #3b82f6;
+    color: white;
+    box-shadow: none;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.completed .mc-funnel-step-icon {
+    background: #22c55e;
+    color: white;
+    box-shadow: none;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.locked .mc-funnel-step-icon {
+    background: #9ca3af;
+    color: white;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.placeholder .mc-funnel-step-icon {
+    background: #f59e0b;
+    color: white;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #111827;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step.locked .mc-funnel-step-title {
+    color: #6b7280;
+}
+
+.mc-funnel-container[data-style="dashboard"] .mc-funnel-step-description {
+    display: none; /* Hidden in dashboard view */
+}
+
+.mc-funnel-container[data-style="dashboard"] .status-badge {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.mc-funnel-container[data-style="dashboard"] .status-badge.completed {
+    color: #059669;
+}
+
+.mc-funnel-container[data-style="dashboard"] .status-badge.available {
+    color: #2563eb;
+}
+
+.mc-funnel-container[data-style="dashboard"] .status-badge.locked {
+    color: #6b7280;
+}
+
+/* Dashboard compact styling for completed users */
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step:before {
+    display: none;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.available {
+    background: #ffffff;
+    border-color: #3b82f6;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.available:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.completed {
+    background: #ffffff;
+    border-color: #22c55e;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.locked {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    opacity: 0.7;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step-content {
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+    border-radius: 4px;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.available .mc-funnel-step-icon {
+    background: #3b82f6;
+    color: white;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.completed .mc-funnel-step-icon {
+    background: #22c55e;
+    color: white;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.locked .mc-funnel-step-icon {
+    background: #9ca3af;
+    color: white;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.placeholder .mc-funnel-step-icon {
+    background: #f59e0b;
+    color: white;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #111827;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step.locked .mc-funnel-step-title {
+    color: #6b7280;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step-description {
+    display: none;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .status-badge {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .status-badge.completed {
+    color: #059669;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .status-badge.available {
+    color: #2563eb;
+}
+
+.mc-funnel-container[data-style="dashboard-compact"] .status-badge.locked {
+    color: #6b7280;
+}
+
+/* Responsive adjustments for dashboard */
+@media (max-width: 768px) {
+    .mc-funnel-container[data-style="dashboard"] .mc-funnel-step-content {
+        padding: 0.875rem 1rem;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .mc-funnel-container[data-style="dashboard"] .mc-funnel-step-info {
+        text-align: left;
+    }
+    
+    .mc-funnel-container[data-style="dashboard"] .mc-funnel-step-title {
+        font-size: 1rem;
+    }
+    
+    .mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step-content {
+        padding: 0.625rem 0.875rem;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step-info {
+        text-align: left;
+    }
+    
+    .mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step-title {
+        font-size: 0.9rem;
+    }
+    
+    .mc-funnel-container[data-style="dashboard-compact"] .mc-funnel-step-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+    
+    /* Responsive adjustments for funnel section */
+    .quiz-dashboard-funnel-section {
+        margin: 1.5rem auto 2rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .quiz-dashboard-hero-greeting {
+        padding: 0 1rem;
+    }
+}

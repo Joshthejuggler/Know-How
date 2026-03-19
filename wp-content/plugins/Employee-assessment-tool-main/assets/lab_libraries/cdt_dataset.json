@@ -1,0 +1,86 @@
+{
+  "risk-comfort": {
+    "label": "Risk Comfort",
+    "description": "Willingness to engage with uncertain outcomes and potential failure",
+    "growth_strategies": {
+      "low": ["Start with small, reversible decisions", "Practice worst-case scenario planning", "Celebrate learning from small failures"],
+      "medium": ["Take on moderately challenging projects", "Seek feedback early and often", "Balance preparation with action"],
+      "high": ["Channel risk-taking into strategic opportunities", "Mentor others in uncertainty tolerance", "Create safety nets for bold moves"]
+    },
+    "coaching_notes": {
+      "low": "Needs structured support and clear success metrics",
+      "medium": "Benefits from stretch goals with safety nets",
+      "high": "Thrives with autonomous challenges and room for innovation"
+    }
+  },
+  "ambiguity-tolerance": {
+    "label": "Ambiguity Tolerance",
+    "description": "Comfort with unclear situations and incomplete information",
+    "growth_strategies": {
+      "low": ["Break complex problems into smaller, clearer parts", "Seek additional context before decisions", "Practice with low-stakes ambiguous situations"],
+      "medium": ["Embrace iterative problem-solving approaches", "Develop comfort with partial solutions", "Practice hypothesis-driven thinking"],
+      "high": ["Lead others through uncertain transitions", "Design experiments in unclear domains", "Become a strategic advisor for complex decisions"]
+    },
+    "coaching_notes": {
+      "low": "Needs clear frameworks and structured approaches",
+      "medium": "Benefits from iterative feedback and course correction",
+      "high": "Excels with open-ended challenges and strategic ambiguity"
+    }
+  },
+  "complexity-handling": {
+    "label": "Complexity Handling",
+    "description": "Ability to work with interconnected systems and multiple variables",
+    "growth_strategies": {
+      "low": ["Use visual mapping tools for complex problems", "Focus on one variable at a time", "Partner with systems thinkers"],
+      "medium": ["Practice systems thinking approaches", "Build complexity gradually in projects", "Learn pattern recognition techniques"],
+      "high": ["Design complex systems and processes", "Teach others to navigate complexity", "Take on multi-stakeholder challenges"]
+    },
+    "coaching_notes": {
+      "low": "Benefits from simplified, linear approaches",
+      "medium": "Ready for moderate systemic challenges",
+      "high": "Thrives with multi-dimensional, interconnected problems"
+    }
+  },
+  "learning-orientation": {
+    "label": "Learning Orientation",
+    "description": "Drive to acquire new knowledge and skills continuously",
+    "growth_strategies": {
+      "low": ["Connect learning to immediate practical benefits", "Use familiar formats and contexts", "Focus on skill-based rather than theory-based learning"],
+      "medium": ["Explore adjacent areas to current expertise", "Join learning communities", "Balance depth with breadth in learning"],
+      "high": ["Pursue cutting-edge or interdisciplinary topics", "Teach and mentor others", "Lead learning initiatives and knowledge sharing"]
+    },
+    "coaching_notes": {
+      "low": "Needs clear relevance and immediate application",
+      "medium": "Benefits from structured learning paths with peer support",
+      "high": "Self-directed and benefits from advanced challenges"
+    }
+  },
+  "future-focus": {
+    "label": "Future Focus",
+    "description": "Orientation toward long-term thinking and planning",
+    "growth_strategies": {
+      "low": ["Start with short-term wins that build toward longer goals", "Use present benefits to motivate future planning", "Partner with future-focused collaborators"],
+      "medium": ["Develop scenario planning skills", "Balance short-term execution with long-term vision", "Practice trend analysis and forecasting"],
+      "high": ["Lead strategic planning initiatives", "Become a visionary voice in your field", "Mentor others in long-term thinking"]
+    },
+    "coaching_notes": {
+      "low": "Needs immediate relevance and quick wins",
+      "medium": "Benefits from medium-term milestones and progress tracking",
+      "high": "Excels with long-term strategic challenges"
+    }
+  },
+  "innovation-drive": {
+    "label": "Innovation Drive",
+    "description": "Motivation to create new solutions and approaches",
+    "growth_strategies": {
+      "low": ["Focus on optimizing existing processes", "Learn from successful innovations in your field", "Collaborate with creative partners"],
+      "medium": ["Practice ideation techniques", "Experiment with small innovations", "Study innovation methodologies"],
+      "high": ["Lead breakthrough innovation projects", "Develop new methodologies or frameworks", "Mentor others in creative problem-solving"]
+    },
+    "coaching_notes": {
+      "low": "Succeeds with incremental improvements and proven methods",
+      "medium": "Ready for moderate creative challenges with support",
+      "high": "Thrives with open-ended innovation challenges"
+    }
+  }
+}

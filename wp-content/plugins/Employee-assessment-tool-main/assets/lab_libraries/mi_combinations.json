@@ -1,0 +1,622 @@
+{
+  "triads": {
+    "linguistic_logical-mathematical_spatial": {
+      "name": "The Strategic Communicator",
+      "description": "Combines clear communication with analytical thinking and visual problem-solving.",
+      "experiment_seeds": [
+        "Create infographics that explain complex data patterns",
+        "Design presentation templates that guide logical flow",
+        "Build decision-making frameworks with visual mapping"
+      ]
+    },
+    "linguistic_logical-mathematical_bodily-kinesthetic": {
+      "name": "The Embodied Explainer", 
+      "description": "Uses physical demonstration and movement to teach logical concepts.",
+      "experiment_seeds": [
+        "Create step-by-step video tutorials with hands-on demos",
+        "Design workshop formats that combine talking and doing",
+        "Build interactive prototypes that teach through experience"
+      ]
+    },
+    "linguistic_logical-mathematical_musical": {
+      "name": "The Rhythmic Reasoner",
+      "description": "Applies pattern and rhythm to structure logical arguments and explanations.",
+      "experiment_seeds": [
+        "Create mnemonics and songs to teach complex processes",
+        "Design presentation formats with rhythmic pacing",
+        "Build storytelling frameworks with musical structure"
+      ]
+    },
+    "linguistic_logical-mathematical_interpersonal": {
+      "name": "The Collaborative Analyst",
+      "description": "Facilitates group problem-solving through structured dialogue.",
+      "experiment_seeds": [
+        "Design facilitation guides for complex discussions",
+        "Create team decision-making protocols",
+        "Build feedback frameworks for group analysis"
+      ]
+    },
+    "linguistic_logical-mathematical_intrapersonal": {
+      "name": "The Reflective Systematizer",
+      "description": "Develops internal frameworks for personal analysis and growth.",
+      "experiment_seeds": [
+        "Create personal reflection templates with logical structure",
+        "Design self-assessment frameworks with clear metrics",
+        "Build journaling systems that track patterns over time"
+      ]
+    },
+    "linguistic_logical-mathematical_naturalistic": {
+      "name": "The Pattern Narrator",
+      "description": "Identifies and communicates patterns in natural and social systems.",
+      "experiment_seeds": [
+        "Document ecosystem patterns through systematic observation",
+        "Create guides for recognizing social/organizational patterns",
+        "Build classification systems for complex environments"
+      ]
+    },
+    "linguistic_spatial_bodily-kinesthetic": {
+      "name": "The Visual Builder",
+      "description": "Creates tangible representations of ideas through visual-spatial thinking.",
+      "experiment_seeds": [
+        "Build 3D models that explain abstract concepts",
+        "Create installation art with explanatory elements",
+        "Design workshops that use space and movement to teach"
+      ]
+    },
+    "linguistic_spatial_musical": {
+      "name": "The Atmospheric Storyteller",
+      "description": "Creates immersive narrative experiences with visual and auditory elements.",
+      "experiment_seeds": [
+        "Design multimedia presentations with story arcs",
+        "Create ambient spaces that tell stories through environment",
+        "Build interactive narratives with soundscapes"
+      ]
+    },
+    "linguistic_spatial_interpersonal": {
+      "name": "The Community Mapper",
+      "description": "Visualizes and facilitates social connections and group dynamics.",
+      "experiment_seeds": [
+        "Create visual maps of community relationships",
+        "Design spaces that encourage specific types of interaction",
+        "Build tools that help groups understand their dynamics"
+      ]
+    },
+    "linguistic_spatial_intrapersonal": {
+      "name": "The Inner Landscape Designer",
+      "description": "Develops visual frameworks for personal understanding and growth.",
+      "experiment_seeds": [
+        "Create personal vision boards with systematic structure",
+        "Design private spaces that support self-reflection",
+        "Build visual tools for tracking internal patterns"
+      ]
+    },
+    "linguistic_spatial_naturalistic": {
+      "name": "The Environmental Storyteller",
+      "description": "Uses natural environments to communicate and teach complex ideas.",
+      "experiment_seeds": [
+        "Create nature walks that teach through observation",
+        "Design outdoor learning experiences with clear narratives",
+        "Build environmental interpretation that connects to larger themes"
+      ]
+    },
+    "linguistic_bodily-kinesthetic_musical": {
+      "name": "The Embodied Performer",
+      "description": "Combines movement, rhythm, and language for powerful expression.",
+      "experiment_seeds": [
+        "Create spoken word performances with choreographed movement",
+        "Design workshops that use rhythm and movement to teach",
+        "Build interactive performances that engage multiple senses"
+      ]
+    },
+    "linguistic_bodily-kinesthetic_interpersonal": {
+      "name": "The Active Facilitator",
+      "description": "Leads groups through physical activities that build understanding.",
+      "experiment_seeds": [
+        "Design team-building activities with clear learning objectives",
+        "Create facilitation techniques that use movement and space",
+        "Build group exercises that combine talking and doing"
+      ]
+    },
+    "linguistic_bodily-kinesthetic_intrapersonal": {
+      "name": "The Embodied Reflector",
+      "description": "Uses physical practices to deepen self-understanding and expression.",
+      "experiment_seeds": [
+        "Develop personal movement practices for reflection",
+        "Create embodied journaling techniques",
+        "Build physical rituals that support personal growth"
+      ]
+    },
+    "linguistic_bodily-kinesthetic_naturalistic": {
+      "name": "The Wild Educator",
+      "description": "Teaches and learns through direct interaction with natural environments.",
+      "experiment_seeds": [
+        "Create outdoor education programs with hands-on learning",
+        "Design nature-based workshops that combine doing and reflecting",
+        "Build skills-sharing programs focused on traditional crafts"
+      ]
+    },
+    "linguistic_musical_interpersonal": {
+      "name": "The Harmonic Connector",
+      "description": "Uses music and rhythm to build community and facilitate understanding.",
+      "experiment_seeds": [
+        "Create group singing or music-making experiences",
+        "Design facilitation techniques that use musical elements",
+        "Build community events that combine music and meaningful conversation"
+      ]
+    },
+    "linguistic_musical_intrapersonal": {
+      "name": "The Inner Composer",
+      "description": "Uses musical elements to explore and express personal insights.",
+      "experiment_seeds": [
+        "Develop personal soundtracks for different moods or activities",
+        "Create audio journaling with musical elements",
+        "Build playlists that support specific types of reflection"
+      ]
+    },
+    "linguistic_musical_naturalistic": {
+      "name": "The Natural Symphony Interpreter",
+      "description": "Finds and communicates the rhythmic patterns in natural systems.",
+      "experiment_seeds": [
+        "Create field recordings that capture natural rhythms",
+        "Design listening experiences that highlight environmental patterns",
+        "Build educational content about natural soundscapes"
+      ]
+    },
+    "linguistic_interpersonal_intrapersonal": {
+      "name": "The Bridge Builder",
+      "description": "Connects personal insights with community understanding through dialogue.",
+      "experiment_seeds": [
+        "Create structured dialogue formats for deep sharing",
+        "Design mentoring programs with clear frameworks",
+        "Build peer coaching systems with reflective practices"
+      ]
+    },
+    "linguistic_interpersonal_naturalistic": {
+      "name": "The Ecological Connector",
+      "description": "Facilitates understanding of human connections to natural systems.",
+      "experiment_seeds": [
+        "Create community education programs about local ecosystems",
+        "Design group experiences in natural settings",
+        "Build environmental advocacy projects with community engagement"
+      ]
+    },
+    "linguistic_intrapersonal_naturalistic": {
+      "name": "The Solitude Seeker",
+      "description": "Uses natural environments for deep personal reflection and insight.",
+      "experiment_seeds": [
+        "Develop personal retreat practices in nature",
+        "Create nature-based reflection frameworks",
+        "Build seasonal practices that connect internal and natural cycles"
+      ]
+    },
+    "logical-mathematical_spatial_bodily-kinesthetic": {
+      "name": "The Applied Engineer",
+      "description": "Builds functional solutions through systematic spatial reasoning.",
+      "experiment_seeds": [
+        "Create prototypes that solve everyday problems",
+        "Design experiments that test theoretical concepts",
+        "Build tools or systems that improve existing processes"
+      ]
+    },
+    "logical-mathematical_spatial_musical": {
+      "name": "The Pattern Composer",
+      "description": "Discovers and creates complex patterns across mathematical and musical domains.",
+      "experiment_seeds": [
+        "Create visualizations of musical patterns and structures",
+        "Design mathematical art with musical elements",
+        "Build systems that generate music from data patterns"
+      ]
+    },
+    "logical-mathematical_spatial_interpersonal": {
+      "name": "The Systems Facilitator",
+      "description": "Helps groups understand and navigate complex systems and processes.",
+      "experiment_seeds": [
+        "Create visual facilitation tools for complex problems",
+        "Design group decision-making frameworks with clear logic",
+        "Build training programs for systematic thinking"
+      ]
+    },
+    "logical-mathematical_spatial_intrapersonal": {
+      "name": "The Inner Architect",
+      "description": "Designs personal systems and frameworks for optimal functioning.",
+      "experiment_seeds": [
+        "Create personal productivity systems with visual organization",
+        "Design self-tracking frameworks with spatial layouts",
+        "Build personal spaces that support systematic thinking"
+      ]
+    },
+    "logical-mathematical_spatial_naturalistic": {
+      "name": "The Natural Systems Analyst",
+      "description": "Studies and maps the logical patterns within natural environments.",
+      "experiment_seeds": [
+        "Create field studies that map ecosystem relationships",
+        "Design experiments that test natural phenomena",
+        "Build models that predict environmental patterns"
+      ]
+    },
+    "logical-mathematical_bodily-kinesthetic_musical": {
+      "name": "The Rhythmic Maker",
+      "description": "Creates through systematic physical processes that follow rhythmic patterns.",
+      "experiment_seeds": [
+        "Develop craft techniques that follow mathematical principles",
+        "Create movement practices with systematic progressions",
+        "Build musical instruments using engineering principles"
+      ]
+    },
+    "logical-mathematical_bodily-kinesthetic_interpersonal": {
+      "name": "The Systematic Teacher",
+      "description": "Shares skills and knowledge through structured, hands-on group experiences.",
+      "experiment_seeds": [
+        "Create workshop curricula with progressive skill building",
+        "Design team challenges that require systematic problem-solving",
+        "Build apprenticeship programs with clear learning objectives"
+      ]
+    },
+    "logical-mathematical_bodily-kinesthetic_intrapersonal": {
+      "name": "The Disciplined Practitioner",
+      "description": "Develops mastery through systematic personal practice and self-correction.",
+      "experiment_seeds": [
+        "Create personal training programs with measurable progress",
+        "Design practice routines that build skill systematically",
+        "Build feedback systems for continuous improvement"
+      ]
+    },
+    "logical-mathematical_bodily-kinesthetic_naturalistic": {
+      "name": "The Field Researcher",
+      "description": "Studies natural phenomena through direct, systematic observation and interaction.",
+      "experiment_seeds": [
+        "Conduct field studies with hands-on data collection",
+        "Create citizen science projects with systematic methodology",
+        "Build experiments that test hypotheses about natural systems"
+      ]
+    },
+    "logical-mathematical_musical_interpersonal": {
+      "name": "The Harmonic Organizer",
+      "description": "Creates structured group experiences that follow musical and mathematical principles.",
+      "experiment_seeds": [
+        "Design group music-making with systematic instruction",
+        "Create workshops that teach mathematical concepts through music",
+        "Build community events with rhythmic structure and logical flow"
+      ]
+    },
+    "logical-mathematical_musical_intrapersonal": {
+      "name": "The Internal Rhythmist",
+      "description": "Uses rhythm and mathematical patterns for personal organization and insight.",
+      "experiment_seeds": [
+        "Create personal routines with musical timing",
+        "Design self-reflection practices with rhythmic elements",
+        "Build tracking systems that reveal patterns over time"
+      ]
+    },
+    "logical-mathematical_musical_naturalistic": {
+      "name": "The Natural Pattern Detector",
+      "description": "Discovers mathematical and rhythmic patterns within natural systems.",
+      "experiment_seeds": [
+        "Study and document natural rhythms and cycles",
+        "Create mathematical models of natural phenomena",
+        "Build tools that translate natural patterns into musical forms"
+      ]
+    },
+    "logical-mathematical_interpersonal_intrapersonal": {
+      "name": "The Reflective Analyst",
+      "description": "Uses systematic thinking to understand both personal and social dynamics.",
+      "experiment_seeds": [
+        "Create frameworks for analyzing group dynamics",
+        "Design personal assessment tools with social components",
+        "Build peer review systems with systematic feedback"
+      ]
+    },
+    "logical-mathematical_interpersonal_naturalistic": {
+      "name": "The Community Systems Thinker",
+      "description": "Applies systematic analysis to understand community relationships with natural environments.",
+      "experiment_seeds": [
+        "Study community sustainability through systematic analysis",
+        "Create group projects that address environmental challenges",
+        "Build tools that help communities understand their ecological impact"
+      ]
+    },
+    "logical-mathematical_intrapersonal_naturalistic": {
+      "name": "The Solo Natural Scientist",
+      "description": "Conducts deep, systematic study of natural phenomena through personal investigation.",
+      "experiment_seeds": [
+        "Create long-term personal studies of natural cycles",
+        "Design self-directed research projects about local ecosystems",
+        "Build personal observation systems for tracking natural patterns"
+      ]
+    },
+    "spatial_bodily-kinesthetic_musical": {
+      "name": "The Spatial Performer",
+      "description": "Creates experiences that combine visual design, physical movement, and musical elements.",
+      "experiment_seeds": [
+        "Create immersive installations with movement and sound",
+        "Design performance spaces that support kinesthetic expression",
+        "Build interactive art that responds to movement and creates music"
+      ]
+    },
+    "spatial_bodily-kinesthetic_interpersonal": {
+      "name": "The Space Designer",
+      "description": "Creates physical environments that facilitate specific types of social interaction.",
+      "experiment_seeds": [
+        "Design spaces that encourage collaboration and connection",
+        "Create interactive installations for community gathering",
+        "Build environments that support group activities and learning"
+      ]
+    },
+    "spatial_bodily-kinesthetic_intrapersonal": {
+      "name": "The Personal Space Curator",
+      "description": "Designs and creates personal environments that support individual well-being and growth.",
+      "experiment_seeds": [
+        "Create personal retreats or meditation spaces",
+        "Design home environments that support specific activities",
+        "Build personal workshops or studios optimized for individual practice"
+      ]
+    },
+    "spatial_bodily-kinesthetic_naturalistic": {
+      "name": "The Environmental Steward",
+      "description": "Works directly with natural environments through design and physical engagement.",
+      "experiment_seeds": [
+        "Create habitat restoration projects with hands-on involvement",
+        "Design outdoor learning spaces that integrate with natural systems",
+        "Build sustainable systems that require ongoing physical maintenance"
+      ]
+    },
+    "spatial_musical_interpersonal": {
+      "name": "The Atmospheric Community Builder",
+      "description": "Creates shared experiences through environmental design and musical elements.",
+      "experiment_seeds": [
+        "Design community spaces with integrated soundscapes",
+        "Create events that combine visual art and collaborative music-making",
+        "Build installations that invite group interaction through sound and space"
+      ]
+    },
+    "spatial_musical_intrapersonal": {
+      "name": "The Personal Atmosphere Designer",
+      "description": "Creates personalized environments that integrate visual and auditory elements for individual reflection.",
+      "experiment_seeds": [
+        "Design personal spaces with custom soundscapes",
+        "Create visual-musical installations for private reflection",
+        "Build personal retreat environments with integrated audio-visual elements"
+      ]
+    },
+    "spatial_musical_naturalistic": {
+      "name": "The Natural Soundscape Curator",
+      "description": "Designs experiences that highlight the visual and auditory patterns of natural environments.",
+      "experiment_seeds": [
+        "Create nature installations that amplify environmental sounds",
+        "Design walking paths that optimize both visual and auditory natural experiences",
+        "Build recording projects that capture natural soundscapes with visual documentation"
+      ]
+    },
+    "spatial_interpersonal_intrapersonal": {
+      "name": "The Boundary Designer",
+      "description": "Creates environments and systems that balance individual and social needs.",
+      "experiment_seeds": [
+        "Design spaces that provide both community connection and private retreat",
+        "Create frameworks for managing personal boundaries in group settings",
+        "Build environments that support both collaboration and individual focus"
+      ]
+    },
+    "spatial_interpersonal_naturalistic": {
+      "name": "The Community-Nature Bridge Builder",
+      "description": "Creates connections between human communities and natural environments through design.",
+      "experiment_seeds": [
+        "Design community gardens or shared natural spaces",
+        "Create outdoor gathering places that integrate with local ecosystems",
+        "Build environmental education spaces for community use"
+      ]
+    },
+    "spatial_intrapersonal_naturalistic": {
+      "name": "The Solitary Nature Designer",
+      "description": "Creates personal experiences and spaces that deepen individual connection with natural environments.",
+      "experiment_seeds": [
+        "Design personal retreat spaces in natural settings",
+        "Create solo wilderness experiences with intentional structure",
+        "Build personal observation posts or reflection spaces in nature"
+      ]
+    },
+    "bodily-kinesthetic_musical_interpersonal": {
+      "name": "The Community Movement Leader",
+      "description": "Facilitates group experiences that combine physical activity with musical elements.",
+      "experiment_seeds": [
+        "Create community dance or movement classes",
+        "Design group fitness programs with musical integration",
+        "Build performance opportunities that combine movement and music"
+      ]
+    },
+    "bodily-kinesthetic_musical_intrapersonal": {
+      "name": "The Personal Practice Developer",
+      "description": "Creates individual physical practices that integrate musical elements for personal growth.",
+      "experiment_seeds": [
+        "Develop personal movement practices with musical accompaniment",
+        "Create workout routines designed around favorite music",
+        "Build personal performance practices that combine physical and musical expression"
+      ]
+    },
+    "bodily-kinesthetic_musical_naturalistic": {
+      "name": "The Natural Rhythm Practitioner",
+      "description": "Engages with natural environments through physical practices that honor natural rhythms and cycles.",
+      "experiment_seeds": [
+        "Create outdoor movement practices that sync with natural cycles",
+        "Design fitness routines that incorporate natural elements and seasonal changes",
+        "Build practices that use natural sounds as rhythmic accompaniment"
+      ]
+    },
+    "bodily-kinesthetic_interpersonal_intrapersonal": {
+      "name": "The Embodied Connector",
+      "description": "Uses physical practices to build both community connection and personal awareness.",
+      "experiment_seeds": [
+        "Create group practices that build individual and collective awareness",
+        "Design partner or small group exercises that deepen personal insight",
+        "Build community service projects that require physical engagement and personal reflection"
+      ]
+    },
+    "bodily-kinesthetic_interpersonal_naturalistic": {
+      "name": "The Community Environmental Steward",
+      "description": "Organizes group activities that involve direct physical engagement with natural environments.",
+      "experiment_seeds": [
+        "Organize community clean-up or restoration projects",
+        "Create group outdoor activities that build environmental awareness",
+        "Build community gardens or shared environmental projects"
+      ]
+    },
+    "bodily-kinesthetic_intrapersonal_naturalistic": {
+      "name": "The Solo Nature Practitioner",
+      "description": "Develops individual practices that combine physical activity with deep nature connection.",
+      "experiment_seeds": [
+        "Create personal outdoor fitness routines in natural settings",
+        "Develop solo hiking or camping practices with intentional reflection",
+        "Build seasonal physical practices that connect with natural cycles"
+      ]
+    },
+    "musical_interpersonal_intrapersonal": {
+      "name": "The Harmonic Bridge",
+      "description": "Uses music to connect personal expression with community building.",
+      "experiment_seeds": [
+        "Create opportunities for personal musical expression in group settings",
+        "Design music-sharing practices that build community while honoring individual voice",
+        "Build peer music-making opportunities that support personal growth"
+      ]
+    },
+    "musical_interpersonal_naturalistic": {
+      "name": "The Environmental Sound Connector",
+      "description": "Uses music and sound to help communities connect with natural environments.",
+      "experiment_seeds": [
+        "Create community sound walks or listening practices in nature",
+        "Design musical experiences that incorporate natural sounds",
+        "Build community events that celebrate local environmental soundscapes"
+      ]
+    },
+    "musical_intrapersonal_naturalistic": {
+      "name": "The Natural Sound Contemplative",
+      "description": "Uses music and natural sounds for deep personal reflection and spiritual connection.",
+      "experiment_seeds": [
+        "Create personal sound meditation practices using natural environments",
+        "Develop musical practices that sync with natural rhythms and seasons",
+        "Build personal sound recording projects that capture meaningful natural environments"
+      ]
+    },
+    "interpersonal_intrapersonal_naturalistic": {
+      "name": "The Community-Nature Wisdom Keeper",
+      "description": "Balances personal reflection, community connection, and environmental awareness to develop integrated wisdom.",
+      "experiment_seeds": [
+        "Create community practices that combine group reflection with nature connection",
+        "Design retreat experiences that balance solitude and community in natural settings",
+        "Build environmental education programs that honor both personal insight and collective wisdom"
+      ]
+    }
+  },
+  "pairs": {
+    "linguistic_logical-mathematical": {
+      "name": "The Systematic Communicator",
+      "focus": "Clear, structured communication and analysis"
+    },
+    "linguistic_spatial": {
+      "name": "The Visual Storyteller", 
+      "focus": "Combining narrative with visual and spatial elements"
+    },
+    "linguistic_bodily-kinesthetic": {
+      "name": "The Active Communicator",
+      "focus": "Physical and embodied communication"
+    },
+    "linguistic_musical": {
+      "name": "The Rhythmic Speaker",
+      "focus": "Language with rhythm, melody, and flow"
+    },
+    "linguistic_interpersonal": {
+      "name": "The Social Communicator",
+      "focus": "Dialogue, facilitation, and group communication"
+    },
+    "linguistic_intrapersonal": {
+      "name": "The Reflective Writer",
+      "focus": "Personal expression and internal dialogue"
+    },
+    "linguistic_naturalistic": {
+      "name": "The Environmental Interpreter",
+      "focus": "Communicating about natural systems and patterns"
+    },
+    "logical-mathematical_spatial": {
+      "name": "The Visual Analyst",
+      "focus": "Systematic thinking with visual-spatial reasoning"
+    },
+    "logical-mathematical_bodily-kinesthetic": {
+      "name": "The Applied Problem Solver",
+      "focus": "Hands-on application of systematic thinking"
+    },
+    "logical-mathematical_musical": {
+      "name": "The Pattern Seeker",
+      "focus": "Mathematical and musical pattern recognition"
+    },
+    "logical-mathematical_interpersonal": {
+      "name": "The Systems Facilitator",
+      "focus": "Helping groups think systematically"
+    },
+    "logical-mathematical_intrapersonal": {
+      "name": "The Personal Systems Designer",
+      "focus": "Self-optimization through systematic approaches"
+    },
+    "logical-mathematical_naturalistic": {
+      "name": "The Natural Systems Analyst",
+      "focus": "Scientific understanding of natural patterns"
+    },
+    "spatial_bodily-kinesthetic": {
+      "name": "The Three-Dimensional Creator",
+      "focus": "Building and creating in physical space"
+    },
+    "spatial_musical": {
+      "name": "The Atmospheric Designer",
+      "focus": "Creating environments with visual and auditory elements"
+    },
+    "spatial_interpersonal": {
+      "name": "The Social Space Designer",
+      "focus": "Creating environments that support human connection"
+    },
+    "spatial_intrapersonal": {
+      "name": "The Personal Environment Curator",
+      "focus": "Optimizing personal spaces for individual needs"
+    },
+    "spatial_naturalistic": {
+      "name": "The Landscape Connector",
+      "focus": "Working with and designing natural environments"
+    },
+    "bodily-kinesthetic_musical": {
+      "name": "The Embodied Performer",
+      "focus": "Physical expression with musical elements"
+    },
+    "bodily-kinesthetic_interpersonal": {
+      "name": "The Movement Leader",
+      "focus": "Leading groups through physical activities"
+    },
+    "bodily-kinesthetic_intrapersonal": {
+      "name": "The Embodied Self-Developer",
+      "focus": "Personal growth through physical practices"
+    },
+    "bodily-kinesthetic_naturalistic": {
+      "name": "The Environmental Activist",
+      "focus": "Direct physical engagement with natural environments"
+    },
+    "musical_interpersonal": {
+      "name": "The Community Music Maker",
+      "focus": "Using music to build and connect communities"
+    },
+    "musical_intrapersonal": {
+      "name": "The Personal Sound Artist",
+      "focus": "Music for individual expression and reflection"
+    },
+    "musical_naturalistic": {
+      "name": "The Natural Sound Interpreter",
+      "focus": "Musical connection with natural environments"
+    },
+    "interpersonal_intrapersonal": {
+      "name": "The Relational Wisdom Keeper",
+      "focus": "Balancing personal insight with social connection"
+    },
+    "interpersonal_naturalistic": {
+      "name": "The Community Environmental Leader",
+      "focus": "Building community around environmental connection"
+    },
+    "intrapersonal_naturalistic": {
+      "name": "The Solitary Nature Mystic",
+      "focus": "Deep personal connection with natural environments"
+    }
+  }
+}

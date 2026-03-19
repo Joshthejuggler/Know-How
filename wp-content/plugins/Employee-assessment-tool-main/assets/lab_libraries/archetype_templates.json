@@ -1,0 +1,164 @@
+{
+  "Discover": {
+    "titlePatterns": [
+      "Scout {topic} through {method}",
+      "Explore {topic} via {approach}",
+      "Investigate {subject} through {lens}",
+      "Map {domain} using {technique}",
+      "Uncover {area} by {means}"
+    ],
+    "stepTemplates": [
+      [
+        "Define a simple question: \"What don't I know about {topic}?\"",
+        "Collect 3 examples from {roleModelsOrSources}.",
+        "Take notes for 45 minutes using {MI_mode} (e.g., sketch, audio, outline).",
+        "Identify one pattern or connection that surprises you.",
+        "Share your discovery with one trusted person."
+      ],
+      [
+        "Choose one aspect of {topic} that puzzles you.",
+        "Spend 30 minutes observing or researching without judging.",
+        "Document what you notice using your strongest {MI_combination}.",
+        "Ask 3 follow-up questions based on what you discovered.",
+        "Plan one small experiment to test your curiosity."
+      ],
+      [
+        "Set a timer for 20 minutes of pure exploration.",
+        "Use {method} to gather raw information about {topic}.",
+        "Create a simple map or visualization of what you found.",
+        "Identify the most surprising or counterintuitive insight.",
+        "Write a one-sentence summary of your key discovery."
+      ]
+    ],
+    "rationales": [
+      "This builds on your {MI_strengths} while gently exercising your {CDT_growth_area} through low-stakes exploration.",
+      "Your {MI_combination} suggests you learn best through {learning_style}, which this discovery process supports.",
+      "This addresses your {CDT_challenge} by creating a safe container for uncertainty and exploration."
+    ],
+    "successCriteria": [
+      [
+        "Spent at least {timeBlock} actively exploring",
+        "Documented findings using preferred {MI_mode}",
+        "Identified one surprising insight or connection"
+      ],
+      [
+        "Asked at least 3 genuine questions about {topic}",
+        "Created some form of tangible record (notes, sketch, audio)",
+        "Shared discovery with at least one person"
+      ],
+      [
+        "Maintained curiosity without rushing to conclusions",
+        "Used {MI_strengths} effectively in the exploration process",
+        "Planned a logical next step based on findings"
+      ]
+    ]
+  },
+  "Build": {
+    "titlePatterns": [
+      "Prototype a {artifact} in {timeBlock}",
+      "Create a {solution} for {problem}",
+      "Build a {tool} to {purpose}",
+      "Craft a {output} using {approach}",
+      "Develop a {system} for {goal}"
+    ],
+    "stepTemplates": [
+      [
+        "Set constraints: time {timeBlock}, budget ${budget}, risk {riskLevel}.",
+        "Create a first version using your {MI_combo} strengths.",
+        "Test with one small user or use case.",
+        "Invite 1–2 people for feedback focused on {successCriterion}.",
+        "Make one key improvement based on what you learned."
+      ],
+      [
+        "Define the core problem your {artifact} will solve.",
+        "Sketch or outline 3 different approaches using {MI_approach}.",
+        "Choose the simplest version and build it in {timeBlock}.",
+        "Test it yourself first, noting what works and what doesn't.",
+        "Get feedback from someone who represents your target user."
+      ],
+      [
+        "Start with the minimum viable version of {artifact}.",
+        "Use materials or tools that match your {MI_strengths}.",
+        "Build iteratively: make, test, adjust, repeat.",
+        "Focus on one core function rather than many features.",
+        "Document lessons learned for future iterations."
+      ]
+    ],
+    "rationales": [
+      "This leverages your {MI_strengths} for hands-on creation while practicing {CDT_skill} through iterative development.",
+      "Building something tangible suits your {MI_combination} and helps you work through {CDT_challenge} in a concrete way.",
+      "Your {player_type} motivation aligns with this creation-focused approach, especially with the {constraint_focus} you've set."
+    ],
+    "successCriteria": [
+      [
+        "Created a working prototype within {timeBlock}",
+        "Tested the creation with at least one real use case",
+        "Received and incorporated feedback from others"
+      ],
+      [
+        "Stayed within budget and time constraints",
+        "Used {MI_strengths} effectively in the building process",
+        "Produced something tangible that addresses the original problem"
+      ],
+      [
+        "Made at least one iteration based on testing or feedback",
+        "Documented lessons learned for future building",
+        "Shared the creation with at least 2 people"
+      ]
+    ]
+  },
+  "Share": {
+    "titlePatterns": [
+      "Share {result} with {audience}",
+      "Present {creation} to {community}",
+      "Teach {insight} through {medium}",
+      "Demonstrate {solution} via {platform}",
+      "Communicate {discovery} using {format}"
+    ],
+    "stepTemplates": [
+      [
+        "Package your work (1-pager, demo, or 90-sec talk).",
+        "Choose an audience that matches your {solo_group_preference}.",
+        "Share with {audience} and ask 3 specific questions.",
+        "Listen for feedback without defending or explaining.",
+        "Log 3 takeaways and decide: repeat, evolve, or archive."
+      ],
+      [
+        "Identify the core value or insight from your {previous_work}.",
+        "Choose a sharing format that plays to your {MI_strengths}.",
+        "Prepare your share in {timeBlock} or less.",
+        "Find 2-3 people who would genuinely benefit from this insight.",
+        "Follow up with sharers to see if/how they used what you shared."
+      ],
+      [
+        "Create a simple, clear way to communicate your {result}.",
+        "Practice your share once before going live.",
+        "Choose a low-pressure environment for your first share.",
+        "Ask for specific feedback: \"What was most/least useful?\"",
+        "Plan your next iteration based on what you learn."
+      ]
+    ],
+    "rationales": [
+      "Sharing helps you practice {CDT_skill} while using your {MI_strengths} to communicate effectively.",
+      "Your {player_type} style benefits from the feedback and connection that comes through sharing work.",
+      "This addresses your {CDT_challenge} by creating structured social interaction around your ideas and creations."
+    ],
+    "successCriteria": [
+      [
+        "Shared with at least {minimum_audience} people",
+        "Received specific feedback from at least 2 sharers",
+        "Asked follow-up questions to understand impact"
+      ],
+      [
+        "Communicated core message clearly using {MI_approach}",
+        "Stayed within {timeBlock} for preparation and delivery",
+        "Maintained curiosity about audience response rather than defending"
+      ],
+      [
+        "Collected at least 3 specific pieces of feedback",
+        "Identified one way to improve future sharing",
+        "Decided on next steps: repeat, evolve, or move on"
+      ]
+    ]
+  }
+}

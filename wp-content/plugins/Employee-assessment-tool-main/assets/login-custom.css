@@ -1,0 +1,122 @@
+body.login {
+    background-color: #f1f5f9;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body.login div#login h1 a {
+    background-image: none;
+    width: 100%;
+    height: auto;
+    text-indent: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    text-transform: none;
+    margin-bottom: 10px;
+    padding-bottom: 0;
+}
+
+body.login div#login {
+    padding-top: 5%;
+}
+
+.login form {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    padding: 40px;
+}
+
+.login label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.login input[type="text"],
+.login input[type="password"],
+.login input[type="email"] {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #f8fafc;
+    box-shadow: none;
+    font-size: 16px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-weight: 400;
+    color: #334155;
+    transition: all 0.2s ease;
+}
+
+.login input[type="text"]:focus,
+.login input[type="password"]:focus,
+.login input[type="email"]:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: #fff;
+}
+
+.login .button.button-primary {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    text-shadow: none;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    height: auto;
+    line-height: 1.5;
+    width: 100%;
+    margin-top: 10px;
+    transition: all 0.2s ease;
+}
+
+.login .button.button-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.login .message,
+.login .success {
+    border-left: 4px solid #10b981;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    color: #334155;
+}
+
+.login #login_error {
+    border-left: 4px solid #ef4444;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    color: #334155;
+}
+
+.login #nav,
+.login #backtoblog {
+    text-align: center;
+    padding: 0;
+}
+
+.login #nav a,
+.login #backtoblog a {
+    color: #94a3b8;
+    font-size: 13px;
+    transition: color 0.2s;
+}
+
+.login #nav a:hover,
+.login #backtoblog a:hover {
+    color: #2563eb;
+}
+
+/* Hide the "Register For This Site" message box if it's just informational */
+.login .message.register {
+    display: none;
+}

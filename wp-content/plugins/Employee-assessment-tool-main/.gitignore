@@ -1,0 +1,52 @@
+# WordPress specific
+.DS_Store
+*.log
+
+# Debug files
+debug_*.php
+debug_*.txt
+debug-*.php
+debug-*.html
+debug-*.js
+*_debug.txt
+magic_debug.txt
+strain_debug.txt
+
+# Temporary files
+temp_*.php
+create_temp_*.php
+
+# Test files (keep some, exclude specific ones)
+test-*.php
+recalculate_*.php
+
+# Composer vendor directory
+vendor/
+
+# Node modules (if any)
+node_modules/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Temporary admin/testing files
+
+admin-activate.php
+check_pages.php
+create-quiz-page.php
+fix_admin_caps.php
+force-migration.php
+reset-funnel-config.php

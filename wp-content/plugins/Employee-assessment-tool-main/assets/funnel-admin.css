@@ -1,0 +1,272 @@
+/* Funnel Admin Interface Styles */
+
+.mc-funnel-admin {
+    max-width: 1000px;
+}
+
+.mc-funnel-admin-section {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.mc-funnel-admin-section h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.3em;
+    border-bottom: 1px solid #e1e1e1;
+    padding-bottom: 8px;
+}
+
+.mc-funnel-admin-section > p {
+    color: #646970;
+    margin-bottom: 20px;
+}
+
+/* Quiz Steps Section */
+.mc-funnel-steps {
+    margin-top: 16px;
+}
+
+.mc-funnel-step-admin {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+    cursor: move;
+}
+
+.mc-funnel-step-admin:hover {
+    border-color: #0073aa;
+    box-shadow: 0 2px 4px rgba(0, 115, 170, 0.1);
+}
+
+.mc-funnel-step-admin.ui-sortable-helper {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: rotate(2deg);
+}
+
+.mc-funnel-step-header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    gap: 12px;
+}
+
+.mc-funnel-step-drag {
+    font-size: 16px;
+    color: #646970;
+    cursor: grab;
+    user-select: none;
+}
+
+.mc-funnel-step-drag:active {
+    cursor: grabbing;
+}
+
+.mc-funnel-step-number {
+    background: #0073aa;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.mc-funnel-step-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mc-funnel-step-title-input {
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    transition: border-color 0.2s ease;
+}
+
+.mc-funnel-step-title-input:focus {
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+    outline: none;
+}
+
+.mc-funnel-step-meta {
+    color: #646970;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Placeholder Configuration */
+.mc-funnel-placeholder-config {
+    margin-top: 16px;
+}
+
+.mc-funnel-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    cursor: pointer;
+}
+
+.mc-funnel-checkbox-label input[type="checkbox"] {
+    transform: scale(1.1);
+}
+
+.mc-funnel-placeholder-fields {
+    background: #f6f7f7;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 16px;
+    margin-top: 12px;
+}
+
+.mc-funnel-field {
+    margin-bottom: 16px;
+}
+
+.mc-funnel-field:last-child {
+    margin-bottom: 0;
+}
+
+.mc-funnel-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #1d2327;
+}
+
+.mc-funnel-field input[type="text"],
+.mc-funnel-field input[type="url"],
+.mc-funnel-field textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.mc-funnel-field input[type="text"]:focus,
+.mc-funnel-field input[type="url"]:focus,
+.mc-funnel-field textarea:focus {
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+    outline: none;
+}
+
+.mc-funnel-field textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Preview Section */
+#mc-funnel-preview {
+    background: #f6f7f7;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 16px;
+    position: relative;
+}
+
+#mc-funnel-preview .mc-funnel-container {
+    margin: 0;
+}
+
+/* Admin Notices */
+#mc-funnel-admin-notices {
+    margin-bottom: 20px;
+}
+
+#mc-funnel-admin-notices .notice {
+    margin: 0 0 10px 0;
+}
+
+/* Button Overrides */
+.mc-funnel-admin .button {
+    margin-right: 8px;
+}
+
+.mc-funnel-admin .button:last-child {
+    margin-right: 0;
+}
+
+/* Loading States */
+.mc-funnel-admin.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.mc-funnel-admin.loading:after {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    border: 3px solid #0073aa;
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 9999;
+}
+
+/* Responsive Design */
+@media (max-width: 782px) {
+    .mc-funnel-step-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .mc-funnel-step-number {
+        align-self: flex-start;
+    }
+    
+    .mc-funnel-placeholder-fields {
+        padding: 12px;
+    }
+    
+    .mc-funnel-admin .button {
+        display: block;
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    
+    .mc-funnel-admin .button:last-child {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .mc-funnel-admin-section {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .mc-funnel-step-header {
+        padding: 12px;
+    }
+    
+    .mc-funnel-step-title-input {
+        font-size: 14px;
+    }
+}

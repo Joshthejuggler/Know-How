@@ -1,0 +1,301 @@
+/**
+ * Improvements for Workshop/Experiment Cards
+ * This stylesheet enhances the layout and spacing of experiment cards
+ */
+
+/* Experiment Card Enhancements */
+.experiment-card {
+  background: var(--lab-surface);
+  border: 1px solid var(--lab-border);
+  border-radius: var(--lab-radius);
+  box-shadow: var(--lab-shadow);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.experiment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--lab-shadow-lg);
+}
+
+/* Improved Header with Better Spacing */
+.experiment-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--lab-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.experiment-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--lab-text);
+  line-height: 1.4;
+  font-weight: 600;
+  flex: 1;
+}
+
+.archetype-badge {
+  padding: 0.35rem 1rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+/* Improved Body with Better Padding and Spacing */
+.experiment-body {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.experiment-description, 
+.experiment-connection {
+  margin-bottom: 1.25rem;
+}
+
+.experiment-description h4,
+.experiment-connection h4,
+.experiment-steps h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--lab-text);
+  letter-spacing: 0.01em;
+}
+
+/* What You'll Do Section with Better Formatting */
+.experiment-description .experiment-summary {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--lab-text);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Why This Fits You Section with Better Formatting */
+.experiment-connection {
+  background: rgba(59, 130, 246, 0.06);
+  border-left: 3px solid var(--lab-primary);
+  padding: 0.9rem 1rem;
+  margin: 1.25rem 0;
+  border-radius: 0 var(--lab-radius) var(--lab-radius) 0;
+}
+
+.connection-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--lab-text);
+  font-style: italic;
+}
+
+/* Calibration Notes with Better Spacing */
+.experiment-calibration {
+  margin: 1rem 0;
+  padding: 0.6rem 0.8rem;
+  background: rgba(107, 114, 128, 0.06);
+  border-radius: var(--lab-radius);
+  border-left: 2px solid rgba(107, 114, 128, 0.2);
+}
+
+.calibration-note {
+  font-size: 0.8rem;
+  color: var(--lab-text-muted);
+  font-style: italic;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Steps with Improved Spacing */
+.experiment-steps {
+  margin: 1.5rem 0;
+}
+
+.experiment-steps ol {
+  margin: 0.75rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+.experiment-steps li {
+  margin-bottom: 0.8rem;
+  color: var(--lab-text);
+  line-height: 1.5;
+  padding-left: 0.5rem;
+}
+
+.experiment-steps li:last-child {
+  margin-bottom: 0;
+}
+
+/* Experiment Meta with Better Spacing */
+.experiment-meta {
+  border-top: 1px solid var(--lab-border);
+  padding-top: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.experiment-effort {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.effort-time,
+.effort-budget,
+.risk-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--lab-radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.effort-time,
+.effort-budget {
+  background: var(--lab-background);
+  color: var(--lab-text);
+}
+
+/* Success Criteria with Better Spacing */
+.success-criteria {
+  margin: 1.25rem 0 0.5rem 0;
+}
+
+.success-criteria h5 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--lab-text);
+}
+
+.success-criteria ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.success-criteria li {
+  margin-bottom: 0.6rem;
+  color: var(--lab-text);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.success-criteria li:last-child {
+  margin-bottom: 0;
+}
+
+/* Actions Area with Better Spacing */
+.experiment-actions {
+  padding: 1.25rem;
+  background: var(--lab-background);
+  border-top: 1px solid var(--lab-border);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* Button Improvements */
+.lab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--lab-radius);
+  padding: 0.7rem 1.25rem;
+  font-size: 0.9rem;
+}
+
+.lab-btn-primary {
+  background: var(--lab-primary);
+  color: white;
+  border: none;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
+}
+
+.lab-btn-primary:hover {
+  background: var(--lab-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
+}
+
+.lab-btn-secondary {
+  background: white;
+  color: var(--lab-text);
+  border: 1px solid var(--lab-border);
+}
+
+.lab-btn-secondary:hover {
+  background: var(--lab-background);
+  border-color: var(--lab-text-muted);
+  transform: translateY(-1px);
+}
+
+/* Custom BUILD Badge */
+.build {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #10b981;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0 0 0 var(--lab-radius);
+}
+
+/* Mobile Responsiveness Improvements */
+@media (max-width: 768px) {
+  .experiment-card {
+    margin-bottom: 1.25rem;
+  }
+  
+  .experiment-header, 
+  .experiment-body {
+    padding: 1.25rem 1rem;
+  }
+  
+  .experiment-actions {
+    padding: 1rem;
+    flex-direction: column;
+  }
+  
+  .experiment-actions .lab-btn {
+    width: 100%;
+  }
+  
+  .experiment-meta {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+  }
+  
+  .experiment-effort {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .effort-time,
+  .effort-budget,
+  .risk-level {
+    width: 100%;
+    justify-content: center;
+  }
+}

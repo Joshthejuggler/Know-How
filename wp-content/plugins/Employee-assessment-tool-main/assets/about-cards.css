@@ -1,0 +1,35 @@
+/* Shared About Card Styles for all quizzes */
+.quiz-about-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2rem;
+}
+.quiz-about-card h2 {
+  margin: 0 0 1rem 0;
+  color: #1a202c;
+  font-size: 1.75rem;
+}
+.quiz-about-card h3 {
+  margin: 1.5rem 0 0.75rem 0;
+  color: #2d3748;
+  font-size: 1.25rem;
+}
+.quiz-about-card p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: #4a5568;
+}
+.quiz-about-card ul {
+  margin: 0.75rem 0 1.5rem 1.5rem;
+}
+.quiz-about-card li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Separation from surrounding content if inserted near funnel */
+.quiz-about-card + .quiz-funnel-card,
+.quiz-funnel-card + .quiz-about-card {
+  margin-top: 1rem;
+}

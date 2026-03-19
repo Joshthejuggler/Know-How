@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExperimentIterationPanel Test</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="assets/lab-mode.css">
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .test-experiment {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+        .test-log {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.875rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>ExperimentIterationPanel Test</h1>
+        <p>This page tests the iteration panel functionality without WordPress backend.</p>
+        
+        <div class="test-experiment">
+            <h3>Sample Experiment</h3>
+            <p><strong>Title:</strong> Learn creative writing basics</p>
+            <p><strong>Steps:</strong> 1) Read writing guide, 2) Practice daily for 30 minutes, 3) Share one piece</p>
+            <p><strong>Effort:</strong> 5 hours, $0</p>
+            <p><strong>Risk:</strong> Low</p>
+        </div>
+        
+        <button class="test-button" onclick="testOpenModal()">Open Iteration Panel</button>
+        <button class="test-button" onclick="testModalFunctionality()">Test Modal Functions</button>
+        <button class="test-button" onclick="testVersionNavigation()">Test Version Navigation</button>
+        <button class="test-button" onclick="testDebugPanel()">Test Debug Panel</button>
+        <button class="test-button" onclick="clearLog()">Clear Log</button>
+        
+        <div class="test-log" id="test-log">
+            <div>Test log will appear here...</div>
+        </div>
+    </div>
+
+    <script src="assets/lab-mode-iterate.js"></script>
+    
+    <script>
+        // Mock window.labMode for testing
+        window.labMode = {
+            ajaxUrl: '/wp-admin/admin-ajax.php',
+            nonce: 'mock-nonce-for-testing',
+            userId: 1
+        };
+        
+        // Sample experiment data
+        const sampleExperiment = {
+            title: "Learn creative writing basics",
+            archetype: "Discover",
+            rationale: "This builds on your linguistic intelligence while developing creative expression skills.",
+            steps: [
+                "Find and read a comprehensive creative writing guide online",
+                "Practice writing for 30 minutes daily using prompts",
+                "Share one piece with friends or online community for feedback"
+            ],
+            effort: {
+                timeHours: 5,
+                budgetUSD: 0
+            },
+            riskLevel: "Low",
+            successCriteria: [
+                "Complete reading of chosen writing guide",
+                "Write for at least 21 days consistently", 
+                "Receive feedback on at least one piece"
+            ],
+            linkedMI: ["linguistic"],
+            linkedCDT: ["creative-expression"],
+            tags: ["writing", "creativity", "daily-practice"]
+        };
+        
+        const sampleUserContext = {
+            mi_top3: [
+                { key: "linguistic", score: 38, label: "Linguistic" },
+                { key: "logical-mathematical", score: 35, label: "Logical-Mathematical" },
+                { key: "intrapersonal", score: 32, label: "Intrapersonal" }
+            ],
+            cdt_bottom2: [
+                { key: "risk-comfort", score: 24, label: "Risk Comfort" },
+                { key: "social-navigation", score: 26, label: "Social Navigation" }
+            ],
+            curiosities: ["creative writing", "storytelling", "poetry"],
+            roleModels: ["Maya Angelou", "Stephen King", "Ursula K. Le Guin"],
+            constraints: {
+                timePerWeekHours: 5,
+                budget: 50,
+                risk: 30,
+                soloToGroup: 40
+            }
+        };
+        
+        function log(message) {
+            const logEl = document.getElementById('test-log');
+            const time = new Date().toLocaleTimeString();
+            logEl.innerHTML += `<div>[${time}] ${message}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('test-log').innerHTML = '<div>Log cleared...</div>';
+        }
+        
+        function testOpenModal() {
+            log('Testing modal open...');
+            
+            if (typeof window.IterationPanel === 'undefined') {
+                log('❌ ERROR: IterationPanel not loaded!');
+                return;
+            }
+            
+            log('✅ IterationPanel found');
+            
+            try {
+                window.IterationPanel.open(sampleExperiment, 0, sampleUserContext);
+                log('✅ Modal opened successfully');
+            } catch (error) {
+                log('❌ ERROR opening modal: ' + error.message);
+            }
+        }
+        
+        function testModalFunctionality() {
+            log('Testing modal functionality...');
+            
+            if (typeof window.IterationPanel === 'undefined') {
+                log('❌ ERROR: IterationPanel not loaded!');
+                return;
+            }
+            
+            // Test state management
+            log('Current isOpen state: ' + window.IterationPanel.isOpen);
+            log('Current experiment: ' + (window.IterationPanel.currentExperiment ? 'Loaded' : 'None'));
+            
+            // Test user context building
+            const context = window.IterationPanel.getUserContext();
+            log('Generated user context: ' + JSON.stringify(context, null, 2));
+            
+            log('✅ Functionality tests complete');
+        }
+        
+        function testVersionNavigation() {
+            log('Testing version navigation...');
+            
+            if (typeof window.IterationPanel === 'undefined') {
+                log('❌ ERROR: IterationPanel not loaded!');
+                return;
+            }
+            
+            if (!window.IterationPanel.isOpen) {
+                log('❌ Modal is not open. Please open it first.');
+                return;
+            }
+            
+            // Simulate multiple versions by adding fake iterations
+            const fakeVersion2 = {
+                ...sampleExperiment,
+                title: sampleExperiment.title + ' (Refined)',
+                steps: [...sampleExperiment.steps, 'Review and improve based on feedback']
+            };
+            
+            const fakeVersion3 = {
+                ...fakeVersion2,
+                title: fakeVersion2.title + ' (Final)',
+                effort: { timeHours: 3, budgetUSD: 15 }
+            };
+            
+            window.IterationPanel.iterations = [
+                sampleExperiment,
+                fakeVersion2, 
+                fakeVersion3
+            ];
+            window.IterationPanel.currentIteration = 2;
+            
+            // Update breadcrumb to show multiple versions
+            window.IterationPanel.updateBreadcrumb();
+            
+            log('✅ Created 3 versions for testing');
+            log('✅ Try clicking on different version buttons (v1, v2, v3)');
+        }
+        
+        function testDebugPanel() {
+            log('Testing debug panel...');
+            
+            if (typeof window.IterationPanel === 'undefined') {
+                log('❌ ERROR: IterationPanel not loaded!');
+                return;
+            }
+            
+            if (!window.IterationPanel.isOpen) {
+                log('❌ Modal is not open. Please open it first.');
+                return;
+            }
+            
+            // Simulate debug history
+            window.IterationPanel.debugHistory = [
+                {
+                    timestamp: new Date().toLocaleTimeString(),
+                    modifier: { kind: 'Time', value: 'Faster' },
+                    systemPrompt: 'You are an AI coach specializing in iterative refinement of a single experiment. The user will send the current experiment JSON and exactly one modifier. Return a revised version of the SAME experiment...',
+                    userPrompt: 'Current Experiment: {...}\n\nModifier to Apply: {"kind":"Time","value":"Faster"}\n\nUser Context: {...}\n\nApply exactly ONE modification as specified by the modifier.',
+                    changedFields: ['title', 'effort'],
+                    calibrationNotes: 'Reduced time commitment from 5 to 3 hours'
+                },
+                {
+                    timestamp: new Date(Date.now() - 60000).toLocaleTimeString(),
+                    modifier: { kind: 'Cost', value: 'Cheaper' },
+                    systemPrompt: 'You are an AI coach specializing in iterative refinement of a single experiment...',
+                    userPrompt: 'Current Experiment: {...}\n\nModifier to Apply: {"kind":"Cost","value":"Cheaper"}',
+                    changedFields: ['effort', 'steps'],
+                    calibrationNotes: 'Removed budget requirement and replaced paid resources with free alternatives'
+                }
+            ];
+            
+            // Update breadcrumb to show debug button
+            window.IterationPanel.updateBreadcrumb();
+            
+            log('✅ Added fake debug history');
+            log('✅ Debug button should now be visible - click it to see AI request details');
+        }
+        
+        // Mock LabModeApp for testing
+        window.LabModeApp = {
+            updateExperiment: function(index, experiment) {
+                log('✅ LabModeApp.updateExperiment called with index ' + index);
+                log('Updated experiment title: ' + experiment.title);
+                return true;
+            },
+            profileData: {
+                mi_results: sampleUserContext.mi_top3,
+                cdt_results: [...sampleUserContext.cdt_bottom2].reverse()
+            },
+            qualifiers: {
+                curiosity: {
+                    curiosities: sampleUserContext.curiosities,
+                    roleModels: sampleUserContext.roleModels,
+                    constraints: sampleUserContext.constraints
+                }
+            }
+        };
+        
+        // Override AJAX for testing
+        const originalAjax = $.ajax;
+        $.ajax = function(options) {
+            log('🌐 AJAX Request to: ' + (options.url || 'unknown'));
+            log('Action: ' + (options.data.action || 'unknown'));
+            
+            // Mock successful iteration response
+            if (options.data.action === 'mc_lab_iterate') {
+                log('📝 Mocking iteration response...');
+                
+                setTimeout(() => {
+                    const mockResponse = {
+                        success: true,
+                        data: {
+                            experiment: {
+                                ...sampleExperiment,
+                                title: sampleExperiment.title + " (AI Refined)",
+                                rationale: sampleExperiment.rationale + " Updated to focus more on daily practice habits.",
+                                effort: {
+                                    timeHours: 4, // Reduced from 5
+                                    budgetUSD: 10  // Increased from 0
+                                },
+                                _calibrationNotes: "Reduced time commitment and added small budget for writing materials."
+                            },
+                            calibrationNotes: "Adjusted time and budget based on 'Faster' modifier",
+                            changedFields: ["title", "rationale", "effort"],
+                            debug: {
+                                systemPrompt: "You are an AI coach specializing in iterative refinement of a single experiment. The user will send the current experiment JSON and exactly one modifier. Return a revised version of the SAME experiment. Only change what the modifier requires; keep all other fields as stable as possible. Respect safety and user constraints. Be concrete and runnable. Keep steps (3–5), success criteria (2–3).\n\nReturn JSON with: archetype, title, rationale, steps (array), effort (object with timeHours and budgetUSD), riskLevel, successCriteria (array), linkedMI (array), linkedCDT (array), and optionally _calibrationNotes explaining what changed.",
+                                userPrompt: "Current Experiment: " + JSON.stringify(sampleExperiment, null, 2) + "\n\nModifier to Apply: {\"kind\":\"Time\",\"value\":\"Faster\"}\n\nUser Context: " + JSON.stringify(sampleUserContext, null, 2) + "\n\nApply exactly ONE modification as specified by the modifier. Return the full revised experiment as JSON.",
+                                model: "gpt-4o-mini",
+                                requestTime: new Date().toISOString(),
+                                tokenUsage: {
+                                    prompt_tokens: 1240,
+                                    completion_tokens: 320,
+                                    total_tokens: 1560
+                                }
+                            }
+                        }
+                    };
+                    
+                    options.success(mockResponse);
+                    log('✅ Mock iteration response sent');
+                }, 1500);
+                
+                return;
+            }
+            
+            // Fall back to original AJAX for other requests
+            return originalAjax.apply(this, arguments);
+        };
+        
+        // Log initial state
+        $(document).ready(function() {
+            log('🚀 Test page loaded');
+            log('jQuery version: ' + $.fn.jquery);
+            log('IterationPanel available: ' + (typeof window.IterationPanel !== 'undefined'));
+        });
+    </script>
+</body>
+</html>

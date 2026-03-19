@@ -1,0 +1,1162 @@
+:root {
+  --mi-primary-color: #1e40af;
+  --mi-primary-color-dark: #1c358a;
+  --mi-secondary-bg: #f0f4f8;
+  --mi-tertiary-bg: #f9f9f9;
+  --mi-light-gray: #e5e7eb;
+  --mi-medium-gray: #d1d5db;
+  --mi-text-color: #374151;
+  /* Enhanced colors for each intelligence - more harmonious palette */
+  --mi-color-logical: #2563eb;
+  /* Deep blue */
+  --mi-color-linguistic: #059669;
+  /* Emerald green */
+  --mi-color-spatial: #7c3aed;
+  /* Purple */
+  --mi-color-kinesthetic: #dc2626;
+  /* Red */
+  --mi-color-musical: #c026d3;
+  /* Magenta */
+  --mi-color-interpersonal: #0891b2;
+  /* Cyan */
+  --mi-color-intrapersonal: #4338ca;
+  /* Indigo */
+  --mi-color-naturalistic: #16a34a;
+  /* Green */
+  /* Johari window quadrant colors - more professional and harmonious */
+  --johari-open: #10b981;
+  /* Emerald - positive, known strengths */
+  --johari-blind: #f59e0b;
+  /* Amber - caution, feedback needed */
+  --johari-hidden: #8b5cf6;
+  /* Purple - personal, introspective */
+  --johari-unknown: #6b7280;
+  /* Gray - neutral, unexplored */
+}
+
+.quiz-wrapper {
+  max-width: 860px;
+  margin: 2em auto;
+  border: 1px solid var(--mi-light-gray);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1);
+  overflow: hidden;
+  /* Ensures child corners don't poke out */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Vertically center quiz on desktop */
+@media (min-width: 768px) {
+  body.elementor-template-canvas {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+.back-bar {
+  background: #fafbfc;
+  border-bottom: 1px solid #edf0f3;
+  padding: 10px 16px;
+}
+
+.back-bar .back-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #5f6b7a;
+  text-decoration: none;
+}
+
+.back-bar .back-link:hover {
+  color: #2b2f36;
+}
+
+#mi-quiz-container {
+  padding: 2em;
+}
+
+.mi-quiz-card {
+  background: #fff;
+  /* Border, padding, and shadow are now on the wrapper/container */
+  text-align: center
+}
+
+/* Staging intro layout */
+#mi-stage.mi-quiz-card {
+  padding: 1.75em 2em 1.5em;
+  text-align: left;
+}
+
+#mi-stage .stage-intro h3 {
+  margin: 1em 0 0.5em;
+}
+
+#mi-stage .stage-intro ul {
+  margin: 0.25em 0 0 1.5em;
+}
+
+/* Funnel card spacing */
+.quiz-funnel-card .mi-quiz-card {
+  padding: 1.25em 1.5em 1.5em;
+}
+
+/* --- New Button Styles --- */
+.mi-quiz-button {
+  display: inline-block;
+  border: 1px solid transparent;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  /* Pill shape */
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+}
+
+.mi-quiz-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Primary Action Button (e.g., Download) */
+.mi-quiz-button.mi-quiz-button-primary {
+  background-color: #1e40af;
+  color: #fff;
+}
+
+.mi-quiz-button.mi-quiz-button-primary:hover {
+  background-color: #1c358a;
+  color: #fff;
+}
+
+/* Secondary Action Button (e.g., Retake) */
+.mi-quiz-button.mi-quiz-button-secondary {
+  background-color: #f1f3f4;
+  color: #2d3748;
+  border-color: #e2e8f0;
+}
+
+.mi-quiz-button.mi-quiz-button-secondary:hover {
+  background-color: #e2e8f0;
+  color: #1a202c;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Danger Action Button (e.g., Delete) */
+.mi-quiz-button.mi-quiz-button-danger {
+  background-color: transparent;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.mi-quiz-button.mi-quiz-button-danger:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  transform: none;
+  box-shadow: none;
+}
+
+.mi-quiz-button:disabled {
+  background-color: #e2e8f0 !important;
+  color: #a0aec0 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.mi-quiz-button-small {
+  margin-left: 10px;
+  padding: 5px 10px;
+  font-size: 0.8em;
+}
+
+.mi-quiz-question-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  margin-bottom: 1.2em;
+  padding: 0 1em
+}
+
+.mi-quiz-question-text {
+  font-size: 1.2em;
+  color: var(--mi-text-color)
+}
+
+.mi-progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 1em
+}
+
+.mi-progress-container {
+  flex-grow: 1;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden
+}
+
+.mi-progress-bar {
+  width: 0%;
+  height: 8px;
+  background: var(--mi-primary-color);
+  transition: width .3s
+}
+
+.mi-progress-counter {
+  font-size: .9em;
+  color: #555;
+  white-space: nowrap
+}
+
+.mi-quiz-likert-options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px
+}
+
+.mi-quiz-option-wrapper {
+  display: flex;
+  flex-basis: 95px;
+  flex-grow: 1
+}
+
+.mi-quiz-likert-options input[type=radio] {
+  display: none
+}
+
+.mi-quiz-likert-options label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 10px 5px;
+  border: 2px solid var(--mi-medium-gray);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .2s;
+  text-align: center
+}
+
+.mi-quiz-likert-options label:hover {
+  border-color: #9ca3af;
+  transform: translateY(-2px)
+}
+
+.mi-quiz-likert-options input[type=radio]:checked+label {
+  background: var(--mi-primary-color);
+  border-color: var(--mi-primary-color-dark);
+  color: #fff
+}
+
+@media (max-width:600px) {
+  .mi-quiz-question-container {
+    height: 120px
+  }
+
+  .mi-quiz-likert-options {
+    flex-direction: column;
+    gap: 8px
+  }
+
+  .mi-quiz-option-wrapper {
+    flex-basis: auto;
+    flex-grow: 0;
+    width: 100%
+  }
+
+  .mi-quiz-likert-options label {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 15px;
+    min-height: 0;
+    text-align: center
+  }
+
+  .results-actions-container {
+    flex-direction: column;
+    align-items: stretch;
+    /* Make buttons full width for a cleaner mobile look */
+  }
+
+  .site-branding {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.mi-quiz-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin-top: 2em;
+  /* This adds the space above the buttons */
+}
+
+@media (max-width: 600px) {
+  .mi-quiz-likert-options .likert-num {
+    margin-right: 15px;
+  }
+}
+
+.mi-age-options {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.mi-form-field {
+  margin-bottom: 1em;
+}
+
+.mi-form-field label {
+  display: block;
+  margin-bottom: .25em;
+  font-weight: bold;
+  text-align: left;
+}
+
+.mi-form-field input[type="text"],
+.mi-form-field input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* --- New Styles from Refactoring --- */
+.results-main-header {
+  padding: 0 0 1.5em 0;
+  margin-bottom: 1.5em;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: center;
+  /* Center the branding */
+}
+
+/* Make it inline-flex to allow centering */
+.site-branding {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.site-logo {
+  max-height: 100px;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+.site-title {
+  font-size: 1.8em;
+  font-weight: 600;
+  color: #1a202c;
+  line-height: 1.2;
+}
+
+/* Results Header */
+.mi-results-header {
+  text-align: center;
+  padding: 1em 1em 0;
+}
+
+.mi-results-header h1 {
+  margin: 0 0 0.1em 0;
+  font-size: 2em;
+}
+
+.mi-results-header h2 {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.mi-results-metadata {
+  font-size: 0.8em;
+  color: #9ca3af;
+  margin-top: 0.5em;
+}
+
+/* General & Layout */
+.mi-section-title {
+  margin-top: 0;
+}
+
+.mi-quiz-notice {
+  font-size: .8em;
+  color: #666;
+  margin-top: 1.5em;
+  max-width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#mi-dev-tools,
+#cdt-dev-tools,
+#bartle-dev-tools {
+  border: 1px dashed #bbb;
+  padding: .75em;
+  border-radius: 8px;
+  background: #fffdf7;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#mi-quiz-intermission {
+  text-align: center;
+  padding: 1.5em;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+#mi-top3-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 1em 0;
+  font-weight: bold;
+}
+
+#mi-quiz-results {
+  margin-top: 2em;
+}
+
+/* Registration Form */
+#mi-magic-register-form {
+  max-width: 360px;
+  margin: 1.5em auto 0;
+}
+
+.form-submit-wrapper {
+  text-align: center;
+  margin-top: 1em;
+}
+
+.form-status {
+  margin-top: 1em;
+  text-align: center;
+}
+
+.form-secondary-action {
+  text-align: center;
+  margin-top: 1.5em;
+}
+
+/* Results Sections */
+.mi-results-section {
+  padding: 2em;
+  border-radius: 8px;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  /* Add bottom margin for spacing in PDF and on screen */
+  page-break-inside: avoid;
+  /* Try to prevent sections from splitting across pages */
+}
+
+.mi-results-section:first-of-type {
+  margin-top: 1em;
+}
+
+.mi-results-section.bg-secondary {
+  background: var(--mi-secondary-bg);
+}
+
+.mi-results-section.bg-tertiary {
+  background: var(--mi-tertiary-bg);
+}
+
+.mi-results-section.bordered {
+  border: 1px solid #eee;
+}
+
+.mi-results-section>.mi-section-title {
+  margin-top: 0;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mi-results-section p.summary {
+  font-size: 1.1em;
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.mi-results-section ol,
+.mi-results-section ul {
+  padding-left: 2em;
+  margin-top: 1em;
+}
+
+.mi-results-section li {
+  margin-bottom: 1.25em;
+}
+
+.mi-results-section em {
+  color: #555;
+}
+
+.mi-results-section .leverage-title,
+.mi-results-section .growth-title {
+  margin-top: .5em;
+  padding-left: 1em;
+  font-size: .9em;
+  color: #333;
+  font-weight: bold;
+}
+
+.mi-results-section .leverage-list,
+.mi-results-section .growth-list {
+  margin: .25em 0 0 1em;
+  font-size: .9em;
+  color: #555;
+}
+
+.mi-results-section .career-item,
+.mi-results-section .hobby-item {
+  margin: 0 0 .25em 1em;
+}
+
+.mi-results-section .hobby-item {
+  margin-bottom: 1.25em;
+}
+
+.mi-detailed-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5em;
+}
+
+.mi-subsection-title {
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+  padding-left: 0.75em;
+  border-left: 4px solid #ccc;
+}
+
+.detailed-score {
+  font-size: 0.9em;
+}
+
+.mi-strengths-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1em;
+}
+
+.mi-strength-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1em;
+  margin-bottom: 1em;
+  /* Add margin for reliable PDF spacing */
+}
+
+.mi-strength-card h4 {
+  margin: 0 0 0.25em 0;
+}
+
+.mi-strength-card p {
+  margin: 0 0 0.5em 0;
+  font-size: 0.9em;
+}
+
+.mi-career-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1em;
+}
+
+.mi-career-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1.5em;
+}
+
+.mi-career-card-header {
+  padding: 0.75em 1em;
+  color: #fff;
+}
+
+.mi-career-card-header h4 {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.mi-career-card-body {
+  padding: 1em;
+}
+
+.mi-career-card-body p {
+  font-size: 0.9em;
+  margin: 0 0 0.5em 0;
+}
+
+.mi-career-card-body ul {
+  margin: 0 0 1em 1.2em;
+  padding: 0;
+  font-size: 0.9em;
+}
+
+.mi-career-card-body li {
+  margin-bottom: 0.25em;
+}
+
+/* Skills Section */
+.mi-skills-intro {
+  text-align: center;
+  font-size: 1.1em;
+  margin-bottom: 1.5em;
+  color: #4a5568;
+}
+
+.mi-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1em;
+}
+
+.mi-skill-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.2em;
+  margin-bottom: 1em;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.mi-skill-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.accordion-content-wrapper {
+  padding: 1em 0;
+}
+
+.results-actions-container {
+  text-align: center;
+  margin-top: 1.5em;
+  display: flex;
+  gap: 1em;
+  justify-content: center;
+}
+
+/* Styles for PDF Export */
+.pdf-export-container {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 800px;
+  /* A reasonable width for letter paper with margins */
+  background: #fff;
+}
+
+.pdf-title-page {
+  text-align: center;
+  padding: 2em 0;
+  /* Adjust padding for continuous flow */
+  /* page-break-after: always; */
+  /* REMOVED to create a single continuous document */
+}
+
+/* Progress Bar in Results */
+.bar-wrapper {
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.bar-inner {
+  height: 100%;
+  transition: width 0.5s ease-in-out;
+}
+
+/* Color-coded bars */
+.bar-inner.bar-logical {
+  background-color: var(--mi-color-logical);
+}
+
+.bar-inner.bar-linguistic {
+  background-color: var(--mi-color-linguistic);
+}
+
+.bar-inner.bar-spatial {
+  background-color: var(--mi-color-spatial);
+}
+
+.bar-inner.bar-kinesthetic {
+  background-color: var(--mi-color-kinesthetic);
+}
+
+.bar-inner.bar-musical {
+  background-color: var(--mi-color-musical);
+}
+
+.bar-inner.bar-interpersonal {
+  background-color: var(--mi-color-interpersonal);
+}
+
+.bar-inner.bar-intrapersonal {
+  background-color: var(--mi-color-intrapersonal);
+}
+
+.bar-inner.bar-naturalistic {
+  background-color: var(--mi-color-naturalistic);
+}
+
+/* Scenario Cards for New Triad/Pair Display */
+.mi-scenarios-intro {
+  text-align: center;
+  font-size: 1.1em;
+  margin-bottom: 1.5em;
+  color: #4a5568;
+}
+
+.mi-scenario-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5em;
+  margin-bottom: 1.5em;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mi-scenario-card.triad-scenario {
+  border-left: 4px solid var(--mi-primary-color);
+}
+
+.mi-scenario-card.pair-scenario {
+  border-left: 4px solid var(--mi-color-interpersonal);
+}
+
+.mi-scenario-title {
+  margin: 0 0 1em 0;
+  font-size: 1.2em;
+  color: #1a202c;
+  font-weight: 600;
+}
+
+.mi-scenario-subtitle {
+  margin: 0 0 0.75em 0;
+  font-size: 1em;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.mi-scenario-statements {
+  margin: 0;
+}
+
+.mi-scenario-statement {
+  margin: 0 0 0.75em 0;
+  line-height: 1.5;
+  font-size: 0.95em;
+  color: #4a5568;
+}
+
+.mi-scenario-statement:last-child {
+  margin-bottom: 0;
+}
+
+.mi-pair-scenarios {
+  margin-top: 1.5em;
+}
+
+.mi-pairs-title {
+  margin: 0 0 1em 0;
+  font-size: 1.1em;
+  color: #2d3748;
+  font-weight: 600;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Mobile responsiveness for scenarios */
+@media (max-width: 600px) {
+  .mi-scenario-card {
+    padding: 1em;
+    margin-bottom: 1em;
+  }
+
+  .mi-scenarios-intro {
+    font-size: 1em;
+    margin-bottom: 1em;
+  }
+}
+
+/* Admin */
+.miq-subs-checkbox-col {
+  width: 28px;
+}
+
+/* ===== LAB MODE STYLES ===== */
+
+/* Form Sections and Fields */
+.mi-form-section {
+  margin-bottom: 2em;
+  padding: 1.5em;
+  background: var(--mi-secondary-bg);
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.mi-form-section h3 {
+  margin-top: 0;
+  margin-bottom: 1em;
+  color: #1a202c;
+  font-size: 1.2em;
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5em;
+}
+
+/* Input Groups with Quick-Select Buttons */
+.mi-input-group {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+
+.mi-input-group input {
+  flex: 1;
+}
+
+.mi-quick-select-btn {
+  background: var(--mi-primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.mi-quick-select-btn:hover {
+  background: var(--mi-primary-color-dark);
+  transform: scale(1.1);
+}
+
+.mi-form-field small {
+  color: #6b7280;
+  font-size: 0.85em;
+  margin-top: 0.25em;
+  display: block;
+}
+
+/* CDT Challenge Options */
+.mi-cdt-dimension {
+  margin-bottom: 1.5em;
+}
+
+.mi-cdt-dimension-title {
+  font-size: 1em;
+  font-weight: 600;
+  margin-bottom: 0.75em;
+  color: var(--mi-primary-color);
+}
+
+.mi-cdt-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.mi-cdt-option {
+  display: block;
+  cursor: pointer;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1em;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.mi-cdt-option:hover {
+  border-color: var(--mi-primary-color);
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
+}
+
+.mi-cdt-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.mi-cdt-option input[type="radio"]:checked+.mi-cdt-option-content {
+  color: var(--mi-primary-color);
+  font-weight: 600;
+}
+
+.mi-cdt-option input[type="radio"]:checked+.mi-cdt-option-content::before {
+  content: "✓";
+  position: absolute;
+  right: 0.75em;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mi-primary-color);
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.mi-cdt-option-content {
+  position: relative;
+  padding-right: 2em;
+}
+
+.mi-cdt-option-text {
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Form Actions */
+.mi-form-actions {
+  text-align: center;
+  padding-top: 1.5em;
+  margin-top: 1.5em;
+  border-top: 1px solid #e2e8f0;
+}
+
+.form-validation-message {
+  display: none;
+  margin-top: 1em;
+  padding: 0.75em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.form-validation-message.error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* Experiments Container */
+.mi-experiments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mi-experiments-header h3 {
+  margin: 0;
+  color: #1a202c;
+  font-size: 1.3em;
+}
+
+.mi-experiments-actions {
+  display: flex;
+  gap: 0.5em;
+}
+
+/* Experiment Cards */
+.mi-experiment-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 1.5em;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mi-experiment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mi-experiment-header {
+  padding: 1em 1.5em;
+  background: var(--mi-secondary-bg);
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mi-experiment-title {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.mi-experiment-intelligence {
+  background: var(--mi-primary-color);
+  color: white;
+  padding: 0.25em 0.75em;
+  border-radius: 9999px;
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.mi-experiment-body {
+  padding: 1.5em;
+}
+
+.mi-experiment-rationale {
+  margin: 0 0 1em 0;
+  line-height: 1.5;
+  color: #4a5568;
+}
+
+.mi-experiment-meta {
+  display: flex;
+  gap: 1em;
+  font-size: 0.9em;
+  color: #6b7280;
+  margin-bottom: 1em;
+}
+
+.mi-experiment-effort,
+.mi-experiment-risk {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.mi-experiment-actions {
+  padding: 1em 1.5em;
+  background: #f9fafb;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 0.75em;
+}
+
+/* Running Experiment View */
+.mi-running-experiment-content {
+  padding: 1.5em;
+}
+
+.mi-experiment-section {
+  margin-bottom: 2em;
+}
+
+.mi-experiment-section h4 {
+  margin: 0 0 1em 0;
+  color: #1a202c;
+  font-size: 1.1em;
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5em;
+}
+
+.mi-experiment-steps {
+  padding-left: 1.5em;
+  margin: 0;
+}
+
+.mi-experiment-steps li {
+  margin-bottom: 1em;
+  line-height: 1.5;
+}
+
+.mi-experiment-criteria {
+  padding-left: 1.5em;
+  margin: 0;
+}
+
+.mi-experiment-criteria li {
+  margin-bottom: 0.5em;
+  line-height: 1.4;
+}
+
+.mi-experiment-details p {
+  margin: 0.5em 0;
+}
+
+/* Mobile Responsive Styles for Lab Mode */
+@media (max-width: 600px) {
+  .mi-form-section {
+    padding: 1em;
+    margin-bottom: 1.5em;
+  }
+
+  .mi-experiments-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1em;
+  }
+
+  .mi-experiments-actions {
+    flex-direction: column;
+  }
+
+  .mi-experiment-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75em;
+    text-align: center;
+  }
+
+  .mi-experiment-actions {
+    flex-direction: column;
+  }
+
+  .mi-cdt-options {
+    gap: 0.75em;
+  }
+
+  .mi-cdt-option {
+    padding: 0.75em;
+  }
+
+  .mi-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mi-quick-select-btn {
+    align-self: center;
+    margin-top: 0.5em;
+  }
+}
+
+/* Dev Tools Styling */
+#mi-dev-tools,
+#cdt-dev-tools,
+#bartle-dev-tools {
+  border: 2px dashed #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background: #fff9c4;
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+  row-gap: 15px;
+}
+
+#mi-dev-tools button,
+#cdt-dev-tools button,
+#bartle-dev-tools button {
+  margin-bottom: 0;
+  /* Let gap handle spacing */
+}
