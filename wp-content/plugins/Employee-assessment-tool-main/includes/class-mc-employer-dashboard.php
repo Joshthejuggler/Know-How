@@ -224,6 +224,8 @@ class MC_Employer_Dashboard
 
                 $subject = "You've been invited to join " . $company_name . "'s Assessment Platform";
                 $headers = ['Content-Type: text/html; charset=UTF-8'];
+                $logo_id = get_user_meta($user_id, 'mc_company_logo_id', true);
+                $logo_url = $logo_id ? wp_get_attachment_url($logo_id) : '';
 
                 // Modern HTML email with dark mode support
                 $message = '
@@ -241,8 +243,6 @@ class MC_Employer_Dashboard
                             .email-card { background-color: #1e293b !important; border: 1px solid #334155 !important; }
                             .email-text { color: #e2e8f0 !important; }
                             .email-text-secondary { color: #94a3b8 !important; }
-                            .email-code-box { background-color: #334155 !important; border-color: #475569 !important; }
-                            .email-code { color: #e2e8f0 !important; }
                             .email-footer { background-color: #1e293b !important; border-top-color: #334155 !important; }
                             .email-footer-text { color: #64748b !important; }
                         }
@@ -256,6 +256,7 @@ class MC_Employer_Dashboard
                                     <!-- Header -->
                                     <tr>
                                         <td style="background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); padding: 40px 40px 30px; text-align: center;">
+                                            ' . ($logo_url ? '<img src="' . esc_url($logo_url) . '" alt="' . esc_attr($company_name) . '" style="max-height: 60px; max-width: 200px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;">' : '') . '
                                             <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em;">You\'re Invited!</h1>
                                             <p style="margin: 12px 0 0; font-size: 16px; color: rgba(255, 255, 255, 0.95);">Join Your Team\'s Assessment Platform</p>
                                         </td>
@@ -268,13 +269,10 @@ class MC_Employer_Dashboard
                                             
                                             <p class="email-text-secondary" style="margin: 0 0 24px; font-size: 16px; color: #475569; line-height: 1.6;"><strong>' . esc_html($company_name) . '</strong> has invited you to discover your unique strengths and accelerate your professional development through comprehensive assessments.</p>
                                             
+                                            <p class="email-text-secondary" style="margin: 0 0 24px; font-size: 16px; color: #475569; line-height: 1.6;">To get started, you\'ll need to create a unique profile. Click the button below and follow the steps to set up your account.</p>
+                                            
                                             <div style="margin: 32px 0; text-align: center;">
                                                 <a href="' . esc_url($invite_link) . '" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">Start Your Assessment →</a>
-                                            </div>
-                                            
-                                            <div class="email-code-box" style="background-color: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 8px; padding: 20px; margin: 24px 0; text-align: center;">
-                                                <p style="margin: 0 0 8px; font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Your Team Invite Code</p>
-                                                <p class="email-code" style="margin: 0; font-size: 28px; font-weight: 800; color: #2563eb; letter-spacing: 3px; font-family: monospace;">' . esc_html($share_code) . '</p>
                                             </div>
                                             
                                             <div style="background-color: #f0f9ff; border-left: 4px solid #2563eb; padding: 16px; margin: 24px 0; border-radius: 4px;">
@@ -286,7 +284,7 @@ class MC_Employer_Dashboard
                                                 </ul>
                                             </div>
                                             
-                                            <p class="email-text-secondary" style="margin: 20px 0 0; font-size: 14px; color: #64748b; text-align: center;">Takes about 15 minutes • 100% confidential</p>
+                            <p class="email-text-secondary" style="margin: 20px 0 0; font-size: 14px; color: #64748b; text-align: center;">Takes about 60 minutes • 100% confidential</p>
                                         </td>
                                     </tr>
                                     

@@ -154,7 +154,7 @@ class MC_Quiz_Dashboard
                 <div class="mc-dashboard-header-row">
                     <div>
                         <h1>My Assessment Dashboard</h1>
-                        <p class="mc-dashboard-intro">Track your progress and view your results below.</p>
+                        <p class="mc-dashboard-intro">Track your progress and complete your assessments below.</p>
                     </div>
                     <?php
                     // Load quiz question files to access category data
@@ -359,10 +359,12 @@ class MC_Quiz_Dashboard
                             </style>
                             <div class="mc-dashboard-grid"
                                 style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
-                                <?php foreach ($config['steps'] as $slug): ?>
-                                    <?php
+                                <?php
+                                $prev_completed = true; // First quiz is always unlocked
+                                foreach ($config['steps'] as $slug):
                                     $title = $config['titles'][$slug] ?? ucfirst(str_replace('-', ' ', $slug));
                                     $is_completed = !empty($completion_status[$slug]);
+                                    $is_locked = !$is_completed && !$prev_completed;
                                     $url = MC_Funnel::get_step_url($slug);
 
                                     // Determine Icon
@@ -376,15 +378,17 @@ class MC_Quiz_Dashboard
                                     elseif ($slug === 'johari-mi-quiz')
                                         $icon = '🪟';
                                     ?>
-                                    <div class="mc-dashboard-card <?php echo $is_completed ? 'completed' : ''; ?>"
-                                        style="width: 100%; box-sizing: border-box;">
+                                    <div class="mc-dashboard-card <?php echo $is_completed ? 'completed' : ($is_locked ? 'locked' : ''); ?>"
+                                        style="width: 100%; box-sizing: border-box;<?php echo $is_locked ? ' opacity: 0.55; pointer-events: none;' : ''; ?>">
                                         <div class="mc-card-header">
                                             <div class="mc-card-title-group">
-                                                <div class="mc-card-icon"><?php echo $icon; ?></div>
+                                                <div class="mc-card-icon"><?php echo $is_locked ? '🔒' : $icon; ?></div>
                                                 <div class="mc-card-title-text">
                                                     <h3><?php echo esc_html($title); ?></h3>
                                                     <?php if ($is_completed): ?>
                                                         <span class="mc-card-status-badge completed">Completed</span>
+                                                    <?php elseif ($is_locked): ?>
+                                                        <span class="mc-card-status-badge pending">Locked</span>
                                                     <?php else: ?>
                                                         <span class="mc-card-status-badge pending">Not Started</span>
                                                     <?php endif; ?>
@@ -392,79 +396,11 @@ class MC_Quiz_Dashboard
                                             </div>
                                         </div>
 
-                                        <?php if ($is_completed): ?>
-                                            <div class="mc-card-summary">
-                                                <?php
-                                                // MI Quiz Summary
-                                                if ($slug === 'mi-quiz') {
-                                                    $mi_results = get_user_meta($user_id, 'miq_quiz_results', true);
-                                                    if (!empty($mi_results['top3']) && isset($mi_categories)) {
-                                                        echo '<span class="mc-summary-label">Top Intelligences</span>';
-                                                        echo '<div class="mc-tag-group">';
-                                                        foreach (array_slice($mi_results['top3'], 0, 3) as $s) {
-                                                            $label = $mi_categories[$s] ?? ucfirst(str_replace('-', ' ', $s));
-                                                            echo '<span class="mc-tag">' . esc_html($label) . '</span>';
-                                                        }
-                                                        echo '</div>';
-                                                    }
-                                                }
-                                                // CDT Quiz Summary
-                                                elseif ($slug === 'cdt-quiz') {
-                                                    $cdt_results = get_user_meta($user_id, 'cdt_quiz_results', true);
-                                                    if (!empty($cdt_results['sortedScores']) && isset($cdt_categories)) {
-                                                        $top_cdt = $cdt_results['sortedScores'][0][0] ?? '';
-                                                        $bottom_cdt = end($cdt_results['sortedScores'])[0] ?? '';
-                                                        $top_label = $cdt_categories[$top_cdt] ?? ucfirst(str_replace('-', ' ', $top_cdt));
-                                                        $bottom_label = $cdt_categories[$bottom_cdt] ?? ucfirst(str_replace('-', ' ', $bottom_cdt));
-
-                                                        echo '<span class="mc-summary-label">Resilience Snapshot</span>';
-                                                        echo '<div class="mc-tag-group">';
-                                                        echo '<span class="mc-tag strength">💪 Strength: ' . esc_html($top_label) . '</span>';
-                                                        echo '<span class="mc-tag growth">🌱 Growth: ' . esc_html($bottom_label) . '</span>';
-                                                        echo '</div>';
-                                                    }
-                                                }
-                                                // Bartle Quiz Summary
-                                                elseif ($slug === 'bartle-quiz') {
-                                                    $bartle_results = get_user_meta($user_id, 'bartle_quiz_results', true);
-                                                    if (!empty($bartle_results['sortedScores'])) {
-                                                        $primary_type = $bartle_results['sortedScores'][0][0] ?? '';
-                                                        $type_label = $bartle_categories[$primary_type] ?? ucfirst($primary_type);
-
-                                                        echo '<span class="mc-summary-label">Core Motivation</span>';
-                                                        echo '<div class="mc-tag-group">';
-                                                        echo '<span class="mc-tag">' . esc_html($type_label) . '</span>';
-                                                        echo '</div>';
-
-                                                        if (isset($bartle_descriptions[$primary_type])) {
-                                                            echo '<div class="mc-description">' . esc_html($bartle_descriptions[$primary_type]) . '</div>';
-                                                        }
-                                                    }
-                                                }
-                                                // Johari Window Summary
-                                                elseif ($slug === 'johari-mi-quiz') {
-                                                    $johari = get_user_meta($user_id, 'johari_mi_profile', true);
-                                                    if (is_array($johari)) {
-                                                        $j_open = isset($johari['open']) ? count((array) $johari['open']) : 0;
-                                                        $j_blind = isset($johari['blind']) ? count((array) $johari['blind']) : 0;
-                                                        $j_hidden = isset($johari['hidden']) ? count((array) $johari['hidden']) : 0;
-                                                        $j_unknown = isset($johari['unknown']) ? count((array) $johari['unknown']) : 0;
-
-                                                        echo '<span class="mc-summary-label">Window Quadrants</span>';
-                                                        echo '<div class="mc-tag-group">';
-                                                        echo '<span class="mc-tag">Open: ' . $j_open . '</span>';
-                                                        echo '<span class="mc-tag">Blind: ' . $j_blind . '</span>';
-                                                        echo '<span class="mc-tag">Hidden: ' . $j_hidden . '</span>';
-                                                        echo '<span class="mc-tag">Unknown: ' . $j_unknown . '</span>';
-                                                        echo '</div>';
-                                                    }
-                                                }
-                                                ?>
-                                            </div>
-                                        <?php endif; ?>
 
                                         <div class="mc-card-actions">
-                                            <?php if ($is_completed && $linked_employer_id): ?>
+                                            <?php if ($is_locked): ?>
+                                                <span class="mc-button small disabled">Complete previous assessment first</span>
+                                            <?php elseif ($is_completed && $linked_employer_id): ?>
                                                 <!-- Employees don't see View Results -->
                                             <?php elseif ($url): ?>
                                                 <a href="<?php echo esc_url($url); ?>" class="mc-button small">
@@ -475,7 +411,10 @@ class MC_Quiz_Dashboard
                                             <?php endif; ?>
                                         </div>
                                     </div>
-                                <?php endforeach; ?>
+                                <?php
+                                    $prev_completed = $is_completed;
+                                endforeach;
+                                ?>
                             </div>
                         </div>
 

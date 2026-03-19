@@ -511,6 +511,8 @@ class MC_Employer_Onboarding
 
                     // Send invites
                     $company_name = get_user_meta($user_id, 'mc_company_name', true) ?: 'Our Company';
+                    $logo_id = get_user_meta($user_id, 'mc_company_logo_id', true);
+                    $logo_url = $logo_id ? wp_get_attachment_url($logo_id) : '';
                     $subject = "You've been invited to join " . $company_name . "'s Assessment Platform";
                     $headers = ['Content-Type: text/html; charset=UTF-8'];
 
@@ -559,22 +561,18 @@ class MC_Employer_Onboarding
                         <body>
                             <div class='email-container'>
                                 <div class='email-header'>
+                                    " . ($logo_url ? "<img src='" . esc_url($logo_url) . "' alt='" . esc_attr($company_name) . "' style='max-height: 60px; max-width: 200px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto;'>" : "") . "
                                     <h1>The Science of Teamwork</h1>
                                 </div>
                                 <div class='email-body'>
                                     <h2>" . $greeting . "</h2>
                                     <p>You have been invited by <strong>" . esc_html($company_name) . "</strong> to take your employee assessments.</p>
                                     <p>These assessments are designed to help uncover your unique strengths, working style, and potential for growth.</p>
+                                    <p>To get started, you'll need to create a unique profile. Click the button below and follow the steps to set up your account.</p>
                                     
                                     <div style='text-align: center; margin: 30px 0;'>
                                         <a href='" . esc_url($invite_link) . "' class='btn'>Start Your Assessment</a>
                                     </div>
-
-                                    <div class='invite-code-box'>
-                                        <span class='invite-code-label'>Your Team Invite Code</span>
-                                        <span class='invite-code'>" . esc_html($share_code) . "</span>
-                                    </div>
-                                    <p style='font-size: 14px; color: #64748b; text-align: center;'>If you are asked for a code during registration, please use the code above.</p>
 
                                     <p class='alt-link'>If the button above doesn't work, copy and paste this link into your browser:<br>
                                     <a href='" . esc_url($invite_link) . "'>" . esc_url($invite_link) . "</a></p>
@@ -591,11 +589,18 @@ class MC_Employer_Onboarding
                     }
                 }
 
-                wp_redirect(add_query_arg('step', 3));
-
                 // Set employer status to active
                 update_user_meta($user_id, 'mc_employer_status', 'active');
 
+                // Redirect straight to the dashboard (skip completion screen)
+                $dashboard_url = home_url('/employer-dashboard/');
+                if (class_exists('MC_Funnel')) {
+                    $found = MC_Funnel::find_page_by_shortcode('mc_employer_dashboard');
+                    if ($found) {
+                        $dashboard_url = $found;
+                    }
+                }
+                wp_redirect($dashboard_url);
                 exit;
             }
         }

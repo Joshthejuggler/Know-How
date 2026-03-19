@@ -183,7 +183,7 @@ class MC_Landing_Pages
                 <div class="mc-container">
                     <div class="mc-stats-grid">
                         <div class="mc-stat-item">
-                            <div class="mc-stat-number">4</div>
+                            <div class="mc-stat-number">3</div>
                             <div class="mc-stat-label">Psychometric Assessments</div>
                         </div>
                         <div class="mc-stat-item">
@@ -237,7 +237,7 @@ class MC_Landing_Pages
                 <div class="mc-container">
                     <div class="mc-section-header">
                         <h2>The Assessments</h2>
-                        <p class="mc-section-subtitle">Four powerful tools to understand your team's unique profile</p>
+                        <p class="mc-section-subtitle">Three powerful tools to understand your team's unique profile</p>
                     </div>
                     <div class="mc-assessments-grid">
                         <div class="mc-assessment-card">
@@ -283,22 +283,6 @@ class MC_Landing_Pages
                                 <li>Uncover core drivers</li>
                                 <li>Tailor incentives effectively</li>
                                 <li>Boost engagement</li>
-                            </ul>
-                        </div>
-                        <div class="mc-assessment-card">
-                            <div class="mc-card-icon mc-icon-johari">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                                    <line x1="12" y1="3" x2="12" y2="21"></line>
-                                </svg>
-                            </div>
-                            <h3>Johari Window</h3>
-                            <p class="mc-card-description">Corroborates their Multiple Intelligences profile.</p>
-                            <ul class="mc-card-benefits">
-                                <li>Validate self-perception</li>
-                                <li>Reveal blind spots</li>
-                                <li>Enhance self-awareness</li>
                             </ul>
                         </div>
                     </div>
@@ -1418,7 +1402,7 @@ class MC_Landing_Pages
                                     <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
                                     <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
                                 </svg>
-                                <span>15 min to complete</span>
+<span>60 min to complete</span>
                             </div>
                             <div class="mc-stat-item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1533,7 +1517,7 @@ class MC_Landing_Pages
                             <h3>Core Motivations</h3>
                             <p class="mc-card-description">Reveal what makes work fulfilling for you</p>
                             <ul class="mc-card-benefits">
-                                <li>Discover if you're an Achiever, Explorer, Socializer, or Killer</li>
+<li>Discover if you're an Achiever, Explorer, Socializer, or Hunter</li>
                                 <li>Design a workday that aligns with your motivation</li>
                                 <li>Find roles and projects that energize you</li>
                             </ul>
@@ -1611,7 +1595,7 @@ class MC_Landing_Pages
                                 <a href="<?php echo esc_url($button_url); ?>"
                                     class="mc-button mc-button-primary mc-button-large"><?php echo esc_html($button_text); ?></a>
                             </div>
-                            <p class="mc-cta-note">Completely confidential • 15 minutes • Results shared with you first</p>
+<p class="mc-cta-note">Completely confidential • 60 minutes • Results shared with you first</p>
                         <?php else: ?>
                             <h2>Ready to Unlock Your Potential?</h2>
                             <p class="mc-cta-subtitle">Join thousands discovering their unique strengths and accelerating their
@@ -1620,7 +1604,7 @@ class MC_Landing_Pages
                                 <a href="<?php echo esc_url($button_url); ?>"
                                     class="mc-button mc-button-primary mc-button-large"><?php echo esc_html($button_text); ?></a>
                             </div>
-                            <p class="mc-cta-note">Free to use • 15 minutes • Completely confidential</p>
+<p class="mc-cta-note">Free to use • 60 minutes • Completely confidential</p>
                         <?php endif; ?>
                     </div>
                 </div>
