@@ -2278,8 +2278,8 @@ class MC_Employer_Dashboard
                                 // Merge fetched data
                                 data.detailed_answers = result.data.detailed_answers;
                                 // Ensure strain_results is also up to date if needed
-                                if (result.data.strain_breakdown) {
-                                    data.strain_results = result.data.strain_breakdown;
+                            if (result.data.strain_results) {
+                                    data.strain_results = result.data.strain_results;
                                 }
                                 // Re-render with full data
                                 openStrainDetailsModal(data);

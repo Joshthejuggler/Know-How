@@ -266,6 +266,11 @@ class MC_Super_Admin
                                     <tr data-employer-id="<?php echo esc_attr($employer->ID); ?>">
                                         <td>
                                             <strong><?php echo esc_html($company_name ?: 'N/A'); ?></strong>
+                                            <?php
+                                            $invite_code = get_user_meta($employer->ID, 'mc_employer_invite_code', true);
+                                            if ($invite_code): ?>
+                                                <br><code class="mc-invite-code-display" title="Click to copy" style="cursor:pointer; font-size: 0.8em; color: #6366f1; background: #eef2ff; padding: 2px 6px; border-radius: 3px;" onclick="navigator.clipboard.writeText('<?php echo esc_attr($invite_code); ?>'); this.textContent='Copied!'; setTimeout(() => this.textContent='<?php echo esc_attr($invite_code); ?>', 1500);"><?php echo esc_html($invite_code); ?></code>
+                                            <?php endif; ?>
                                         </td>
                                         <td><?php echo esc_html($employer->display_name); ?></td>
                                         <td>
@@ -670,6 +675,12 @@ class MC_Super_Admin
                 update_user_meta($existing_user_id, 'mc_company_share_code', $share_code);
             }
 
+            // Generate employer invite code if not exists
+            if (!get_user_meta($existing_user_id, 'mc_employer_invite_code', true)) {
+                $employer_invite_code = strtoupper(wp_generate_password(10, false));
+                update_user_meta($existing_user_id, 'mc_employer_invite_code', $employer_invite_code);
+            }
+
             // Existing users keep their own password
             if ($send_invite) {
                 $this->send_employer_welcome_email($existing_user_id, $email);
@@ -708,6 +719,10 @@ class MC_Super_Admin
 
         $share_code = strtoupper(wp_generate_password(8, false));
         update_user_meta($user_id, 'mc_company_share_code', $share_code);
+
+        // Generate employer invite code for gated signup
+        $employer_invite_code = strtoupper(wp_generate_password(10, false));
+        update_user_meta($user_id, 'mc_employer_invite_code', $employer_invite_code);
 
         if ($send_invite) {
             $this->send_employer_welcome_email($user_id, $email, $password);
@@ -991,12 +1006,25 @@ class MC_Super_Admin
                                     ';
         }
 
+        // Build onboarding link with employer invite code
+        $employer_invite_code = get_user_meta($user_id, 'mc_employer_invite_code', true);
+        $onboarding_link = $onboarding_url;
+        if ($employer_invite_code) {
+            $onboarding_link = add_query_arg('employer_code', $employer_invite_code, $onboarding_url);
+        }
+
         $message .= '
                                     <div style="margin: 32px 0;">
                                         <h2 class="email-text" style="margin: 0 0 16px; font-size: 20px; font-weight: 700; color: #0f172a;">🚀 Get Started</h2>
                                         <p class="email-text-secondary" style="margin: 0 0 20px; font-size: 15px; color: #475569;">Complete your company profile to begin inviting team members:</p>
-                                        <a href="' . esc_url($onboarding_url) . '" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">Complete Your Profile →</a>
+                                        <a href="' . esc_url($onboarding_link) . '" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">Complete Your Profile →</a>
                                     </div>
+                                    ' . ($employer_invite_code ? '
+                                    <div class="email-box" style="background-color: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 24px; margin: 0 0 24px;">
+                                        <p class="email-text-secondary" style="margin: 0 0 8px; font-size: 14px; color: #64748b;">Your employer invite code (in case you need it):</p>
+                                        <code style="background: rgba(99, 102, 241, 0.1); padding: 4px 12px; border-radius: 4px; font-family: monospace; font-size: 18px; font-weight: 700; color: #6366f1; letter-spacing: 2px;">' . esc_html($employer_invite_code) . '</code>
+                                    </div>
+                                    ' : '') . '
                                     
                                     <div class="email-info-box" style="background-color: #f0f9ff; border-left: 4px solid #2563eb; padding: 20px; margin: 32px 0; border-radius: 4px;">
                                         <h3 class="email-text" style="margin: 0 0 12px; font-size: 16px; font-weight: 700; color: #0f172a;">Once set up, you\'ll be able to:</h3>

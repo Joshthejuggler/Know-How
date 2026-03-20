@@ -838,8 +838,9 @@
         }
 
         if (isEmployee) {
-            saveResultsToServer();
-            renderEmployeeComplete();
+            saveResultsToServer()
+                .then(() => renderEmployeeComplete())
+                .catch(() => renderEmployeeComplete());
         } else {
             saveResultsToServer();
             renderResults();
@@ -1440,7 +1441,7 @@
     }
 
     function saveResultsToServer(resultsHtml = '') {
-        if (!isLoggedIn) return;
+        if (!isLoggedIn) return Promise.resolve();
 
         // Strip emojis for PDF generation
         const emojiRegex = /[\u{2696}\u{1F9E9}\u{1F4D4}\u{1F504}\u{1F5D1}]\u{FE0F}?/gu;
@@ -1457,10 +1458,22 @@
             bodyParams.results_html = pdfHtml;
         }
 
-        fetch(ajaxUrl, {
+        return fetch(ajaxUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams(bodyParams)
+        })
+        .then(r => {
+            if (!r.ok) throw new Error('Save failed: ' + r.status);
+            return r.json();
+        })
+        .then(j => {
+            if (!j.success) throw new Error('Save rejected: ' + (j.data || 'unknown'));
+            return j;
+        })
+        .catch(err => {
+            console.error('CDT save error:', err);
+            throw err;
         });
     }
 

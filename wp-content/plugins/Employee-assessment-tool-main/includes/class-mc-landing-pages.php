@@ -16,6 +16,47 @@ class MC_Landing_Pages
         add_shortcode('mc_employee_landing', [__CLASS__, 'render_employee_landing']);
         add_action('template_redirect', [__CLASS__, 'handle_invite_logic']);
         add_action('wp_footer', [__CLASS__, 'print_landing_scripts']);
+
+        // AJAX handler for employer access request form
+        add_action('wp_ajax_mc_request_employer_access', [__CLASS__, 'ajax_request_employer_access']);
+        add_action('wp_ajax_nopriv_mc_request_employer_access', [__CLASS__, 'ajax_request_employer_access']);
+    }
+
+    /**
+     * AJAX: Handle employer access request form — emails site admin.
+     */
+    public static function ajax_request_employer_access()
+    {
+        check_ajax_referer('mc_employer_access_request', 'nonce');
+
+        $name = sanitize_text_field($_POST['request_name'] ?? '');
+        $email = sanitize_email($_POST['request_email'] ?? '');
+        $company = sanitize_text_field($_POST['request_company'] ?? '');
+        $message_text = sanitize_textarea_field($_POST['request_message'] ?? '');
+
+        if (empty($name) || empty($email) || !is_email($email) || empty($company)) {
+            wp_send_json_error(['message' => 'Please fill in all required fields.']);
+        }
+
+        $admin_email = get_option('admin_email');
+        $subject = '[Employer Access Request] ' . $company . ' — ' . $name;
+
+        $body = "New employer access request:\n\n";
+        $body .= "Name: {$name}\n";
+        $body .= "Email: {$email}\n";
+        $body .= "Company: {$company}\n";
+        if ($message_text) {
+            $body .= "Message: {$message_text}\n";
+        }
+        $body .= "\n---\nSubmitted from the employer landing page.";
+
+        $sent = wp_mail($admin_email, $subject, $body, ['Reply-To: ' . $name . ' <' . $email . '>']);
+
+        if ($sent) {
+            wp_send_json_success(['message' => 'Your request has been submitted. We\'ll be in touch soon!']);
+        } else {
+            wp_send_json_error(['message' => 'Failed to send request. Please try again or contact us directly.']);
+        }
     }
 
     /**
@@ -166,14 +207,8 @@ class MC_Landing_Pages
                     <h1>Unlock Your Team's True Potential</h1>
                     <p class="mc-landing-subtitle">Understand your employees' skill sets and core motivators. Promote people
                         into positions they will excel in and motivate them in ways that appeal to them the most.</p>
-                    <?php
-                    $onboarding_url = '#';
-                    if (class_exists('MC_Funnel')) {
-                        $onboarding_url = MC_Funnel::find_page_by_shortcode('mc_employer_onboarding') ?: '#';
-                    }
-                    ?>
                     <div class="mc-hero-cta">
-                        <a href="<?php echo esc_url($onboarding_url); ?>" class="mc-button mc-button-primary">Get Started</a>
+                        <a href="#request-access" class="mc-button mc-button-primary">Request Access</a>
                         <a href="#assessments" class="mc-button mc-button-secondary">Learn More</a>
                     </div>
                 </div>
@@ -345,22 +380,85 @@ class MC_Landing_Pages
                 </div>
             </section>
 
-            <section class="mc-landing-section mc-final-cta">
+            <section id="request-access" class="mc-landing-section mc-final-cta">
                 <div class="mc-container mc-container-narrow">
                     <div class="mc-cta-box">
-                        <h2>Ready to Build Stronger Teams?</h2>
-                        <p class="mc-cta-subtitle">Increase retention, reduce friction, and unlock hidden strengths in your
-                            workforce.</p>
-                        <div class="mc-cta-buttons">
-                            <a href="<?php echo esc_url($onboarding_url); ?>"
-                                class="mc-button mc-button-primary mc-button-large">Get Started</a>
+                        <h2>Request Access</h2>
+                        <p class="mc-cta-subtitle">We're currently onboarding employers by invitation. Tell us about your company and we'll get you set up.</p>
+
+                        <div id="mc-access-request-form-wrapper" style="max-width: 480px; margin: 2rem auto 0; text-align: left;">
+                            <form id="mc-access-request-form">
+                                <?php wp_nonce_field('mc_employer_access_request', 'mc_access_nonce'); ?>
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.9rem;">Your Name *</label>
+                                    <input type="text" name="request_name" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem;" placeholder="Jane Smith">
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.9rem;">Work Email *</label>
+                                    <input type="email" name="request_email" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem;" placeholder="jane@company.com">
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.9rem;">Company Name *</label>
+                                    <input type="text" name="request_company" required style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem;" placeholder="Acme Corp">
+                                </div>
+                                <div style="margin-bottom: 1.5rem;">
+                                    <label style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.9rem;">Message <span style="font-weight: 400; color: #94a3b8;">(optional)</span></label>
+                                    <textarea name="request_message" rows="3" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; resize: vertical;" placeholder="Tell us about your team..."></textarea>
+                                </div>
+                                <button type="submit" class="mc-button mc-button-primary mc-button-large" style="width: 100%;">Submit Request</button>
+                            </form>
+                            <div id="mc-access-request-success" style="display: none; text-align: center; padding: 2rem 0;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" style="width: 48px; height: 48px; margin-bottom: 1rem;"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l3 3 5-6"></path></svg>
+                                <h3 style="margin: 0 0 0.5rem;">Request Submitted!</h3>
+                                <p style="color: #64748b;">We'll review your request and reach out soon.</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem;">
                             <button onclick="openSampleReportModal()" class="mc-button mc-button-outline mc-button-large"
                                 type="button">View Sample Report</button>
                         </div>
-                        <p class="mc-cta-note">No credit card required • 5-minute setup</p>
                     </div>
                 </div>
             </section>
+
+            <script>
+            (function() {
+                var form = document.getElementById('mc-access-request-form');
+                if (!form) return;
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var btn = form.querySelector('button[type="submit"]');
+                    btn.disabled = true;
+                    btn.textContent = 'Submitting...';
+
+                    var data = new FormData(form);
+                    data.append('action', 'mc_request_employer_access');
+                    data.append('nonce', form.querySelector('[name="mc_access_nonce"]').value);
+
+                    fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
+                        method: 'POST',
+                        body: data
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(resp) {
+                        if (resp.success) {
+                            form.style.display = 'none';
+                            document.getElementById('mc-access-request-success').style.display = 'block';
+                        } else {
+                            alert(resp.data.message || 'Something went wrong.');
+                            btn.disabled = false;
+                            btn.textContent = 'Submit Request';
+                        }
+                    })
+                    .catch(function() {
+                        alert('Network error. Please try again.');
+                        btn.disabled = false;
+                        btn.textContent = 'Submit Request';
+                    });
+                });
+            })();
+            </script>
 
             <footer class="mc-landing-footer">
                 <div class="mc-container">

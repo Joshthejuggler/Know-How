@@ -1424,6 +1424,32 @@ TXT;
             "- 'Naturalist' -> 'Systems Thinking', 'Organizational Awareness', 'Market Ecosystem Analysis', 'Categorization'.\n" .
             "EXAMPLE: Instead of 'High Bodily-Kinesthetic', say 'Strong aptitude for operational execution and field work'.\n" .
             "EXAMPLE: Instead of 'Musical Intelligence', say 'Keen ability to recognize patterns and manage workflow cadence'.\n\n" .
+            "SCORING INSTRUCTIONS FOR OVERALL FIT:\n" .
+            "You MUST evaluate the employee against THREE dimensions and return a separate integer score (0-100) for each. Use the FULL range. Do NOT default to safe mid-range scores.\n" .
+            "\n" .
+            "1. ROLE ALIGNMENT (How well assessment results match the specific Role Title and Responsibilities):\n" .
+            "   90-100: Top strengths directly map to core role demands; ideal cognitive and behavioral profile for this position.\n" .
+            "   70-89: Good alignment with most role requirements; minor gaps in secondary areas.\n" .
+            "   50-69: Moderate fit; some important role requirements are not well-supported by their profile.\n" .
+            "   30-49: Significant gaps between their strengths and what the role demands.\n" .
+            "   0-29: Major misalignment; their profile suggests fundamentally different strengths than this role requires.\n" .
+            "\n" .
+            "2. CULTURE & VALUES FIT (How well personality, motivators, and work style match the Company Values and Culture):\n" .
+            "   90-100: Motivational drivers and personality type strongly reinforce stated company values and culture.\n" .
+            "   70-89: Good cultural alignment with minor friction points.\n" .
+            "   50-69: Mixed signals; some values align while others may create tension.\n" .
+            "   30-49: Notable misalignment between personal drivers and organizational culture.\n" .
+            "   0-29: Fundamental mismatch between individual profile and company culture.\n" .
+            "\n" .
+            "3. STRAIN & RESILIENCE FIT (How well stress responses and coping capacity match role pressure levels):\n" .
+            "   90-100: Very low strain + high developmental capacity; well-equipped for this role's pressure level.\n" .
+            "   70-89: Manageable strain; adequate coping for expected demands.\n" .
+            "   50-69: Moderate strain signals; may need support structures for high-pressure aspects.\n" .
+            "   30-49: Elevated strain; role demands may exceed current resilience capacity.\n" .
+            "   0-29: High strain + low coping; significant burnout risk in this role.\n" .
+            "\n" .
+            "IMPORTANT: If the Workplace Context (company values/culture/industry) is empty or missing, score culture_fit_score as 50 (neutral) and note this in the rationale.\n" .
+            "IMPORTANT: Be willing to score below 60. A realistic low score is MORE valuable to employers than an inflated one. Differentiate clearly between strong and weak candidates.\n\n" .
             "Return ONLY a JSON object with the following structure:\n" .
             "{\n" .
             "  \"executive_snapshot\": {\n" .
@@ -1435,8 +1461,13 @@ TXT;
             "    \"ideal_conditions\": \"Summary of ideal working conditions\"\n" .
             "  },\n" .
             "  \"overall_fit\": {\n" .
-            "    \"score\": \"<<INTEGER 0-100>>\",\n" .
-            "    \"rationale\": \"Detailed explanation (3-4 sentences) of why this fit score was assigned, referencing specific role requirements and workplace values. Explain the 'Why' behind the score so the employer understands the synthesis.\"\n" .
+            "    \"role_alignment_score\": \"<<INTEGER 0-100 per Role Alignment rubric>>\",\n" .
+            "    \"role_alignment_rationale\": \"2-3 sentences: how their assessment strengths map (or don't) to the specific role requirements.\",\n" .
+            "    \"culture_fit_score\": \"<<INTEGER 0-100 per Culture & Values Fit rubric>>\",\n" .
+            "    \"culture_fit_rationale\": \"2-3 sentences: alignment or gaps between their profile and company values/culture.\",\n" .
+            "    \"strain_resilience_score\": \"<<INTEGER 0-100 per Strain & Resilience Fit rubric>>\",\n" .
+            "    \"strain_resilience_rationale\": \"2-3 sentences: their stress coping capacity vs. role pressure demands.\",\n" .
+            "    \"rationale\": \"Overall 2-3 sentence synthesis combining all three dimensions into a holistic assessment.\"\n" .
             "  },\n" .
             "  \"communication_playbook\": {\n" .
             "    \"do\": [\"Specific advice 1\", \"Specific advice 2\"],\n" .
@@ -1487,7 +1518,9 @@ TXT;
             "}";
 
         $user_prompt = "Employee Data: " . wp_json_encode($payload) . "\n\n" .
-            "Generate the report. Be critical and specific. For 'Recommended Actions', focus on onboarding, project assignment, and mentorship. For 'Discussion Questions', focus on behavioral questions that reveal how they handle their specific weaknesses.";
+            "Generate the report. Be critical and specific — use the FULL 0-100 scoring range for each fit dimension. " .
+            "Cross-reference the employee's assessment results against their Role context AND Workplace context to produce differentiated scores. " .
+            "For 'Recommended Actions', focus on onboarding, project assignment, and mentorship. For 'Discussion Questions', focus on behavioral questions that reveal how they handle their specific weaknesses.";
 
         // Call OpenAI
         $model = self::get_selected_model();
@@ -1521,6 +1554,23 @@ TXT;
         if (empty($analysis['executive_snapshot']) || empty($analysis['coaching_recommendations'])) {
             error_log('MC AI Analysis Failed to parse new structure: ' . $content);
             return false;
+        }
+
+        // Compute deterministic weighted overall fit score from AI component scores
+        // Weights: Role Alignment 40%, Culture Fit 35%, Strain Resilience 25%
+        if (!empty($analysis['overall_fit'])) {
+            $role_score = intval($analysis['overall_fit']['role_alignment_score'] ?? 50);
+            $culture_score = intval($analysis['overall_fit']['culture_fit_score'] ?? 50);
+            $strain_score = intval($analysis['overall_fit']['strain_resilience_score'] ?? 50);
+
+            // Clamp each component to 0-100
+            $role_score = max(0, min(100, $role_score));
+            $culture_score = max(0, min(100, $culture_score));
+            $strain_score = max(0, min(100, $strain_score));
+
+            $analysis['overall_fit']['score'] = intval(round(
+                $role_score * 0.40 + $culture_score * 0.35 + $strain_score * 0.25
+            ));
         }
 
         // Calculate Metadata

@@ -15,17 +15,129 @@ class MC_Employer_Onboarding
     }
 
     /**
-     * Redirect non-logged in users to login page
+     * Redirect non-logged in users to login page.
+     * Gate access: only users with the employer role (or a valid employer_code) can proceed.
      */
     public static function check_access()
     {
-        if (!is_user_logged_in() && is_page()) {
-            global $post;
-            if ($post && has_shortcode($post->post_content, 'mc_employer_onboarding')) {
-                wp_redirect(wp_login_url(get_permalink()));
+        if (!is_page()) {
+            return;
+        }
+
+        global $post;
+        if (!$post || !has_shortcode($post->post_content, 'mc_employer_onboarding')) {
+            return;
+        }
+
+        // Redirect non-logged in users to login (preserving employer_code in redirect)
+        if (!is_user_logged_in()) {
+            $login_url = wp_login_url(get_permalink());
+            if (isset($_GET['employer_code'])) {
+                $login_url = add_query_arg('redirect_to', urlencode(add_query_arg('employer_code', sanitize_text_field($_GET['employer_code']), get_permalink())), wp_login_url());
+            }
+            wp_redirect($login_url);
+            exit;
+        }
+
+        // If user is already an employer, allow through
+        $user = wp_get_current_user();
+        if (in_array(MC_Roles::ROLE_EMPLOYER, (array) $user->roles) || current_user_can('manage_options')) {
+            return;
+        }
+
+        // Check for employer_code and validate
+        if (isset($_GET['employer_code'])) {
+            $code = sanitize_text_field($_GET['employer_code']);
+            $employer_id = self::validate_employer_invite_code($code);
+
+            if ($employer_id) {
+                // Promote this user to employer and transfer the pre-created company data
+                self::claim_employer_invite($user->ID, $employer_id);
+                // Reload the page without the code param so they land clean
+                wp_redirect(remove_query_arg('employer_code'));
                 exit;
             }
         }
+
+        // No valid code and not an employer — redirect to employer landing with error
+        $landing_url = home_url('/employer-landing/');
+        if (class_exists('MC_Funnel')) {
+            $found = MC_Funnel::find_page_by_shortcode('mc_employer_landing');
+            if ($found) {
+                $landing_url = $found;
+            }
+        }
+        wp_redirect(add_query_arg('access_denied', '1', $landing_url));
+        exit;
+    }
+
+    /**
+     * Validate an employer invite code against user meta.
+     *
+     * @param string $code The invite code to validate.
+     * @return int|false The employer user ID if valid, false otherwise.
+     */
+    public static function validate_employer_invite_code($code)
+    {
+        if (empty($code)) {
+            return false;
+        }
+
+        $args = [
+            'meta_key' => 'mc_employer_invite_code',
+            'meta_value' => $code,
+            'number' => 1,
+            'fields' => 'ID'
+        ];
+        $query = new WP_User_Query($args);
+        $results = $query->get_results();
+
+        return !empty($results) ? intval($results[0]) : false;
+    }
+
+    /**
+     * Claim an employer invite: promote user to employer and transfer company data.
+     *
+     * @param int $user_id The user being promoted.
+     * @param int $employer_id The pre-created employer account.
+     */
+    private static function claim_employer_invite($user_id, $employer_id)
+    {
+        // If the invite was created for a different user (admin pre-created), transfer data
+        if ($user_id !== $employer_id) {
+            // Transfer company meta from pre-created account
+            $meta_keys = [
+                'mc_company_name',
+                'mc_company_share_code',
+                'mc_company_logo_id',
+                'mc_employer_status',
+                'mc_subscription_plan',
+                'mc_employer_invite_code',
+                'mc_workplace_industry',
+                'mc_workplace_values',
+                'mc_workplace_culture',
+                'mc_workplace_context',
+            ];
+
+            foreach ($meta_keys as $key) {
+                $value = get_user_meta($employer_id, $key, true);
+                if ($value !== '' && $value !== false) {
+                    update_user_meta($user_id, $key, $value);
+                }
+            }
+        }
+
+        // Assign employer role
+        $user = new WP_User($user_id);
+        $user->add_role(MC_Roles::ROLE_EMPLOYER);
+
+        // Ensure status is set
+        if (!get_user_meta($user_id, 'mc_employer_status', true)) {
+            update_user_meta($user_id, 'mc_employer_status', 'active');
+        }
+
+        // Mark the invite code as claimed
+        update_user_meta($user_id, 'mc_employer_invite_claimed', current_time('mysql'));
     }
 
     /**

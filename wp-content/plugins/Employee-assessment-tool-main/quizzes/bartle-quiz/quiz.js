@@ -395,7 +395,9 @@
         }
 
         if (isEmployee) {
-            renderEmployeeComplete();
+            saveResultsToServer()
+                .then(() => renderEmployeeComplete())
+                .catch(() => renderEmployeeComplete());
         } else {
             renderResults();
         }
@@ -615,15 +617,13 @@
                 <a href="${logoutUrl}" class="bartle-quiz-button bartle-quiz-button-primary" style="display:inline-block;">Log Out</a>
             </div>`;
 
-        // Still save results to server
-        saveResultsToServer();
         window.scrollTo(0, 0);
     }
 
     function saveResultsToServer() {
-        if (!isLoggedIn) return;
+        if (!isLoggedIn) return Promise.resolve();
 
-        fetch(ajaxUrl, {
+        return fetch(ajaxUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
@@ -632,6 +632,18 @@
                 user_id: currentUser.id,
                 results: JSON.stringify(quizState)
             })
+        })
+        .then(r => {
+            if (!r.ok) throw new Error('Save failed: ' + r.status);
+            return r.json();
+        })
+        .then(j => {
+            if (!j.success) throw new Error('Save rejected: ' + (j.data || 'unknown'));
+            return j;
+        })
+        .catch(err => {
+            console.error('Bartle save error:', err);
+            throw err;
         });
     }
 

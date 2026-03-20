@@ -350,8 +350,8 @@ class MC_Login_Customizer
                         }
                     }
                 } else {
-                    // Default new registrations to Employer (if no invite code or token)
-                    $user->set_role(MC_Roles::ROLE_EMPLOYER);
+                    // Default new registrations to subscriber (employer requires invite from admin)
+                    $user->set_role('subscriber');
                 }
             }
 
