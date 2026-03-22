@@ -225,11 +225,13 @@ class MC_Culture_Scorecard {
         foreach ($cdt_totals as $slug => $total) {
             $cdt_averages[$slug] = round($total / $valid_count, 1);
         }
+        $cdt_averages = MC_Helpers::apply_ipsative($cdt_averages);
 
         $bartle_averages = [];
         foreach ($bartle_totals as $slug => $total) {
             $bartle_averages[$slug] = round($total / $valid_count, 1);
         }
+        $bartle_averages = MC_Helpers::apply_ipsative($bartle_averages);
 
         // --- Compute Player Type distribution ---
         $distribution = [];
@@ -307,6 +309,7 @@ class MC_Culture_Scorecard {
                 $candidate_cdt[$pair[0]] = round($pair[1] / 50 * 100);
             }
         }
+        $candidate_cdt = MC_Helpers::apply_ipsative($candidate_cdt);
 
         // --- Build candidate Bartle scores (0-100) ---
         $candidate_bartle = [];
@@ -318,6 +321,7 @@ class MC_Culture_Scorecard {
                 }
             }
         }
+        $candidate_bartle = MC_Helpers::apply_ipsative($candidate_bartle);
 
         // ── CDT Gap Analysis ──────────────────────────────────────────────────
         $cdt_gaps         = [];

@@ -331,10 +331,27 @@ class Micro_Coach_Core
                     $cdt_scores_by_slug = array_column($cdt_results['sortedScores'] ?? [], 1, 0);
                     $cdt_slug_map = ['ambiguity-tolerance', 'value-conflict-navigation', 'self-confrontation-capacity', 'discomfort-regulation', 'growth-orientation'];
                     $bartle_scores_by_slug = array_column($bartle_results['sortedScores'] ?? [], 1, 0);
+                    $pt_slug_map = ['explorer', 'achiever', 'socializer', 'strategist'];
+                    
+                    // Pre-compute ipsative versions for display
+                    $cdt_ipsative_raw = [];
+                    foreach ($cdt_slug_map as $_slug) {
+                        $cdt_ipsative_raw[$_slug] = round(($cdt_scores_by_slug[$_slug] ?? 0) / 50 * 100);
+                    }
+                    $cdt_ipsative = MC_Helpers::apply_ipsative($cdt_ipsative_raw);
+
+                    $bartle_ipsative_raw = [];
+                    foreach ($pt_slug_map as $_slug) {
+                        $bartle_ipsative_raw[$_slug] = round(($bartle_scores_by_slug[$_slug] ?? 0) / 50 * 100);
+                    }
+                    $bartle_ipsative = MC_Helpers::apply_ipsative($bartle_ipsative_raw);
+
                     $primary_bartle_slug = $bartle_results['sortedScores'][0][0] ?? '';
                     $secondary_bartle_slug = $bartle_results['sortedScores'][1][0] ?? '';
-                    $primary_bartle_pct = round(($bartle_scores_by_slug[$primary_bartle_slug] ?? 0) / 50 * 100);
-                    $secondary_bartle_pct = round(($bartle_scores_by_slug[$secondary_bartle_slug] ?? 0) / 50 * 100);
+                    
+                    // Use ipsative relative percentages for the identity card
+                    $primary_bartle_pct = $bartle_ipsative[$primary_bartle_slug] ?? round(($bartle_scores_by_slug[$primary_bartle_slug] ?? 0) / 50 * 100);
+                    $secondary_bartle_pct = $bartle_ipsative[$secondary_bartle_slug] ?? round(($bartle_scores_by_slug[$secondary_bartle_slug] ?? 0) / 50 * 100);
 
                     // CDT top and bottom two scores
                     $cdt_sorted = $cdt_results['sortedScores'] ?? [];
@@ -367,12 +384,12 @@ class Micro_Coach_Core
                     }
 
                     foreach ($cdt_slug_map as $i => $slug) {
-                        $cdt_chart_data[8 + $i] = round((($cdt_scores_by_slug[$slug] ?? 0) / 50) * 100);
+                        $cdt_chart_data[8 + $i] = $cdt_ipsative[$slug] ?? 0;
                     }
                     $pt_chart_data = array_fill(0, 17, null);
                     $pt_slug_map = ['explorer', 'achiever', 'socializer', 'strategist'];
                     foreach ($pt_slug_map as $i => $slug) {
-                        $pt_chart_data[13 + $i] = round((($bartle_scores_by_slug[$slug] ?? 0) / 50) * 100);
+                        $pt_chart_data[13 + $i] = $bartle_ipsative[$slug] ?? 0;
                     }
 
                     // Build result page URLs for deep links
@@ -389,12 +406,12 @@ class Micro_Coach_Core
                     }
                     $cdt_chart_data = array_fill(0, 17, null);
                     foreach ($cdt_slug_map as $i => $slug) {
-                        $cdt_chart_data[8 + $i] = round(($cdt_scores_by_slug[$slug] ?? 0) / 50 * 100);
+                        $cdt_chart_data[8 + $i] = $cdt_ipsative[$slug] ?? 0;
                     }
                     $pt_chart_data = array_fill(0, 17, null);
                     $pt_slug_map = ['explorer', 'achiever', 'socializer', 'strategist'];
                     foreach ($pt_slug_map as $i => $slug) {
-                        $pt_chart_data[13 + $i] = round(($bartle_scores_by_slug[$slug] ?? 0) / 50 * 100);
+                        $pt_chart_data[13 + $i] = $bartle_ipsative[$slug] ?? 0;
                     }
                     ?>
                     <div class="dashboard-tabs">
