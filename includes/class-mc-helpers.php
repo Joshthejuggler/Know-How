@@ -355,6 +355,57 @@ class MC_Helpers {
     }
     
     /**
+     * Apply ipsative normalization to a set of scores.
+     *
+     * Amplifies the top 3 scores and progressively de-emphasises the rest,
+     * creating a differentiated cognitive profile instead of a flat "everyone
+     * is a savant" distribution. This is a DISPLAY-ONLY transform — stored
+     * data is never modified.
+     *
+     * Rank multipliers (0 = highest scorer):
+     *   Rank 1 → ×1.30  |  Rank 2 → ×1.15  |  Rank 3 → ×1.05
+     *   Rank 4 → ×0.90  |  Rank 5 → ×0.80  |  Rank 6 → ×0.75
+     *   Rank 7 → ×0.70  |  Rank 8 → ×0.65
+     *
+     * After applying multipliers the whole set is re-scaled so the top value
+     * never exceeds 100.
+     *
+     * @param  array $scores  Associative [ slug => score ] on a 0–100 scale.
+     * @return array          Ipsatively normalised [ slug => score ] on 0–100.
+     */
+    public static function apply_ipsative( array $scores ): array {
+        if ( empty( $scores ) || count( $scores ) < 2 ) {
+            return $scores;
+        }
+
+        // Rank multipliers: index 0 = 1st place, etc.
+        $multipliers = [ 1.30, 1.15, 1.05, 0.90, 0.80, 0.75, 0.70, 0.65 ];
+
+        // Sort descending to assign ranks (preserves slug association)
+        arsort( $scores );
+        $ranked_slugs = array_keys( $scores );
+
+        // Apply per-rank multiplier
+        $weighted = [];
+        foreach ( $ranked_slugs as $rank => $slug ) {
+            $m = $multipliers[ min( $rank, count( $multipliers ) - 1 ) ];
+            $weighted[ $slug ] = $scores[ $slug ] * $m;
+        }
+
+        // Re-normalise: if the boosted top value exceeds 100, scale everything
+        // down proportionally so the ceiling stays at 100.
+        $max_val = max( $weighted );
+        $scale   = ( $max_val > 100 ) ? ( 100 / $max_val ) : 1.0;
+
+        $result = [];
+        foreach ( $weighted as $slug => $val ) {
+            $result[ $slug ] = (int) min( 100, round( $val * $scale ) );
+        }
+
+        return $result;
+    }
+
+    /**
      * Get system information for debugging
      * 
      * @return array System information

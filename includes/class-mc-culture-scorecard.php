@@ -1011,6 +1011,8 @@ class MC_Culture_Scorecard {
                     $mi_scores[$slug] = round($raw / 40 * 100);
                 }
             }
+            // Apply ipsative normalization (display-only — emphasises top 3, de-emphasises the rest)
+            $mi_scores = MC_Helpers::apply_ipsative($mi_scores);
             arsort($mi_scores);
 
             // Top 3

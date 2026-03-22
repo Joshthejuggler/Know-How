@@ -276,6 +276,15 @@ class Micro_Coach_Core
                     $cdt_results = get_user_meta($user_id, 'cdt_quiz_results', true);
                     $bartle_results = get_user_meta($user_id, 'bartle_quiz_results', true);
 
+                    // Pre-compute ipsative-normalised MI scores for display
+                    // (display-only: raw DB data is never touched)
+                    $mi_raw_pct = [];
+                    $mi_slug_order = ['linguistic', 'logical-mathematical', 'spatial', 'bodily-kinesthetic', 'musical', 'interpersonal', 'intrapersonal', 'naturalistic'];
+                    foreach ($mi_slug_order as $_slug) {
+                        $mi_raw_pct[$_slug] = round(($mi_results['part1Scores'][$_slug] ?? 0) / 40 * 100);
+                    }
+                    $mi_ipsative = MC_Helpers::apply_ipsative($mi_raw_pct);
+
                     // Always enqueue dashboard CSS for completed users
                     wp_enqueue_style('dashboard-enhanced-css', plugins_url('assets/dashboard.css', __FILE__), [], '1.0.4');
 
@@ -354,10 +363,9 @@ class Micro_Coach_Core
                     $mi_chart_data = array_fill(0, 17, null);
                     $mi_slug_map = ['linguistic', 'logical-mathematical', 'spatial', 'bodily-kinesthetic', 'musical', 'interpersonal', 'intrapersonal', 'naturalistic'];
                     foreach ($mi_slug_map as $i => $slug) {
-                        $mi_chart_data[$i] = round(($mi_results['part1Scores'][$slug] ?? 0) / 40 * 100);
+                        $mi_chart_data[$i] = $mi_ipsative[$slug] ?? 0;
                     }
-                    $cdt_chart_data = array_fill(0, 17, null);
-                    $cdt_slug_map = ['ambiguity-tolerance', 'value-conflict-navigation', 'self-confrontation-capacity', 'discomfort-regulation', 'growth-orientation'];
+
                     foreach ($cdt_slug_map as $i => $slug) {
                         $cdt_chart_data[8 + $i] = round((($cdt_scores_by_slug[$slug] ?? 0) / 50) * 100);
                     }
@@ -377,7 +385,7 @@ class Micro_Coach_Core
                     $mi_chart_data = array_fill(0, 17, null);
                     $mi_slug_map = ['linguistic', 'logical-mathematical', 'spatial', 'bodily-kinesthetic', 'musical', 'interpersonal', 'intrapersonal', 'naturalistic'];
                     foreach ($mi_slug_map as $i => $slug) {
-                        $mi_chart_data[$i] = round(($mi_results['part1Scores'][$slug] ?? 0) / 40 * 100);
+                        $mi_chart_data[$i] = $mi_ipsative[$slug] ?? 0;
                     }
                     $cdt_chart_data = array_fill(0, 17, null);
                     foreach ($cdt_slug_map as $i => $slug) {
@@ -445,7 +453,7 @@ class Micro_Coach_Core
                                     foreach ($mi_results['top3'] as $mi_slug) {
                                         $label = $mi_categories[$mi_slug] ?? ucfirst(str_replace('-', ' ', $mi_slug));
                                         $score = (int) ($mi_results['part1Scores'][$mi_slug] ?? 0);
-                                        $pct = max(0, min(100, round(($score / 40) * 100)));
+                                        $pct = $mi_ipsative[$mi_slug] ?? max(0, min(100, round(($score / 40) * 100)));
                                         // Icon mapping
                                         $icon = '⭐';
                                         $l = $label;
