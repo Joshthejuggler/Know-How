@@ -90,7 +90,7 @@ class MC_Super_Admin
             'mc-super-admin-css',
             plugin_dir_url(__DIR__) . 'assets/super-admin.css',
             [],
-            '1.0.14'
+            filemtime(plugin_dir_path(__DIR__) . 'assets/super-admin.css')
         );
 
         // Enqueue employer dashboard styles for the report modal on Admin Testing page
