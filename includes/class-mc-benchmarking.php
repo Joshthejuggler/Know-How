@@ -83,45 +83,76 @@ class MC_Benchmarking {
         $user_id = get_current_user_id();
         $is_global_admin = current_user_can('manage_options');
 
-        // Current employees: type is 'current' OR meta not set at all (legacy users)
-        $args_current = [
-            'fields'     => ['ID', 'display_name', 'user_email'],
-            'meta_query' => [
-                'relation' => 'OR',
-                [
-                    'key'     => 'mc_employment_type',
-                    'value'   => 'current',
-                    'compare' => '='
-                ],
-                [
-                    'key'     => 'mc_employment_type',
-                    'compare' => 'NOT EXISTS'
-                ]
-            ]
-        ];
-
-        // Candidates: type must explicitly be 'potential'
-        $args_candidates = [
-            'fields'     => ['ID', 'display_name', 'user_email'],
-            'meta_query' => [
-                [
-                    'key'     => 'mc_employment_type',
-                    'value'   => 'potential',
-                    'compare' => '='
-                ]
-            ]
-        ];
-
         // Scope to current employer if they are not a global admin
         if (!$is_global_admin) {
-            $employer_scope = [
-                'key'   => 'mc_linked_employer_id',
-                'value' => $user_id
+            // Current employees: must be linked to this employer AND (type='current' OR type not set)
+            $args_current = [
+                'fields'     => ['ID', 'display_name', 'user_email'],
+                'meta_query' => [
+                    'relation' => 'AND',
+                    [
+                        'key'   => 'mc_linked_employer_id',
+                        'value' => $user_id
+                    ],
+                    [
+                        'relation' => 'OR',
+                        [
+                            'key'     => 'mc_employment_type',
+                            'value'   => 'current',
+                            'compare' => '='
+                        ],
+                        [
+                            'key'     => 'mc_employment_type',
+                            'compare' => 'NOT EXISTS'
+                        ]
+                    ]
+                ]
             ];
-            $args_current['meta_query'][] = $employer_scope;
-            $args_candidates['meta_query'][] = $employer_scope;
-            // For candidates, require 'relation' because we have two meta conditions
-            $args_candidates['meta_query']['relation'] = 'AND';
+
+            // Candidates: must be linked to this employer AND type='potential'
+            $args_candidates = [
+                'fields'     => ['ID', 'display_name', 'user_email'],
+                'meta_query' => [
+                    'relation' => 'AND',
+                    [
+                        'key'   => 'mc_linked_employer_id',
+                        'value' => $user_id
+                    ],
+                    [
+                        'key'     => 'mc_employment_type',
+                        'value'   => 'potential',
+                        'compare' => '='
+                    ]
+                ]
+            ];
+        } else {
+            // Global admin sees all users, filtered only by type
+            $args_current = [
+                'fields'     => ['ID', 'display_name', 'user_email'],
+                'meta_query' => [
+                    'relation' => 'OR',
+                    [
+                        'key'     => 'mc_employment_type',
+                        'value'   => 'current',
+                        'compare' => '='
+                    ],
+                    [
+                        'key'     => 'mc_employment_type',
+                        'compare' => 'NOT EXISTS'
+                    ]
+                ]
+            ];
+
+            $args_candidates = [
+                'fields'     => ['ID', 'display_name', 'user_email'],
+                'meta_query' => [
+                    [
+                        'key'     => 'mc_employment_type',
+                        'value'   => 'potential',
+                        'compare' => '='
+                    ]
+                ]
+            ];
         }
 
         $current_employees = get_users($args_current);
