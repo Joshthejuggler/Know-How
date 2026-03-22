@@ -196,6 +196,12 @@ class MC_Benchmarking {
             $candidate_data = $this->get_user_scores($candidate_id);
             $user_info = get_userdata($candidate_id);
             if ($user_info) $candidate_name = $user_info->display_name;
+
+            if ($candidate_data && class_exists('MC_Helpers')) {
+                foreach ($candidate_data as $cat => &$vals) {
+                    $vals = MC_Helpers::apply_ipsative($vals);
+                }
+            }
         }
 
         if (!$candidate_data) {
@@ -285,6 +291,10 @@ class MC_Benchmarking {
             foreach ($dimensions as $cat => &$vals) {
                 foreach ($vals as $key => &$val) {
                     $val = round($val / $count, 1);
+                }
+                // Apply our new ipsative curve to the computed average to stretch it
+                if (class_exists('MC_Helpers')) {
+                    $vals = MC_Helpers::apply_ipsative($vals);
                 }
             }
         }
