@@ -81,7 +81,13 @@ class MC_Benchmarking {
      */
     public function render_page($return = false) {
         $user_id = get_current_user_id();
-        $is_global_admin = current_user_can('manage_options');
+        // A "true" global admin is one who has manage_options but is NOT also an employer
+        // (employers who were granted manage_options should still be scoped to their own team)
+        $is_employer = current_user_can(MC_Roles::CAP_MANAGE_EMPLOYEES);
+        $has_linked_employees = !empty(get_user_meta($user_id, 'mc_invited_employees', true)) 
+                                || !empty(get_user_meta($user_id, 'mc_company_name', true));
+        $is_global_admin = current_user_can('manage_options') && !$is_employer && !$has_linked_employees;
+
 
         // Scope to current employer if they are not a global admin
         if (!$is_global_admin) {
