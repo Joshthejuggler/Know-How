@@ -327,7 +327,8 @@ jQuery(document).ready(function($) {
         cultureRadarChart = new Chart(ctx, {
             type: 'radar',
             data: {
-                labels: chartData.labels,
+                // Split words by space so Chart.js stacks them on multiple lines
+                labels: chartData.labels.map(l => l.split(' ')),
                 datasets: [{
                     data: chartData.benchmark,
                     fill: true,
@@ -341,9 +342,17 @@ jQuery(document).ready(function($) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                layout: { padding: 20 },
+                layout: { padding: 30 },
                 scales: {
-                    r: { beginAtZero: true, max: 100, ticks: { display: false } }
+                    r: { 
+                        beginAtZero: true, 
+                        max: 100, 
+                        ticks: { display: false },
+                        pointLabels: {
+                            font: { size: 10, weight: '500' },
+                            color: '#64748b'
+                        }
+                    }
                 },
                 plugins: { legend: { display: false } }
             }
