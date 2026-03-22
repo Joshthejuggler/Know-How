@@ -395,13 +395,13 @@
 /* Fix Tooltip Clipping for rightmost Action buttons */
 .mc-tooltip-left .tooltiptext {
     left: auto !important;
-    right: -5px !important;
+    right: 0 !important;
     transform: none !important;
 }
 
 .mc-tooltip-left .tooltiptext::after {
     left: auto !important;
-    right: 18px !important; /* Anchor the arrow under the middle of the button */
+    right: 13px !important; /* Center arrow under 36px button (36/2 - 5px border) */
     margin-left: 0 !important;
 }
 
