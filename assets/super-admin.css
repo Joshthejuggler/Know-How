@@ -675,10 +675,10 @@ a.mc-action-btn:hover {
 
 .mc-nested-grid {
     display: grid;
-    grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr 1.5fr 80px;
+    grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr 1.5fr 120px;
     /* Name, Email, Status, Type, Quizzes, Last Login, Actions */
-    gap: 0 32px;
-    /* No row gap (handled by padding/border), 32px column gap */
+    gap: 0 24px;
+    /* No row gap (handled by padding/border), 24px column gap */
     width: 100%;
 }
 
@@ -705,7 +705,7 @@ a.mc-action-btn:hover {
 }
 
 /* Remove bottom border for the last row's cells */
-.mc-grid-cell:nth-last-child(-n+6) {
+.mc-grid-cell:nth-last-child(-n+7) {
     border-bottom: none;
 }
 
