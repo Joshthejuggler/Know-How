@@ -352,6 +352,10 @@ class MC_Employer_Onboarding
                                 <input type="text" name="employees[0][name]" placeholder="Full Name" class="mc-input" required>
                                 <input type="email" name="employees[0][email]" placeholder="email@company.com" class="mc-input"
                                     required>
+                                <select name="employees[0][type]" class="mc-input mc-type-select">
+                                    <option value="current">Current Employee</option>
+                                    <option value="potential">Potential Employee (Candidate)</option>
+                                </select>
                                 <input type="text" name="employees[0][role]" placeholder="Role Title"
                                     class="mc-input mc-full-width" required>
                                 <textarea name="employees[0][responsibilities]" placeholder="Key Responsibilities&#10;• "
@@ -363,6 +367,10 @@ class MC_Employer_Onboarding
                             <div class="mc-invite-row">
                                 <input type="text" name="employees[1][name]" placeholder="Full Name" class="mc-input">
                                 <input type="email" name="employees[1][email]" placeholder="email@company.com" class="mc-input">
+                                <select name="employees[1][type]" class="mc-input mc-type-select">
+                                    <option value="current">Current Employee</option>
+                                    <option value="potential">Potential Employee (Candidate)</option>
+                                </select>
                                 <input type="text" name="employees[1][role]" placeholder="Role Title"
                                     class="mc-input mc-full-width">
                                 <textarea name="employees[1][responsibilities]" placeholder="Key Responsibilities&#10;• "
@@ -374,6 +382,10 @@ class MC_Employer_Onboarding
                             <div class="mc-invite-row">
                                 <input type="text" name="employees[2][name]" placeholder="Full Name" class="mc-input">
                                 <input type="email" name="employees[2][email]" placeholder="email@company.com" class="mc-input">
+                                <select name="employees[2][type]" class="mc-input mc-type-select">
+                                    <option value="current">Current Employee</option>
+                                    <option value="potential">Potential Employee (Candidate)</option>
+                                </select>
                                 <input type="text" name="employees[2][role]" placeholder="Role Title"
                                     class="mc-input mc-full-width">
                                 <textarea name="employees[2][responsibilities]" placeholder="Key Responsibilities&#10;• "
@@ -420,6 +432,10 @@ class MC_Employer_Onboarding
                         <div class="mc-invite-row">
                             <input type="text" name="employees[${index}][name]" placeholder="Full Name" class="mc-input">
                             <input type="email" name="employees[${index}][email]" placeholder="email@company.com" class="mc-input">
+                            <select name="employees[${index}][type]" class="mc-input mc-type-select">
+                                <option value="current">Current Employee</option>
+                                <option value="potential">Potential Employee (Candidate)</option>
+                            </select>
                             <input type="text" name="employees[${index}][role]" placeholder="Role Title" class="mc-input mc-full-width">
                             <textarea name="employees[${index}][responsibilities]" placeholder="Key Responsibilities\n• " class="mc-input mc-full-width" rows="4"></textarea>
                         </div>
@@ -559,7 +575,8 @@ class MC_Employer_Onboarding
                             'email' => $email,
                             'name' => $name,
                             'role' => $role,
-                            'responsibilities' => $responsibilities
+                            'responsibilities' => $responsibilities,
+                            'type' => sanitize_text_field($employee['type'] ?? 'current')
                         ];
                         $emails_to_invite[] = [
                             'email' => $email,

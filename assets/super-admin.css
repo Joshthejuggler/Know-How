@@ -675,8 +675,8 @@ a.mc-action-btn:hover {
 
 .mc-nested-grid {
     display: grid;
-    grid-template-columns: 1.5fr 2fr 1fr 1fr 1.5fr 80px;
-    /* Name, Email, Status, Quizzes, Last Login, Actions */
+    grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr 1.5fr 80px;
+    /* Name, Email, Status, Type, Quizzes, Last Login, Actions */
     gap: 0 32px;
     /* No row gap (handled by padding/border), 32px column gap */
     width: 100%;

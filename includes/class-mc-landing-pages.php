@@ -155,6 +155,9 @@ class MC_Landing_Pages
                                         ];
                                         update_user_meta($user_id, 'mc_employee_role_context', $context);
                                     }
+                                    if (is_array($invite) && !empty($invite['type'])) {
+                                        update_user_meta($user_id, 'mc_employment_type', $invite['type']);
+                                    }
                                     break;
                                 }
                             }

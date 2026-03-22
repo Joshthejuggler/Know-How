@@ -302,4 +302,36 @@ jQuery(document).ready(function ($) {
         $btn.toggleClass('active');
         $detailsRow.toggle();
     });
+
+    // Toggle employment type (Employee vs Candidate)
+    $(document).on('click', '.mc-btn-toggle-type', function () {
+        const $btn = $(this);
+        const userId = $btn.data('user-id');
+        const $row = $btn.closest('.mc-nested-grid'); // Or parent cell
+        
+        $btn.prop('disabled', true).html('<span class="mc-loading"></span>');
+
+        $.ajax({
+            url: mcSuperAdmin.ajaxUrl,
+            type: 'POST',
+            data: {
+                action: 'mc_toggle_employment_type',
+                nonce: mcSuperAdmin.nonce,
+                user_id: userId
+            },
+            success: function (response) {
+                if (response.success) {
+                    // Simple refresh is easiest for these nested UI updates
+                    window.location.reload();
+                } else {
+                    alert(response.data.message || 'Error toggling type');
+                    $btn.prop('disabled', false).html('<span class="dashicons dashicons-randomize"></span>');
+                }
+            },
+            error: function () {
+                alert('Connection error');
+                $btn.prop('disabled', false).html('<span class="dashicons dashicons-randomize"></span>');
+            }
+        });
+    });
 });

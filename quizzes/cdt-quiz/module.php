@@ -249,6 +249,7 @@ class CDT_Quiz_Plugin
 
         <div id="cdt-about-modal" class="cdt-quiz-card quiz-about-card" style="display:none; text-align:left;">
             <h2 class="cdt-section-title">About the Growth Strengths Assessment</h2>
+            <p style="margin-bottom: 1.5rem; line-height: 1.6; color: #4a5568;">This assessment reveals how you handle uncertainty and conflict. For organizations, this tool supports hiring decisions and internal team development by profiling resilience, coaching needs, and conflict resolution styles.</p>
 
             <div style="margin-top:0.5rem;">
                 <h3 class="cdt-section-title" style="font-size:1.1rem;">What it measures</h3>

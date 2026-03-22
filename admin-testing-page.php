@@ -151,6 +151,10 @@ function mc_render_admin_testing_page()
                         update_user_meta($user_id, 'first_name', $first_name);
                     if ($last_name)
                         update_user_meta($user_id, 'last_name', $last_name);
+                    
+                    $type = isset($_POST['employee_type']) ? sanitize_text_field($_POST['employee_type']) : 'current';
+                    update_user_meta($user_id, 'mc_employment_type', $type);
+
                     update_user_meta($user_id, 'mc_age_group', 'adult');
                     delete_user_meta($user_id, 'mc_needs_age_group');
                     $user = new WP_User($user_id);
@@ -159,9 +163,13 @@ function mc_render_admin_testing_page()
                     $invited_employees = get_user_meta($employer_id, 'mc_invited_employees', true);
                     if (!is_array($invited_employees))
                         $invited_employees = [];
-                    $invited_employees[] = ['email' => $email, 'name' => trim($first_name . ' ' . $last_name)];
+                    $invited_employees[] = [
+                        'email' => $email, 
+                        'name' => trim($first_name . ' ' . $last_name),
+                        'type' => $type
+                    ];
                     update_user_meta($employer_id, 'mc_invited_employees', $invited_employees);
-                    $message = "Employee created! Email: $email | Password: $password";
+                    $message = "Employee created! Email: $email | Type: " . ucfirst($type);
                     $message_type = 'success';
                 }
             }
@@ -400,6 +408,38 @@ function mc_render_admin_testing_page()
             background: linear-gradient(135deg, #b45309, #92400e);
             border-color: #92400e;
             color: #fff;
+        }
+
+        .mc-status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .status-current {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-potential {
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fef08a;
+        }
+
+        .mc-status-badge:hover {
+            filter: brightness(0.95);
+            transform: scale(1.05);
         }
 
         .mc-btn-delete:hover {
@@ -849,10 +889,82 @@ function mc_render_admin_testing_page()
                             <th><label for="employee_last_name">Last</label></th>
                             <td><input type="text" name="employee_last_name" id="employee_last_name"></td>
                         </tr>
+                        <tr>
+                            <th><label for="employee_profile_type">Profile Type</label></th>
+                            <td>
+                                <select name="employee_profile_type" id="employee_profile_type">
+                                    <option value="average">Average</option>
+                                    <option value="rockstar">Rockstar (Excellent)</option>
+                                    <option value="high_strain">High Strain (Poor)</option>
+                                    <option value="low_strain">Low Strain</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="employee_type">Type</label></th>
+                            <td>
+                                <select name="employee_type" id="employee_type">
+                                    <option value="current">Current Employee</option>
+                                    <option value="potential">Potential Employee (Candidate)</option>
+                                </select>
+                            </td>
+                        </tr>
                     </table>
                     <p class="submit">
                         <button type="button" class="button" onclick="autoFillEmployee()">Auto-Fill</button>
                         <button type="submit" name="create_employee" class="button button-primary">Create</button>
+                    </p>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Bulk Create Employees</h2>
+                <form id="bulk-employee-form">
+                    <table class="form-table compact-form">
+                        <tr>
+                            <th><label for="bulk_employer_id">Employer</label></th>
+                            <td><select id="bulk_employer_id">
+                                    <option value="">-- Select --</option>
+                                    <?php foreach ($employers as $employer):
+                                        $company = get_user_meta($employer->ID, 'mc_company_name', true) ?: 'No Company'; ?>
+                                        <option value="<?php echo esc_attr($employer->ID); ?>"><?php echo esc_html($company); ?></option>
+                                    <?php endforeach; ?>
+                                </select></td>
+                        </tr>
+                        <tr>
+                            <th><label for="bulk_count">Count</label></th>
+                            <td><input type="number" id="bulk_count" value="5" min="1" max="25"></td>
+                        </tr>
+                        <tr>
+                            <th><label for="bulk_profile_type">Profile</label></th>
+                            <td>
+                                <select id="bulk_profile_type">
+                                    <option value="average">Average</option>
+                                    <option value="rockstar">Rockstar</option>
+                                    <option value="high_strain">High Strain</option>
+                                    <option value="low_strain">Low Strain</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="bulk_employment_type">Type</label></th>
+                            <td>
+                                <select id="bulk_employment_type">
+                                    <option value="current">Current Employee</option>
+                                    <option value="potential">Potential Employee</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="bulk_skip_ai">Skip AI Report?</label></th>
+                            <td>
+                                <input type="checkbox" id="bulk_skip_ai" checked>
+                                <span class="description" style="font-size: 11px; color: #666; margin-left: 5px;">(Highly recommended: speeds up creation and saves API costs)</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <p class="submit">
+                        <button type="button" class="button button-primary" onclick="bulkCreateEmployees(event)">Bulk Create & Generate Results</button>
                     </p>
                 </form>
             </div>
@@ -900,6 +1012,8 @@ function mc_render_admin_testing_page()
                         <th>Name</th>
                         <th>Role</th>
                         <th>Company/Employer</th>
+                        <th>Profile</th>
+                        <th>Status</th>
                         <th>Quizzes</th>
                         <th>Registered</th>
                         <th>Actions</th>
@@ -908,7 +1022,7 @@ function mc_render_admin_testing_page()
                 <tbody>
                     <?php if (empty($recent_users)): ?>
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 20px;">No users found.</td>
+                            <td colspan="8" style="text-align: center; padding: 20px;">No users found.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($recent_users as $user):
@@ -954,6 +1068,10 @@ function mc_render_admin_testing_page()
                             $mi = get_user_meta($user->ID, 'miq_quiz_results', true);
                             $cdt = get_user_meta($user->ID, 'cdt_quiz_results', true);
                             $bartle = get_user_meta($user->ID, 'bartle_quiz_results', true);
+
+                            $employment_type = get_user_meta($user->ID, 'mc_employment_type', true) ?: 'current';
+                            $status_display = ucfirst($employment_type) . ($employment_type === 'potential' ? ' (Candidate)' : '');
+
                             if (!is_array($mi))
                                 $mi = [];
                             if (!is_array($cdt))
@@ -998,6 +1116,25 @@ function mc_render_admin_testing_page()
                                         class="mc-role-badge mc-role-<?php echo esc_attr($role_display); ?>"><?php echo esc_html($role_display); ?></span>
                                 </td>
                                 <td><?php echo esc_html($company); ?></td>
+                                <td>
+                                    <?php
+                                    $p_type = get_user_meta($user->ID, 'mc_profile_type', true);
+                                    if ($p_type): ?>
+                                        <span class="mc-badge-outline" style="font-size:10px; padding:2px 8px;"><?php echo esc_html(ucfirst($p_type)); ?></span>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($role === MC_Roles::ROLE_EMPLOYEE): ?>
+                                        <span class="mc-status-badge status-<?php echo esc_attr($employment_type); ?>"
+                                            onclick="toggleEmploymentType(<?php echo $user->ID; ?>, this)" title="Click to Toggle Status">
+                                            <?php echo esc_html($status_display); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <?php if ($completed_quizzes > 0): ?>
                                         <span class="mc-quiz-count"><?php echo $completed_quizzes; ?>/3</span>
@@ -1202,8 +1339,69 @@ function mc_render_admin_testing_page()
             const timestamp = Date.now().toString().slice(-4);
             document.getElementById('employee_email').value = `${local}+employee${employeeCounter}_${timestamp}@${domain}`;
             document.getElementById('employee_first_name').value = 'Test';
-            document.getElementById('employee_last_name').value = `Employee ${employeeCounter}`;
+            
+            const profileType = document.getElementById('employee_profile_type').value;
+            const types = ['current', 'potential'];
+            const type = types[employeeCounter % 2];
+            document.getElementById('employee_type').value = type;
+            
+            document.getElementById('employee_last_name').value = `${profileType.charAt(0).toUpperCase() + profileType.slice(1)} ${type.charAt(0).toUpperCase() + type.slice(1)} ${employeeCounter}`;
             employeeCounter++;
+        }
+
+        async function bulkCreateEmployees(event) {
+            const employerId = document.getElementById('bulk_employer_id').value;
+            const count = parseInt(document.getElementById('bulk_count').value);
+            const profile = document.getElementById('bulk_profile_type').value;
+            const employment = document.getElementById('bulk_employment_type').value;
+            const skipAi = document.getElementById('bulk_skip_ai').checked ? 1 : 0;
+            const baseEmail = document.getElementById('base_email').value;
+
+            if (!employerId) { alert('Please select an Employer in the bulk creation form.'); return; }
+            if (!baseEmail) { 
+                alert('Please enter a Base Email Address at the top of the page first.'); 
+                document.getElementById('base_email').focus();
+                return; 
+            }
+
+            const btn = event.target;
+            const oldText = btn.textContent;
+            btn.disabled = true;
+
+            for (let i = 0; i < count; i++) {
+                btn.textContent = `Generating ${i + 1} of ${count}...`;
+                try {
+                    const response = await fetch(ajaxurl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            action: 'mc_create_test_employee',
+                            employer_id: employerId,
+                            i: i,
+                            profile_type: profile,
+                            employment_type: employment,
+                            skip_ai: skipAi,
+                            base_email: baseEmail,
+                            nonce: '<?php echo wp_create_nonce('mc_admin_testing_nonce'); ?>'
+                        })
+                    });
+                    const data = await response.json();
+                    if (!data.success) {
+                        alert(`Error creating employee ${i+1}: ` + data.data.message);
+                        btn.disabled = false;
+                        btn.textContent = oldText;
+                        return;
+                    }
+                } catch (e) {
+                    alert('Connection error during generation. Some employees may have been created.');
+                    btn.disabled = false;
+                    btn.textContent = oldText;
+                    return;
+                }
+            }
+
+            btn.textContent = 'All Done! Reloading...';
+            setTimeout(() => location.reload(), 1000);
         }
 
         function deleteTestUser(userId, userEmail) {
@@ -1217,6 +1415,37 @@ function mc_render_admin_testing_page()
             url.searchParams.set('role_filter', role);
             url.searchParams.delete('paged');
             window.location.href = url.toString();
+        }
+
+        async function toggleEmploymentType(userId, badge) {
+            badge.style.opacity = '0.5';
+            badge.style.pointerEvents = 'none';
+
+            try {
+                const response = await fetch(ajaxurl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        action: 'mc_toggle_employment_type',
+                        user_id: userId,
+                        nonce: '<?php echo wp_create_nonce('mc_admin_testing_nonce'); ?>'
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    badge.textContent = data.data.display;
+                    badge.className = `mc-status-badge status-${data.data.new_type}`;
+                } else {
+                    alert('Error: ' + data.data.message);
+                }
+            } catch (e) {
+                alert('Connection error');
+            } finally {
+                badge.style.opacity = '1';
+                badge.style.pointerEvents = 'auto';
+            }
         }
 
 

@@ -215,7 +215,8 @@
 .mc-employee-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
+    align-items: flex-start;
 }
 
 .mc-employee-email {
@@ -354,7 +355,7 @@
 .mc-tooltip .tooltiptext {
     visibility: hidden;
     width: max-content;
-    max-width: 160px;
+    max-width: 220px;
     background-color: var(--mc-text-primary);
     color: var(--mc-white);
     text-align: center;
@@ -371,7 +372,8 @@
     font-weight: 500;
     box-shadow: var(--mc-shadow-lg);
     pointer-events: none;
-    white-space: nowrap;
+    white-space: normal;
+    line-height: 1.4;
 }
 
 .mc-tooltip .tooltiptext::after {
@@ -388,6 +390,19 @@
 .mc-tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+/* Fix Tooltip Clipping for rightmost Action buttons */
+.mc-tooltip-left .tooltiptext {
+    left: auto !important;
+    right: -5px !important;
+    transform: none !important;
+}
+
+.mc-tooltip-left .tooltiptext::after {
+    left: auto !important;
+    right: 18px !important; /* Anchor the arrow under the middle of the button */
+    margin-left: 0 !important;
 }
 
 /* Empty State */
@@ -456,15 +471,33 @@
 .mc-button.secondary,
 .mc-modal .mc-button.secondary {
     background: var(--mc-white);
-    color: var(--mc-primary);
-    border: 1.5px solid var(--mc-border);
+    color: var(--mc-text-primary);
+    border: 1px solid var(--mc-border);
     box-shadow: var(--mc-shadow-sm);
 }
 
 .mc-button.secondary:hover,
 .mc-modal .mc-button.secondary:hover {
     background: var(--mc-background);
-    border-color: var(--mc-primary);
+    border-color: var(--mc-text-light);
+    box-shadow: var(--mc-shadow-md);
+}
+
+.mc-button.tertiary,
+.mc-modal .mc-button.tertiary {
+    background: transparent;
+    color: var(--mc-text-light);
+    border: 1.5px solid transparent;
+    box-shadow: none;
+}
+
+.mc-button.tertiary:hover,
+.mc-modal .mc-button.tertiary:hover {
+    background: var(--mc-background);
+    color: var(--mc-text-dark);
+    border-color: var(--mc-border);
+    transform: none;
+    box-shadow: none;
 }
 
 .mc-button.small,
@@ -509,7 +542,7 @@
 .mc-onboarding-wrapper a.mc-button.mc-button-secondary,
 .mc-onboarding-wrapper .mc-button.secondary,
 .mc-onboarding-wrapper .mc-button.mc-button-secondary {
-    color: var(--mc-primary) !important;
+    color: var(--mc-text-primary) !important;
 }
 
 #mc-dashboard-wrapper a.mc-button.secondary:hover,
@@ -520,22 +553,37 @@
 .mc-onboarding-wrapper a.mc-button.mc-button-secondary:hover,
 .mc-onboarding-wrapper .mc-button.secondary:hover,
 .mc-onboarding-wrapper .mc-button.mc-button-secondary:hover {
-    color: var(--mc-primary) !important;
+    color: var(--mc-text-primary) !important;
     background: var(--mc-background);
     transition: width 0.3s ease;
+}
+
+/* Tertiary Button Support */
+#mc-dashboard-wrapper a.mc-button.tertiary,
+.mc-modal a.mc-button.tertiary,
+.mc-onboarding-wrapper a.mc-button.tertiary {
+    color: var(--mc-text-light) !important;
+    background: transparent !important;
+}
+
+#mc-dashboard-wrapper a.mc-button.tertiary:hover,
+.mc-modal a.mc-button.tertiary:hover,
+.mc-onboarding-wrapper a.mc-button.tertiary:hover {
+    color: var(--mc-text-dark) !important;
+    background: var(--mc-background) !important;
 }
 
 /* Map dashed classes to Main Styles */
 .mc-button.mc-button-secondary {
     background: var(--mc-white);
-    color: var(--mc-primary);
-    border: 1.5px solid var(--mc-border);
+    color: var(--mc-text-primary);
+    border: 1px solid var(--mc-border);
     box-shadow: var(--mc-shadow-sm);
 }
 
 .mc-button.mc-button-secondary:hover {
     background: var(--mc-background);
-    border-color: var(--mc-primary);
+    border-color: var(--mc-text-light);
 }
 
 .mc-button.mc-button-large {
@@ -1573,4 +1621,53 @@
     margin-top: 24px !important;
     font-size: 0.95rem !important;
     line-height: 1.6 !important;
+}
+
+/* Employment Type Badges */
+.mc-type-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.70rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: 0;
+    margin-top: 4px;
+    vertical-align: middle;
+    width: fit-content;
+}
+
+.mc-type-badge.current {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.mc-type-badge.potential {
+    background: #fdf2f8;
+    color: #9d174d;
+    border: 1px solid #fbcfe8;
+}
+
+/* Onboarding Type Select */
+select.mc-input.mc-type-select {
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    background-color: var(--mc-white);
+    border: 1px solid var(--mc-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    color: var(--mc-text-primary);
+    cursor: pointer;
+    display: block;
+}
+
+select.mc-input.mc-type-select:focus {
+    outline: none;
+    border-color: var(--mc-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }

@@ -153,6 +153,40 @@ class MC_Funnel
     }
 
     /**
+     * Get brief descriptions for all assessment categories
+     * 
+     * @return array Map of category slug => Description
+     */
+    public static function get_assessment_descriptions()
+    {
+        return [
+            // MI Descriptions
+            'linguistic' => 'Excels at conveying ideas clearly, persuading, and facilitating effective dialogue.',
+            'logical-mathematical' => 'Strong at pattern recognition, logical reasoning, and strategic problem-solving.',
+            'spatial' => 'Skilled at visualizing concepts, design thinking, and spatial organization.',
+            'bodily-kinesthetic' => 'Learns by doing, highly practical, and thrives in hands-on or dynamic environments.',
+            'musical' => 'Sensitive to rhythms, patterns, and timing in workflows and communications.',
+            'interpersonal' => 'High emotional intelligence, excellent at collaboration, and navigating team relationships.',
+            'intrapersonal' => 'Strong self-awareness, independent work ethic, and goal-oriented focus.',
+            'naturalistic' => 'Adept at seeing the big picture, categorizing information, and understanding complex ecosystems.',
+            'existential' => 'Driven by purpose, values alignment, and long-term vision.',
+            
+            // CDT Descriptions
+            'ambiguity-tolerance' => 'Comfortable making decisions and moving forward without having all the clear answers or a defined playbook.',
+            'value-conflict-navigation' => 'Skilled at navigating situations where underlying values clash, finding constructive paths forward.',
+            'self-confrontation-capacity' => 'Able to honestly reflect on personal blind spots and pivot when presented with challenging feedback.',
+            'discomfort-regulation' => 'Maintains composure and effectiveness when dealing with difficult conversations or high-pressure situations.',
+            'conflict-resolution-tolerance' => 'Views conflict as a necessary tool for growth and addresses tension directly rather than avoiding it.',
+            
+            // Bartle Descriptions
+            'explorer' => 'Motivated by exploring new systems, discovering hidden knowledge, and the thrill of the unknown.',
+            'achiever' => 'Motivated by setting and achieving measurable goals, tracking progress, and mastering skills.',
+            'socializer' => 'Motivated by interacting with others, building relationships, and contributing to a community.',
+            'strategist' => 'Motivated by competition, overcoming challenges, and proving skills against others.'
+        ];
+    }
+
+    /**
      * Check if all assessments are complete and trigger notifications/AI analysis
      * 
      * @param int $user_id User ID
@@ -217,21 +251,27 @@ class MC_Funnel
 
             // Extract & Translate Key Metrics
             $mi_map = self::get_mi_business_translations();
+            $descriptions = self::get_assessment_descriptions();
+            
             $mi_top3 = $all_results['mi']['top3'] ?? [];
-            $mi_labels = array_map(function ($slug) use ($mi_map) {
-                return $mi_map[$slug] ?? ucwords(str_replace('-', ' ', $slug));
+            $mi_data = array_map(function ($slug) use ($mi_map, $descriptions) {
+                return [
+                    'label' => $mi_map[$slug] ?? ucwords(str_replace('-', ' ', $slug)),
+                    'desc' => $descriptions[$slug] ?? ''
+                ];
             }, $mi_top3);
 
-            // Format MI list with bullets if more than one, or comma separated
-            // Let's use a nice list for the email
+            // Forward compatibility for old code expecting $mi_labels
+            $mi_labels = array_map(function($item) { return $item['label']; }, $mi_data);
 
             $cdt_score = $all_results['cdt']['sortedScores'][0][1] ?? 0;
             $cdt_label = $all_results['cdt']['sortedScores'][0][0] ?? 'N/A';
             $cdt_summary = ucwords(str_replace('-', ' ', $cdt_label)); // Removed score as per feedback
+            $cdt_desc = $descriptions[$cdt_label] ?? '';
 
             $bartle_type = $all_results['bartle']['sortedScores'][0][0] ?? 'N/A';
             $bartle_summary = ucwords($bartle_type);
-
+            $bartle_desc = $descriptions[$bartle_type] ?? '';
             $subject = 'Assessment Insights: ' . $user_name;
 
             $dashboard_url = self::find_page_by_shortcode('mc_employer_dashboard');
@@ -292,32 +332,27 @@ class MC_Funnel
                                 Top Business Competencies
                             </h3>
                             <div style='display: grid; grid-gap: 12px;'>
-                                <?php foreach ($mi_labels as $label): ?>
+                                <?php foreach ($mi_data as $item): ?>
                                     <div
-                                        style='background: #f8fafc; padding: 12px 16px; border-radius: 6px; border-left: 4px solid #3b82f6; font-weight: 600; color: #334155;'>
-                                        <?php echo esc_html($label); ?>
+                                        style='background: #f8fafc; padding: 12px 16px; border-radius: 6px; border-left: 4px solid #3b82f6;'>
+                                        <div style='font-weight: 600; color: #334155; margin-bottom: 4px;'><?php echo esc_html($item['label']); ?></div>
+                                        <div style='font-size: 14px; color: #64748b;'><?php echo esc_html($item['desc']); ?></div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
                         </div>
 
                         <!-- Secondary Metrics Grid -->
-                        <div style='display: table; width: 100%; border-spacing: 0; margin-bottom: 24px;'>
-                            <div
-                                style='display: table-cell; width: 48%; vertical-align: top; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;'>
-                                <strong
-                                    style='display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px;'>Change
-                                    Style</strong>
-                                <span
-                                    style='font-size: 16px; font-weight: 600; color: #0f172a;'><?php echo esc_html($cdt_summary); ?></span>
+                        <div style='margin-bottom: 24px;'>
+                            <div style='background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 16px;'>
+                                <strong style='display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px;'>Change Style</strong>
+                                <div style='font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 4px;'><?php echo esc_html($cdt_summary); ?></div>
+                                <div style='font-size: 14px; color: #64748b;'><?php echo esc_html($cdt_desc); ?></div>
                             </div>
-                            <div style='display: table-cell; width: 4%;'></div> <!-- Spacer -->
-                            <div
-                                style='display: table-cell; width: 48%; vertical-align: top; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;'>
-                                <strong
-                                    style='display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px;'>Motivation</strong>
-                                <span
-                                    style='font-size: 16px; font-weight: 600; color: #0f172a;'><?php echo esc_html($bartle_summary); ?></span>
+                            <div style='background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;'>
+                                <strong style='display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 8px;'>Motivation</strong>
+                                <div style='font-size: 16px; font-weight: 600; color: #0f172a; margin-bottom: 4px;'><?php echo esc_html($bartle_summary); ?></div>
+                                <div style='font-size: 14px; color: #64748b;'><?php echo esc_html($bartle_desc); ?></div>
                             </div>
                         </div>
 
@@ -343,6 +378,61 @@ class MC_Funnel
             $message = ob_get_clean();
 
             wp_mail($employer_email, $subject, $message, $headers);
+
+            // Send Employee Results (Matter-of-fact version)
+            if (!empty($user_email)) {
+                $user_subject = 'Your Assessment Results - The Science of Teamwork';
+                ob_start();
+                ?>
+                <!DOCTYPE html>
+                <html>
+                <body style='font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f3f4f6; margin: 0; padding: 20px;'>
+                    <div style='max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden;'>
+                        <div style='background-color: #1e293b; padding: 32px 24px; text-align: center; border-bottom: 4px solid #3b82f6;'>
+                            <h2 style='color: #ffffff; margin: 0; font-size: 24px; font-weight: 700;'>Your Assessment Results</h2>
+                            <p style='color: #94a3b8; margin: 8px 0 0 0; font-size: 16px;'><?php echo esc_html($user_name); ?></p>
+                        </div>
+                        <div style='padding: 32px 24px;'>
+                            <p style='margin-top: 0; font-size: 16px; color: #334155;'>Thank you for completing your assessments! Here is a direct summary of your core strengths and working style based on your responses.</p>
+                            
+                            <h3 style='color: #0f172a; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 32px; margin-bottom: 16px;'>
+                                Top Intelligences
+                            </h3>
+                            <div style='margin: 0 0 24px 0;'>
+                                <?php foreach ($mi_data as $item): ?>
+                                    <div style='margin-bottom: 16px;'>
+                                        <div style='color: #0f172a; font-size: 16px; font-weight: 600; margin-bottom: 4px;'><?php echo esc_html($item['label']); ?></div>
+                                        <div style='color: #475569; font-size: 15px;'><?php echo esc_html($item['desc']); ?></div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <h3 style='color: #0f172a; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 16px;'>
+                                Growth Strengths
+                            </h3>
+                            <div style='margin-bottom: 24px;'>
+                                <div style='color: #0f172a; font-size: 18px; font-weight: 600; margin-bottom: 4px;'><?php echo esc_html($cdt_summary); ?></div>
+                                <div style='color: #475569; font-size: 15px;'><?php echo esc_html($cdt_desc); ?></div>
+                            </div>
+
+                            <h3 style='color: #0f172a; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 16px;'>
+                                Core Motivator
+                            </h3>
+                            <div>
+                                <div style='color: #0f172a; font-size: 18px; font-weight: 600; margin-bottom: 4px;'><?php echo esc_html($bartle_summary); ?></div>
+                                <div style='color: #475569; font-size: 15px;'><?php echo esc_html($bartle_desc); ?></div>
+                            </div>
+                        </div>
+                        <div style='background-color: #f1f5f9; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0;'>
+                            <p style='margin: 0; color: #94a3b8; font-size: 12px;'>The Science of Teamwork</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                <?php
+                $user_message = ob_get_clean();
+                wp_mail($user_email, $user_subject, $user_message, $headers);
+            }
         }
     }
 

@@ -81,6 +81,12 @@ if (!class_exists('MC_User_Switcher')) {
 if (!class_exists('MC_Report_Template')) {
     require_once MC_QUIZ_PLATFORM_PATH . 'includes/class-mc-report-template.php';
 }
+if (!class_exists('MC_Benchmarking')) {
+    require_once MC_QUIZ_PLATFORM_PATH . 'includes/class-mc-benchmarking.php';
+}
+if (!class_exists('MC_Culture_Scorecard')) {
+    require_once MC_QUIZ_PLATFORM_PATH . 'includes/class-mc-culture-scorecard.php';
+}
 
 // Include all the necessary class files.
 // These files should ONLY define classes, not run any code themselves.
@@ -144,6 +150,8 @@ function mc_quiz_platform_init()
     MC_Login_Customizer::init();
     MC_Roles::init();
     MC_Magic_Login::init();
+    new MC_Benchmarking();
+    MC_Culture_Scorecard::init();
 
     // Initialize Super Admin Dashboard
     if (is_admin() && current_user_can('manage_options')) {

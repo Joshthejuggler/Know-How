@@ -183,14 +183,54 @@ class MC_Quiz_Dashboard
                 $all_complete = $completed_steps >= $total_steps;
 
                 if ($all_complete && $linked_employer_id):
+                    // Fetch results for unified summary
+                    $all_results = MC_Funnel::get_all_assessment_results($user_id);
+                    $mi_map = MC_Funnel::get_mi_business_translations();
+                    $descriptions = MC_Funnel::get_assessment_descriptions();
+                    
+                    $mi_top3 = $all_results['mi']['top3'] ?? [];
+                    $mi_data = array_map(function ($slug) use ($mi_map, $descriptions) {
+                        return [
+                            'label' => $mi_map[$slug] ?? ucwords(str_replace('-', ' ', $slug)),
+                            'desc' => $descriptions[$slug] ?? ''
+                        ];
+                    }, $mi_top3);
+                    
+                    $cdt_label = $all_results['cdt']['sortedScores'][0][0] ?? 'N/A';
+                    $cdt_summary = ucwords(str_replace('-', ' ', $cdt_label));
+                    $cdt_desc = $descriptions[$cdt_label] ?? '';
+                    
+                    $bartle_type = $all_results['bartle']['sortedScores'][0][0] ?? 'N/A';
+                    $bartle_summary = ucwords($bartle_type);
+                    $bartle_desc = $descriptions[$bartle_type] ?? '';
                     ?>
-                    <div class="mc-dashboard-unlock-card" style="border-color: #c6f6d5; background: linear-gradient(135deg, #f0fff4 0%, #ffffff 100%);">
-                        <div class="mc-unlock-content" style="text-align: center;">
-                            <div style="font-size: 2.5em; margin-bottom: 0.25em;">✅</div>
-                            <h3 style="font-size: 1.4em; margin: 0 0 0.5em;">You're All Done!</h3>
-                            <p style="color: #4a5568; font-size: 1.05em; margin: 0 0 0.5em;">Thank you for completing all of your assessments.</p>
-                            <p style="color: #4a5568; font-size: 1.05em; margin: 0 0 1.25em;">Your team lead will review your results and discuss them with you.</p>
-                            <a href="<?php echo wp_logout_url(home_url()); ?>" class="mc-button" style="display: inline-block;">Log Out</a>
+                    <div class="mc-dashboard-unlock-card" style="border-color: #e2e8f0; background: #f8fafc; text-align: left; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                        <h3 style="font-size: 1.5em; margin: 0 0 0.5em; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; color: #0f172a;">Your Assessment Summary</h3>
+                        <p style="color: #4a5568; margin: 0 0 20px; font-size: 1.05em;">Thank you for completing all of your assessments! Here is a direct summary of your core traits based on your responses.</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 10px;">
+                            <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                                <strong style="display: block; font-size: 0.85em; text-transform: uppercase; color: #64748b; margin-bottom: 12px; letter-spacing: 0.5px;">Top Intelligences</strong>
+                                <?php foreach ($mi_data as $item): ?>
+                                    <div style="margin-bottom: 16px;">
+                                        <div style="color: #0f172a; font-weight: 600; font-size: 1.05em; margin-bottom: 4px;"><?php echo esc_html($item['label']); ?></div>
+                                        <div style="color: #64748b; font-size: 0.95em; line-height: 1.4;"><?php echo esc_html($item['desc']); ?></div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            
+                            <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                                <strong style="display: block; font-size: 0.85em; text-transform: uppercase; color: #64748b; margin-bottom: 12px; letter-spacing: 0.5px;">Growth Strengths</strong>
+                                <div style="color: #0f172a; font-size: 1.1em; font-weight: 600; margin-bottom: 8px;"><?php echo esc_html($cdt_summary); ?></div>
+                                <div style="color: #64748b; font-size: 0.95em; line-height: 1.4;"><?php echo esc_html($cdt_desc); ?></div>
+                            </div>
+
+                            <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                                <strong style="display: block; font-size: 0.85em; text-transform: uppercase; color: #64748b; margin-bottom: 12px; letter-spacing: 0.5px;">Core Motivator</strong>
+                                <div style="color: #0f172a; font-size: 1.1em; font-weight: 600; margin-bottom: 8px;"><?php echo esc_html($bartle_summary); ?></div>
+                                <div style="color: #64748b; font-size: 0.95em; line-height: 1.4;"><?php echo esc_html($bartle_desc); ?></div>
+                            </div>
+                            </div>
                         </div>
                     </div>
                 <?php elseif (!$all_complete && !$linked_employer_id): ?>

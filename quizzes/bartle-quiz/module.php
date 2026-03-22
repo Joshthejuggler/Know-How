@@ -217,10 +217,7 @@ class Bartle_Quiz_Plugin
             <div id="bartle-about-modal" class="bartle-quiz-intro quiz-about-card" style="display:none;">
                 <h2>Core Motivation Assessment</h2>
                 <div class="bartle-intro-content">
-                    <p>The Bartle Player Type Quiz is designed to uncover what truly motivates you when you engage with games,
-                        challenges, or even everyday learning. Originally created by game researcher Richard Bartle, the model
-                        has been widely used to understand different kinds of players — but the same framework also applies to
-                        work, school, and personal growth.</p>
+                    <p>The Core Motivation Assessment is designed to uncover what truly motivates you when you engage with complex environments and challenges. Originally created by game researcher Richard Bartle, the model has been widely used to understand different kinds of players. Today, this assessment is used for hiring and internal team development to ensure individuals are placed in roles that align with their natural drivers.</p>
 
                     <h3>The Four Player Types</h3>
                     <ul class="player-types-list">

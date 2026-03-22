@@ -607,14 +607,14 @@
         } catch (e) { }
         if (devTools) devTools.style.display = 'none';
 
-        const logoutUrl = bartle_quiz_data.logoutUrl || '/wp-login.php?action=logout';
+        const dashboardUrl = bartle_quiz_data.dashboardUrl || '/';
 
         container.innerHTML = `
             <div class="bartle-quiz-card" style="text-align:center; padding: 3em 2em;">
-                <h2 class="bartle-section-title">You're All Done!</h2>
+                <h2 class="bartle-section-title">Assessment Complete!</h2>
                 <p style="font-size:1.1em; color:#4a5568; margin:1em 0;">Thank you for completing your assessments! Your responses have been recorded.</p>
-                <p style="font-size:1.05em; color:#4a5568; margin:0.5em 0 1.5em;">Your team lead will review your results and discuss them with you. You can now log out.</p>
-                <a href="${logoutUrl}" class="bartle-quiz-button bartle-quiz-button-primary" style="display:inline-block;">Log Out</a>
+                <p style="font-size:1.05em; color:#4a5568; margin:0.5em 0 1.5em;">You can now view a summary of your results on your dashboard.</p>
+                <a href="${dashboardUrl}" class="bartle-quiz-button bartle-quiz-button-primary" style="display:inline-block;">View Assessment Summary</a>
             </div>`;
 
         window.scrollTo(0, 0);

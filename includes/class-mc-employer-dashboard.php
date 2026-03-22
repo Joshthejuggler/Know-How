@@ -30,9 +30,11 @@ class MC_Employer_Dashboard
                         <input type="text" name="mc_role_title" id="mc_role_input" placeholder="e.g. Senior Developer" required>
                     </div>
                     <div class="mc-form-group">
-                        <label>Key Responsibilities <span class="mc-required">*</span></label>
-                        <textarea name="mc_responsibilities" id="mc_resp_input" rows="4"
-                            placeholder="Key duties and expectations..." required></textarea>
+                        <label>Employment Type <span class="mc-required">*</span></label>
+                        <select name="mc_employment_type" id="mc_type_input" class="mc-input mc-type-select">
+                            <option value="current">Current Employee</option>
+                            <option value="potential">Potential Employee (Candidate)</option>
+                        </select>
                     </div>
                     <div class="mc-form-actions" style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
                         <button type="button" class="mc-button secondary" onclick="closeEmployeeModal()">Cancel</button>
@@ -502,14 +504,27 @@ class MC_Employer_Dashboard
                         <p class="mc-dashboard-intro">Manage your team and track their assessment progress.</p>
                     </div>
                     <div class="mc-header-actions">
-                        <button class="mc-button secondary" onclick="openWorkplaceModal()">Workplace Settings</button>
+                        <button class="mc-button tertiary" onclick="openWorkplaceModal()">Workplace Settings</button>
+                        <?php $is_bench = isset($_GET['view']) && $_GET['view'] === 'benchmarking'; ?>
+                        <a href="<?php echo esc_url(add_query_arg('view', 'benchmarking')); ?>" class="mc-button secondary" <?php echo $is_bench ? 'style="background: #eff6ff; border-color: var(--mc-primary); color: var(--mc-primary-dark); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);"' : ''; ?>>Talent Comparison</a>
                         <a href="<?php echo esc_url(MC_Funnel::find_page_by_shortcode('mc_employer_onboarding')); ?>?step=2"
                             class="mc-button">Invite More Employees</a>
                     </div>
                 </div>
 
+                <?php if (isset($_GET['view']) && $_GET['view'] === 'benchmarking'): ?>
+                    <div class="mc-benchmarking-view">
+                        <div style="margin-bottom: 20px;">
+                            <a href="<?php echo esc_url(remove_query_arg('view')); ?>" class="mc-back-link">← Back to Team List</a>
+                        </div>
+                        <?php echo do_shortcode('[mc_talent_comparison]'); ?>
+                    </div>
+                <?php else: ?>
+
                 <div class="mc-filters">
                     <button class="mc-filter-btn active" onclick="filterTeam('all', this)">All</button>
+                    <button class="mc-filter-btn" onclick="filterTeam('potential', this)">Candidates</button>
+                    <button class="mc-filter-btn" onclick="filterTeam('current', this)">Employees</button>
                     <button class="mc-filter-btn" onclick="filterTeam('active', this)">Active</button>
                     <button class="mc-filter-btn" onclick="filterTeam('complete', this)">Complete</button>
                     <button class="mc-filter-btn" onclick="filterTeam('pending', this)">Pending</button>
@@ -566,7 +581,8 @@ class MC_Employer_Dashboard
                         $display_list[$user->user_email] = [
                             'email' => $user->user_email,
                             'user' => $user,
-                            'status' => $status
+                            'status' => $status,
+                            'type' => get_user_meta($user->ID, 'mc_employment_type', true) ?: 'current'
                         ];
                     }
 
@@ -620,7 +636,8 @@ class MC_Employer_Dashboard
                                     'user' => $user,
                                     'status' => $status,
                                     'invited_name' => $name,
-                                    'token' => $token
+                                    'token' => $token,
+                                    'type' => (is_array($invite_data) && !empty($invite_data['type'])) ? $invite_data['type'] : 'current'
                                 ];
                             } elseif (!isset($display_list[$email])) {
                                 $display_list[$email] = [
@@ -628,7 +645,8 @@ class MC_Employer_Dashboard
                                     'user' => null,
                                     'status' => $status,
                                     'invited_name' => $name,
-                                    'token' => $token
+                                    'token' => $token,
+                                    'type' => (is_array($invite_data) && !empty($invite_data['type'])) ? $invite_data['type'] : 'current'
                                 ];
                             }
                         }
@@ -682,19 +700,25 @@ class MC_Employer_Dashboard
                                         // Let's keep status as class name.
                                         ?>
                                         <tr class="mc-team-row <?php echo esc_attr($row_class); ?>"
-                                            data-status="<?php echo esc_attr($row_class); ?>">
+                                            data-status="<?php echo esc_attr($row_class); ?>"
+                                            data-type="<?php echo esc_attr($item['type']); ?>">
                                             <td>
                                                 <div class="mc-employee-info">
                                                     <span class="mc-employee-email"><?php echo esc_html($email); ?></span>
-                                                    <?php if ($employee_user): ?>
-                                                        <span
-                                                            class="mc-employee-name"><?php echo esc_html($employee_user->display_name); ?></span>
-                                                    <?php elseif (!empty($item['invited_name'])): ?>
-                                                        <span class="mc-employee-name" style="color: #64748b; font-style: italic;">
-                                                            <?php echo esc_html($item['invited_name']); ?>
-                                                            (Invited)
-                                                        </span>
-                                                    <?php endif; ?>
+                                                    <span class="mc-employee-name" style="<?php echo !$employee_user ? 'color: #64748b; font-style: italic;' : ''; ?>">
+                                                        <?php 
+                                                        if ($employee_user) {
+                                                            echo esc_html($employee_user->display_name);
+                                                        } elseif (!empty($item['invited_name'])) {
+                                                            echo esc_html($item['invited_name']) . ' (Invited)';
+                                                        } else {
+                                                            echo '&mdash; (Invited)';
+                                                        }
+                                                        ?>
+                                                    </span>
+                                                    <span class="mc-type-badge <?php echo esc_attr($item['type']); ?>">
+                                                        <?php echo $item['type'] === 'potential' ? 'Candidate' : 'Employee'; ?>
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td>
@@ -759,7 +783,8 @@ class MC_Employer_Dashboard
                                                         <button class="mc-action-btn mc-tooltip" onclick='openEmployeeModal(<?php echo htmlspecialchars(json_encode([
                                                             "id" => $employee_user->ID,
                                                             "name" => $employee_user->display_name,
-                                                            "context" => get_user_meta($employee_user->ID, "mc_employee_role_context", true) ?: []
+                                                            "context" => get_user_meta($employee_user->ID, "mc_employee_role_context", true) ?: [],
+                                                            "type" => $item["type"]
                                                         ]), ENT_QUOTES, 'UTF-8'); ?>)'>
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                                 stroke-width="1.5" stroke="currentColor">
@@ -802,7 +827,7 @@ class MC_Employer_Dashboard
 
                                                         if ($analysis):
                                                             ?>
-                                                            <button class="mc-action-btn mc-tooltip" onclick='openAnalysisModal(<?php echo htmlspecialchars(json_encode([
+                                                            <button class="mc-action-btn mc-tooltip mc-tooltip-left" onclick='openAnalysisModal(<?php echo htmlspecialchars(json_encode([
                                                                 "id" => $employee_user->ID,
                                                                 "name" => $employee_user->display_name,
                                                                 "analysis" => $analysis,
@@ -826,10 +851,9 @@ class MC_Employer_Dashboard
                                                                 ?>
                                                                 <?php
                                                                 $role_ctx = get_user_meta($employee_user->ID, 'mc_employee_role_context', true);
-                                                                // $has_role = !empty($role_ctx) && !empty($role_ctx['role']);
                                                                 $has_role = !empty($role_ctx) && !empty($role_ctx['role']);
                                                                 ?>
-                                                                <button class="mc-action-btn mc-tooltip"
+                                                                <button class="mc-action-btn mc-tooltip mc-tooltip-left"
                                                                     onclick="generateAnalysisReport(<?php echo $employee_user->ID; ?>, this)"
                                                                     id="generate-report-btn-<?php echo $employee_user->ID; ?>"
                                                                     data-has-role="<?php echo $has_role ? 'true' : 'false'; ?>"
@@ -846,13 +870,29 @@ class MC_Employer_Dashboard
                                                         <?php endif; ?>
                                                     <?php endif; ?>
 
+                                                    <!-- 5. Download Full Assessment Report PDF -->
+                                                    <?php if (class_exists('MC_Culture_Scorecard') && MC_Culture_Scorecard::candidate_is_ready($employee_user->ID)): ?>
+                                                        <form method="post" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" style="display:inline;" target="_blank">
+                                                            <input type="hidden" name="action" value="mc_generate_candidate_pdf">
+                                                            <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('mc_culture_scorecard_nonce'); ?>">
+                                                            <input type="hidden" name="candidate_id" value="<?php echo $employee_user->ID; ?>">
+                                                            <input type="hidden" name="scorecard_id" value="scorecard_1">
+                                                            <button type="submit" class="mc-action-btn mc-tooltip mc-tooltip-left" title="Download Full Assessment Report">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                                                </svg>
+                                                                <span class="tooltiptext">Download Full Report</span>
+                                                            </button>
+                                                        </form>
+                                                    <?php endif; ?>
+
                                                     <!-- Archive/Restore button comes LAST -->
                                                     <?php if ($status !== 'Archived'): ?>
                                                         <form method="post" style="display:inline;"
                                                             onsubmit="return confirm('Archive <?php echo esc_attr($email); ?>?');">
                                                             <input type="hidden" name="mc_archive_user"
                                                                 value="<?php echo esc_attr($email); ?>">
-                                                            <button type="submit" class="mc-action-btn mc-tooltip">
+                                                            <button type="submit" class="mc-action-btn mc-tooltip mc-tooltip-left">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                                     stroke-width="1.5" stroke="currentColor">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -866,7 +906,7 @@ class MC_Employer_Dashboard
                                                             onsubmit="return confirm('Restore <?php echo esc_attr($email); ?>?');">
                                                             <input type="hidden" name="mc_restore_user"
                                                                 value="<?php echo esc_attr($email); ?>">
-                                                            <button type="submit" class="mc-action-btn mc-tooltip">
+                                                            <button type="submit" class="mc-action-btn mc-tooltip mc-tooltip-left">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                                     stroke-width="1.5" stroke="currentColor">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -898,7 +938,7 @@ class MC_Employer_Dashboard
                         </div>
                     <?php endif; ?>
                 </div>
-            </div>
+            <?php endif; // End benchmarking view check ?>
         </div>
 
         <!-- Workplace Context Modal -->
@@ -1348,10 +1388,10 @@ class MC_Employer_Dashboard
                 document.getElementById('mc_emp_id_input').value = data.id;
                 document.getElementById('mc-emp-name-display').textContent = 'For: ' + data.name;
 
-                // Safety check for context
                 const context = data.context || {};
                 document.getElementById('mc_role_input').value = context.role || '';
                 document.getElementById('mc_resp_input').value = context.responsibilities || '';
+                document.getElementById('mc_type_input').value = data.type || 'current';
             }
             function closeEmployeeModal() {
                 document.getElementById('mc-employee-modal').style.display = 'none';
@@ -1986,6 +2026,14 @@ class MC_Employer_Dashboard
                         } else {
                             row.style.display = '';
                         }
+                    } else if (status === 'potential' || status === 'current') {
+                        // Filter by type (potential/current), but exclude archived
+                        const rowType = row.getAttribute('data-type');
+                        if (rowType === status && rowStatus !== 'archived') {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
                     } else if (status === 'active') {
                         // Active shows both 'registered' and 'all-assessments-complete'
                         if (rowStatus === 'registered' || rowStatus === 'all-assessments-complete') {
@@ -2136,8 +2184,7 @@ class MC_Employer_Dashboard
 
             function saveEmployeeContext(generateAfter) {
                 const empId = document.getElementById('mc_emp_id_input').value;
-                const role = document.getElementById('mc_role_input').value;
-                const resp = document.getElementById('mc_resp_input').value;
+                const type = document.getElementById('mc_type_input').value;
 
                 if (!role || !resp) {
                     alert('Please fill in both Role Title and Responsibilities.');
@@ -2155,6 +2202,7 @@ class MC_Employer_Dashboard
                 data.append('employee_id', empId);
                 data.append('role', role);
                 data.append('responsibilities', resp);
+                data.append('type', type);
 
                 fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
                     method: 'POST',
@@ -2171,7 +2219,21 @@ class MC_Employer_Dashboard
                                 try {
                                     const currentData = JSON.parse(genBtn.getAttribute('data-emp-context'));
                                     currentData.context = { role: role, responsibilities: resp };
+                                    currentData.type = type; // Update type in data too
                                     genBtn.setAttribute('data-emp-context', JSON.stringify(currentData));
+                                    
+                                    // Update the onclick attribute if it's not using data-emp-context (it is in line 771)
+                                    // But wait, line 771 uses PHP json_encode. 
+                                    // We need to update the onclick too or just rely on the button elements.
+                                    // Actually, we should update the badge in the row too.
+                                    const row = genBtn.closest('tr');
+                                    if (row) {
+                                        const typeBadge = row.querySelector('.mc-type-badge');
+                                        if (typeBadge) {
+                                            typeBadge.className = 'mc-type-badge ' + type;
+                                            typeBadge.textContent = (type === 'potential' ? 'Candidate' : 'Employee');
+                                        }
+                                    }
                                 } catch (e) { }
                             }
 
@@ -2443,6 +2505,7 @@ class MC_Employer_Dashboard
         $emp_id = intval($_POST['employee_id']);
         $role = sanitize_text_field($_POST['role']);
         $resp = sanitize_textarea_field($_POST['responsibilities']);
+        $type = sanitize_text_field($_POST['type']);
 
         if (!$emp_id || empty($role) || empty($resp)) {
             $current_user_id = get_current_user_id(); // Define $current_user_id here for the error message
@@ -2463,6 +2526,7 @@ class MC_Employer_Dashboard
         ];
 
         update_user_meta($emp_id, 'mc_employee_role_context', $context);
+        update_user_meta($emp_id, 'mc_employment_type', $type);
 
         wp_send_json_success(['message' => 'Context saved.']);
     }

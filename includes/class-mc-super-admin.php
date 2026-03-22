@@ -22,6 +22,8 @@ class MC_Super_Admin
             add_action('wp_ajax_mc_delete_employee', [$this, 'ajax_delete_employee']);
             add_action('wp_ajax_delete_test_user', [$this, 'ajax_delete_test_user']);
             add_action('wp_ajax_mc_generate_test_data', [$this, 'ajax_generate_test_data']);
+            add_action('wp_ajax_mc_create_test_employee', [$this, 'ajax_create_test_employee']);
+            add_action('wp_ajax_mc_toggle_employment_type', [$this, 'ajax_toggle_employment_type']);
 
         }
         // Note: Switch back button is now handled by MC_User_Switcher class
@@ -368,6 +370,7 @@ class MC_Super_Admin
                                                         <div class="mc-grid-head">Name</div>
                                                         <div class="mc-grid-head">Email</div>
                                                         <div class="mc-grid-head">Status</div>
+                                                        <div class="mc-grid-head">Type</div>
                                                         <div class="mc-grid-head">Quizzes</div>
                                                         <div class="mc-grid-head">Last Login</div>
                                                         <div class="mc-grid-head">Actions</div>
@@ -400,6 +403,16 @@ class MC_Super_Admin
                                                                 </span>
                                                             </div>
                                                             <div class="mc-grid-cell">
+                                                                <?php 
+                                                                $emp_type = get_user_meta($employee->ID, "mc_employment_type", true) ?: "current";
+                                                                $type_label = ($emp_type === "potential") ? "Candidate" : "Employee";
+                                                                $type_class = ($emp_type === "potential") ? "mc-badge-info" : "mc-badge-default";
+                                                                ?>
+                                                                <span class="mc-badge <?php echo esc_attr($type_class); ?>">
+                                                                    <?php echo esc_html($type_label); ?>
+                                                                </span>
+                                                            </div>
+                                                            <div class="mc-grid-cell">
                                                                 <span class="mc-badge mc-badge-info">
                                                                     <?php echo esc_html($completed_quizzes . ' / 3'); ?>
                                                                 </span>
@@ -417,6 +430,11 @@ class MC_Super_Admin
                                                                         class="mc-action-btn mc-btn-switch" title="Run As User">
                                                                         <span class="dashicons dashicons-migrate"></span>
                                                                     </a>
+                                                                    <button type="button" class="mc-action-btn mc-btn-toggle-type"
+                                                                        data-user-id="<?php echo esc_attr($employee->ID); ?>"
+                                                                        title="Toggle Employee/Candidate">
+                                                                        <span class="dashicons dashicons-randomize"></span>
+                                                                    </button>
                                                                     <button type="button" class="mc-action-btn mc-btn-delete-employee"
                                                                         data-employee-id="<?php echo esc_attr($employee->ID); ?>"
                                                                         data-employee-name="<?php echo esc_attr($employee->display_name); ?>"
@@ -1312,16 +1330,151 @@ class MC_Super_Admin
             wp_send_json_error(['message' => 'Invalid user ID']);
         }
 
+        $result = $this->generate_user_mock_data($user_id, $type);
+
+        if (is_wp_error($result)) {
+            wp_send_json_error(['message' => $result->get_error_message()]);
+        }
+
+        wp_send_json_success(['message' => 'Test data generated successfully']);
+    }
+
+    /**
+     * AJAX: Create a single test employee with results. (Part of bulk loop)
+     */
+    public function ajax_create_test_employee()
+    {
+        check_ajax_referer('mc_admin_testing_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized']);
+        }
+
+        $employer_id = intval($_POST['employer_id'] ?? 0);
+        $profile_type = sanitize_text_field($_POST['profile_type'] ?? 'average');
+        $employment_type = sanitize_text_field($_POST['employment_type'] ?? 'current');
+        $base_email = sanitize_email($_POST['base_email'] ?? '');
+        $counter = intval($_POST['i'] ?? 0);
+
+        if (!$employer_id || !$base_email) {
+            wp_send_json_error(['message' => 'Invalid parameters']);
+        }
+
+        list($local, $domain) = explode('@', $base_email);
+        $timestamp = substr(time(), -4) . rand(10, 99);
+        $email = "{$local}+test{$counter}_{$timestamp}@{$domain}";
+
+        if (email_exists($email)) {
+             wp_send_json_error(['message' => 'Email collision, try again.']);
+        }
+
+        $type_label = ($employment_type === 'potential') ? 'Candidate' : 'Employee';
+        $type_formatted = ucfirst($profile_type);
+        $display_name = "{$type_formatted} {$type_label} " . ($counter + 1);
+        $password = 'password123';
+        
+        $user_id = wp_insert_user([
+            'user_login'    => $email,
+            'user_pass'     => $password,
+            'user_email'    => $email,
+            'display_name'  => $display_name,
+            'role'          => MC_Roles::ROLE_EMPLOYEE,
+            'first_name'    => $type_formatted,
+            'last_name'     => $type_label . " " . ($counter + 1)
+        ]);
+
+        if (is_wp_error($user_id)) {
+             wp_send_json_error(['message' => $user_id->get_error_message()]);
+        }
+
+        update_user_meta($user_id, 'mc_employment_type', $employment_type);
+        update_user_meta($user_id, 'mc_linked_employer_id', $employer_id);
+        update_user_meta($user_id, 'mc_age_group', 'adult');
+        
+        $user = new WP_User($user_id);
+        $user->set_role(MC_Roles::ROLE_EMPLOYEE);
+
+        // Update employer's invited list
+        $invited = get_user_meta($employer_id, 'mc_invited_employees', true) ?: [];
+        $invited[] = ['email' => $email, 'name' => $display_name, 'type' => $employment_type];
+        update_user_meta($employer_id, 'mc_invited_employees', $invited);
+
+        // Generate results
+        $skip_ai = !empty($_POST['skip_ai']) && $_POST['skip_ai'] === '1';
+        $this->generate_structured_mock_data($user_id, $profile_type, $skip_ai);
+
+        wp_send_json_success(['message' => "Employee $email created."]);
+    }
+
+    /**
+     * AJAX: Toggle employment type between 'current' and 'potential'.
+     */
+    public function ajax_toggle_employment_type()
+    {
+        // Accept either testing nonce or super admin nonce for backwards compatibility
+        if (isset($_POST['nonce'])) {
+            if (!wp_verify_nonce($_POST['nonce'], 'mc_admin_testing_nonce') && !wp_verify_nonce($_POST['nonce'], 'mc_super_admin_nonce')) {
+                wp_send_json_error(['message' => 'Security check failed.']);
+            }
+        } else {
+             check_ajax_referer('mc_super_admin_nonce', 'nonce');
+        }
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized']);
+        }
+
+        $user_id = intval($_POST['user_id'] ?? 0);
+        if (!$user_id) {
+            wp_send_json_error(['message' => 'Invalid User ID']);
+        }
+
+        $current_type = get_user_meta($user_id, 'mc_employment_type', true) ?: 'current';
+        $new_type = ($current_type === 'current') ? 'potential' : 'current';
+        
+        update_user_meta($user_id, 'mc_employment_type', $new_type);
+
+        // Also update invited employees list for the employer
+        $employer_id = get_user_meta($user_id, 'mc_linked_employer_id', true);
+        if ($employer_id) {
+            $invited = get_user_meta($employer_id, 'mc_invited_employees', true);
+            if (is_array($invited)) {
+                $email = get_userdata($user_id)->user_email;
+                foreach ($invited as &$entry) {
+                    if ($entry['email'] === $email) {
+                        $entry['type'] = $new_type;
+                        break;
+                    }
+                }
+                update_user_meta($employer_id, 'mc_invited_employees', $invited);
+            }
+        }
+
+        wp_send_json_success([
+            'new_type' => $new_type,
+            'display' => ucfirst($new_type) . ($new_type === 'potential' ? ' (Candidate)' : '')
+        ]);
+    }
+
+    /**
+     * Logic for generating mock quiz data.
+     */
+    private function generate_structured_mock_data($user_id, $type, $skip_ai = false)
+    {
         // Helper to generate answers based on strain level (base_score)
-        // 1 = Excellent (Low Strain) -> Ans: 1-2 (mostly 1)
-        // 3 = Average (Mod Strain)   -> Ans: 2-3 (mostly 2, some 3) - was too high
-        // 5 = Poor (High Strain)     -> Ans: 4-5
         $get_ans = function ($base) {
-            if ($base == 1)
-                return rand(1, 2); // Mostly 1-2
-            if ($base == 5)
-                return rand(4, 5); // Mostly 4-5
-            return rand(2, 3); // Spread 2-3 (lowered from 2-4 to avoid 75% strain)
+            if ($base == 1) return rand(1, 2); 
+            if ($base == 5) return rand(4, 5); 
+            return rand(2, 4); // Wider range for average
+        };
+
+        // Helper to sum individual random answers for organic variation
+        $sum_ans = function($count, $base) use ($get_ans) {
+            $sum = 0;
+            for($i=0; $i<$count; $i++) {
+                $sum += $get_ans($base);
+            }
+            return $sum;
         };
 
         // Helper for capability scores (add variation)
@@ -1330,21 +1483,29 @@ class MC_Super_Admin
         };
 
         $base_score = 3;
-        $score_min = 12; // Moderate skills
+        $score_min = 12; 
         $score_max = 24;
 
-        if ($type === 'excellent') {
+        if ($type === 'excellent' || $type === 'rockstar') {
             $base_score = 1;
-            $score_min = 18; // High skills
-            $score_max = 30; // Max
-        }
-        if ($type === 'poor') {
+            $score_min = 20; 
+            $score_max = 30; 
+        } elseif ($type === 'poor' || $type === 'high_strain') {
             $base_score = 5;
-            $score_min = 5; // Low skills
+            $score_min = 5; 
             $score_max = 16;
+        } elseif ($type === 'low_strain') {
+            $base_score = 1;
+            $score_min = 12;
+            $score_max = 24;
         }
 
-        // 1. Generate MI Data (Range 0-30 usually)
+        // Add "Individual Jitter" for more descriptive/organic diversity
+        $jitter = rand(-5, 5);
+        $score_min = max(0, $score_min + $jitter);
+        $score_max = min(100, $score_max + $jitter);
+
+        // 1. Generate MI Data
         $mi_scores = [
             'linguistic' => $get_score($score_min, $score_max),
             'logical' => $get_score($score_min, $score_max),
@@ -1354,24 +1515,23 @@ class MC_Super_Admin
             'interpersonal' => $get_score($score_min, $score_max),
             'intrapersonal' => $get_score($score_min, $score_max),
             'naturalist' => $get_score($score_min, $score_max),
-            // Strain placeholders (Corrected multipliers based on question counts)
-            // MI: Rumination (4), Avoidance (3), Emotional Flood (3)
-            'si-rumination' => $get_ans($base_score) * 4,
-            'si-avoidance' => $get_ans($base_score) * 3,
-            'si-emotional-flood' => $get_ans($base_score) * 3
+            // Organic Strain Sub-scores (Summing individual randoms)
+            'si-rumination' => $sum_ans(4, $base_score),
+            'si-avoidance' => $sum_ans(3, $base_score),
+            'si-emotional-flood' => $sum_ans(3, $base_score)
         ];
 
         $mi_answers = [
-            "When I face a difficult decision, I need extra time to figure out the 'right' move." => $get_ans($base_score),
-            "I replay conversations or choices in my head to see what I could have done differently." => $get_ans($base_score),
-            "I sometimes feel mentally 'stuck' when two of my thoughts or values clash." => $get_ans($base_score),
-            "I often need to think through many possibilities before I can focus." => $get_ans($base_score),
-            "I often feel a strong urge to step away from a problem when it becomes confusing." => $get_ans($base_score),
-            "If a task feels uncertain, I tend to put it off until I feel more ready." => $get_ans($base_score),
-            "I prefer learning environments where I can step away and come back when it feels right." => $get_ans($base_score),
-            "When trying something new, my emotions can shift suddenly depending on how it goes." => $get_ans($base_score),
-            "When too much is happening at once, I feel overwhelmed before I can think clearly." => $get_ans($base_score),
-            "Strong feelings can suddenly disrupt my ability to stay engaged with a task." => $get_ans($base_score)
+            "Decision Time" => $get_ans($base_score),
+            "Replay Conversations" => $get_ans($base_score),
+            "Mentally Stuck" => $get_ans($base_score),
+            "Possibilities Focus" => $get_ans($base_score),
+            "Urge to Step Away" => $get_ans($base_score),
+            "uncertainty delay" => $get_ans($base_score),
+            "learning environment step away" => $get_ans($base_score),
+            "emotions shift" => $get_ans($base_score),
+            "overwhelmed intensity" => $get_ans($base_score),
+            "stay engaged disrupt" => $get_ans($base_score)
         ];
 
         $mi_results = [
@@ -1382,37 +1542,42 @@ class MC_Super_Admin
             'answers' => $mi_answers
         ];
 
+        // Populate sortedScores for MI
+        foreach (['linguistic', 'logical', 'spatial', 'musical', 'kinesthetic', 'interpersonal', 'intrapersonal', 'naturalist'] as $s) {
+            if (isset($mi_scores[$s])) $mi_results['sortedScores'][] = [$s, $mi_scores[$s]];
+        }
+        usort($mi_results['sortedScores'], function($a, $b) { return $b[1] <=> $a[1]; });
+        $mi_results['top3'] = [$mi_results['sortedScores'][0][0], $mi_results['sortedScores'][1][0], $mi_results['sortedScores'][2][0]];
+
         update_user_meta($user_id, 'miq_quiz_results', $mi_results);
 
 
-        // 2. Generate CDT Data (Range 0-20ish)
-        // Tune range: if score_max is 24 (MI), CDT max is usually 20. Let's scale slightly or use direct variation.
-        $cdt_min = intval($score_min * 0.8);
-        $cdt_max = intval($score_max * 0.8);
+        // 2. Generate CDT Data
+        $cdt_min = 25;
+        $cdt_max = 50;
 
         $cdt_scores = [
             'ambiguity-tolerance' => $get_score($cdt_min, $cdt_max),
             'value-conflict-navigation' => $get_score($cdt_min, $cdt_max),
             'self-confrontation-capacity' => $get_score($cdt_min, $cdt_max),
             'discomfort-regulation' => $get_score($cdt_min, $cdt_max),
-            'conflict-resolution-tolerance' => $get_score($cdt_min, $cdt_max),
-            // CDT: Rumination (3), Avoidance (4), Emotional Flood (3)
-            'si-rumination' => $get_ans($base_score) * 3,
-            'si-avoidance' => $get_ans($base_score) * 4,
-            'si-emotional-flood' => $get_ans($base_score) * 3
+            'growth-orientation' => $get_score($cdt_min, $cdt_max),
+            'si-rumination' => $sum_ans(3, $base_score),
+            'si-avoidance' => $sum_ans(4, $base_score),
+            'si-emotional-flood' => $sum_ans(3, $base_score)
         ];
 
         $cdt_answers = [
-            "When things do not make sense yet, I keep turning the problem over in my mind." => $get_ans($base_score),
-            "I often try to mentally solve confusion before I move forward." => $get_ans($base_score),
-            "Even after making a decision, I sometimes revisit it in my mind repeatedly." => $get_ans($base_score),
-            "When I face two good options, I sometimes freeze and struggle to choose." => $get_ans($base_score),
-            "When I am unsure what is right, I tend to delay taking action." => $get_ans($base_score),
-            "When things feel uncertain, I prefer to step back rather than push ahead." => $get_ans($base_score),
-            "If something feels ambiguous, I may wait for clarity instead of acting right away." => $get_ans($base_score),
-            "Unexpected changes can hit me emotionally before I can think them through." => $get_ans($base_score),
-            "Contradictions or mixed signals can feel emotionally intense for me." => $get_ans($base_score),
-            "Confusing situations can create a rush of feelings that make clarity hard." => $get_ans($base_score)
+            "Ambiguity mind turn" => $get_ans($base_score),
+            "solve confusion priority" => $get_ans($base_score),
+            "revisit decision" => $get_ans($base_score),
+            "two good options freeze" => $get_ans($base_score),
+            "unsure delay" => $get_ans($base_score),
+            "uncertainty step back" => $get_ans($base_score),
+            "clarity wait" => $get_ans($base_score),
+            "unexpected emotions" => $get_ans($base_score),
+            "contradictions intense" => $get_ans($base_score),
+            "mixed signals rush" => $get_ans($base_score)
         ];
 
         $cdt_results = [
@@ -1423,6 +1588,12 @@ class MC_Super_Admin
             'answers' => $cdt_answers
         ];
 
+        // Populate sortedScores for CDT
+        foreach (['ambiguity-tolerance', 'value-conflict-navigation', 'self-confrontation-capacity', 'discomfort-regulation', 'growth-orientation'] as $s) {
+            if (isset($cdt_scores[$s])) $cdt_results['sortedScores'][] = [$s, $cdt_scores[$s]];
+        }
+        usort($cdt_results['sortedScores'], function($a, $b) { return $b[1] <=> $a[1]; });
+
         update_user_meta($user_id, 'cdt_quiz_results', $cdt_results);
 
 
@@ -1432,23 +1603,22 @@ class MC_Super_Admin
             'achiever' => $get_score($cdt_min, $cdt_max),
             'socializer' => $get_score($cdt_min, $cdt_max),
             'strategist' => $get_score($cdt_min, $cdt_max),
-            // Bartle: Rumination (4), Avoidance (3), Emotional Flood (3)
-            'si-rumination' => $get_ans($base_score) * 4,
-            'si-avoidance' => $get_ans($base_score) * 3,
-            'si-emotional-flood' => $get_ans($base_score) * 3
+            'si-rumination' => $sum_ans(4, $base_score),
+            'si-avoidance' => $sum_ans(3, $base_score),
+            'si-emotional-flood' => $sum_ans(3, $base_score)
         ];
 
         $bartle_answers = [
-            "After a challenge or interaction, I often think about it long after it is over." => $get_ans($base_score),
-            "I often explore ideas deeply because I want to understand every angle first." => $get_ans($base_score),
-            "I sometimes research or plan so much that starting becomes difficult." => $get_ans($base_score),
-            "I often revisit past choices to hunt for patterns or lessons." => $get_ans($base_score),
-            "I sometimes hesitate to start something new if I am not sure I will do it well." => $get_ans($base_score),
-            "When competition or pressure rises, I might withdraw instead of pushing harder." => $get_ans($base_score),
-            "When tasks feel overwhelming, I tend to step away for a break." => $get_ans($base_score),
-            "In group settings, strong emotions can throw me off track." => $get_ans($base_score),
-            "If something unexpected happens, my emotions can spike quickly." => $get_ans($base_score),
-            "My reactions can become intense when something important feels threatened." => $get_ans($base_score)
+            "Interaction thinking" => $get_ans($base_score),
+            "explore all angles" => $get_ans($base_score),
+            "research planning block" => $get_ans($base_score),
+            "revisit past patterns" => $get_ans($base_score),
+            "hesitate start" => $get_ans($base_score),
+            "withdraw pressure" => $get_ans($base_score),
+            "overwhelming break" => $get_ans($base_score),
+            "group settings throw off" => $get_ans($base_score),
+            "unexpected spike" => $get_ans($base_score),
+            "intense reactive" => $get_ans($base_score)
         ];
 
         $bartle_results = [
@@ -1458,6 +1628,12 @@ class MC_Super_Admin
             'part1Scores' => $bartle_scores,
             'answers' => $bartle_answers
         ];
+
+        // Populate sortedScores for Bartle
+        foreach (['explorer', 'achiever', 'socializer', 'strategist'] as $s) {
+            if (isset($bartle_scores[$s])) $bartle_results['sortedScores'][] = [$s, $bartle_scores[$s]];
+        }
+        usort($bartle_results['sortedScores'], function($a, $b) { return $b[1] <=> $a[1]; });
 
         update_user_meta($user_id, 'bartle_quiz_results', $bartle_results);
 
@@ -1500,16 +1676,14 @@ class MC_Super_Admin
                 MC_Strain_Index_Scorer::calculate_from_user_meta($user_id);
             }
 
-            // FORCE fresh analysis for test data (bypasses "already completed" check in funnel)
-            if (class_exists('Micro_Coach_AI')) {
+            if (!$skip_ai && class_exists('Micro_Coach_AI')) {
                 Micro_Coach_AI::generate_analysis_on_completion($user_id);
             }
         } catch (Throwable $e) {
-            error_log('MC Test Data Generation Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-            wp_send_json_error(['message' => 'Error generating test data: ' . $e->getMessage()]);
+            return new WP_Error('test_data_error', $e->getMessage());
         }
 
-        wp_send_json_success(['message' => 'Test data generated successfully']);
+        return true;
     }
 
 }

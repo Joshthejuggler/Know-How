@@ -921,9 +921,8 @@ class MI_Quiz_Plugin_AI
         <div id="mi-about-modal" class="mi-quiz-card mi-quiz-intro quiz-about-card"
             style="display:none; text-align:left; max-width:840px; margin:16px auto;">
             <h2 class="mi-section-title">About the MI Quiz</h2>
-            <p>The Multiple Intelligences (MI) quiz helps you understand the kinds of problems you’re best at solving by mapping
-                your strengths across eight intelligences. These patterns influence which learning paths feel natural, which
-                projects energize you, and which study habits actually stick.</p>
+            <p>The Multiple Intelligences (MI) quiz helps identify the kinds of problems you’re best at solving by mapping
+                your strengths across eight intelligences. For organizations, this tool supports hiring decisions, internal team development, and role alignment by clarifying which projects and environments naturally energize you.</p>
 
             <h3>What it measures</h3>
             <ul>
@@ -947,8 +946,12 @@ class MI_Quiz_Plugin_AI
             <h3>What you’ll get</h3>
             <ul>
                 <li>A clear snapshot of your top intelligences.</li>
-                <li>Two short sections: what to leverage now and where to grow.</li>
-                <li>Links into related assessments and next steps.</li>
+                <?php if ($is_employee_user): ?>
+                    <li>An automated summary upon finishing all your assigned assessments.</li>
+                <?php else: ?>
+                    <li>Two short sections: what to leverage now and where to grow.</li>
+                    <li>Links into related assessments and next steps.</li>
+                <?php endif; ?>
             </ul>
 
             <h3>Time & tips</h3>
