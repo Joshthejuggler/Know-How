@@ -24,6 +24,7 @@ class MC_Super_Admin
             add_action('wp_ajax_mc_generate_test_data', [$this, 'ajax_generate_test_data']);
             add_action('wp_ajax_mc_create_test_employee', [$this, 'ajax_create_test_employee']);
             add_action('wp_ajax_mc_toggle_employment_type', [$this, 'ajax_toggle_employment_type']);
+            add_action('wp_ajax_mc_migrate_cdt_slug', [$this, 'ajax_migrate_cdt_slug']);
 
         }
         // Note: Switch back button is now handled by MC_User_Switcher class
@@ -199,6 +200,54 @@ class MC_Super_Admin
                     </div>
                 </div>
             </div>
+
+            <!-- Migration Tools -->
+            <div id="mc-migration-tools" style="background:#fff8ed; border:1px solid #f59e0b; border-radius:10px; padding:18px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+                <div>
+                    <strong style="color:#92400e;">⚠️ Data Migration: Growth Orientation</strong>
+                    <p style="margin:4px 0 0; color:#78350f; font-size:13px;">The CDT quiz slug was renamed from <code>conflict-resolution-tolerance</code> to <code>growth-orientation</code>. Run this once to fix existing users' saved results so Growth Orientation shows correctly in all reports.</p>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
+                    <span id="mc-migrate-status" style="font-size:13px; color:#6b7280;"></span>
+                    <button type="button" id="mc-btn-migrate-cdt" class="button button-primary" style="background:#f59e0b; border-color:#d97706; white-space:nowrap;">
+                        <span class="dashicons dashicons-update" style="margin-top:3px;"></span> Run Migration
+                    </button>
+                </div>
+            </div>
+            <script>
+            document.getElementById('mc-btn-migrate-cdt').addEventListener('click', function() {
+                const btn = this;
+                const status = document.getElementById('mc-migrate-status');
+                if (!confirm('This will update all existing CDT quiz results to rename "conflict-resolution-tolerance" → "growth-orientation". Continue?')) return;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="dashicons dashicons-update" style="margin-top:3px; animation:spin 1s linear infinite;"></span> Running...';
+                status.textContent = '';
+                const fd = new FormData();
+                fd.append('action', 'mc_migrate_cdt_slug');
+                fd.append('nonce', '<?php echo wp_create_nonce('mc_migrate_cdt_slug'); ?>');
+                fetch(ajaxurl, { method: 'POST', body: fd })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            status.innerHTML = '<span style="color:#10b981;">✓ ' + data.data.message + '</span>';
+                            btn.innerHTML = '✓ Done';
+                            btn.style.background = '#10b981';
+                            btn.style.borderColor = '#059669';
+                            // Hide the banner after 5s
+                            setTimeout(() => document.getElementById('mc-migration-tools').style.display = 'none', 5000);
+                        } else {
+                            status.innerHTML = '<span style="color:#ef4444;">Error: ' + (data.data || 'Unknown') + '</span>';
+                            btn.disabled = false;
+                            btn.innerHTML = '<span class="dashicons dashicons-update" style="margin-top:3px;"></span> Retry';
+                        }
+                    })
+                    .catch(() => {
+                        status.innerHTML = '<span style="color:#ef4444;">Request failed.</span>';
+                        btn.disabled = false;
+                        btn.innerHTML = '<span class="dashicons dashicons-update" style="margin-top:3px;"></span> Retry';
+                    });
+            });
+            </script>
 
             <!-- Actions Bar -->
             <div class="mc-actions-bar">
@@ -1684,6 +1733,73 @@ class MC_Super_Admin
         }
 
         return true;
+    }
+
+    /**
+     * AJAX: Migrate cdt_quiz_results from 'conflict-resolution-tolerance' → 'growth-orientation'
+     * Run once after the slug rename. Safe to run multiple times (idempotent).
+     */
+    public function ajax_migrate_cdt_slug() {
+        check_ajax_referer('mc_migrate_cdt_slug', 'nonce');
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+
+        $old_slug = 'conflict-resolution-tolerance';
+        $new_slug = 'growth-orientation';
+
+        // Find all users who have cdt_quiz_results stored
+        $users = get_users([
+            'meta_key'     => 'cdt_quiz_results',
+            'meta_compare' => 'EXISTS',
+            'fields'       => 'ids',
+            'number'       => -1,
+        ]);
+
+        $updated = 0;
+        $skipped = 0;
+
+        foreach ($users as $user_id) {
+            $results = get_user_meta($user_id, 'cdt_quiz_results', true);
+
+            if (empty($results) || !is_array($results)) {
+                $skipped++;
+                continue;
+            }
+
+            $changed = false;
+
+            // 1. Rename in scores map
+            if (isset($results['scores'][$old_slug])) {
+                $results['scores'][$new_slug] = $results['scores'][$old_slug];
+                unset($results['scores'][$old_slug]);
+                $changed = true;
+            }
+
+            // 2. Rename in sortedScores array of [slug, value] pairs
+            if (!empty($results['sortedScores']) && is_array($results['sortedScores'])) {
+                foreach ($results['sortedScores'] as &$pair) {
+                    if (is_array($pair) && isset($pair[0]) && $pair[0] === $old_slug) {
+                        $pair[0] = $new_slug;
+                        $changed = true;
+                    }
+                }
+                unset($pair);
+            }
+
+            if ($changed) {
+                update_user_meta($user_id, 'cdt_quiz_results', $results);
+                $updated++;
+            } else {
+                $skipped++;
+            }
+        }
+
+        wp_send_json_success([
+            'message' => "Migration complete. Updated: {$updated} users, Already correct / skipped: {$skipped} users.",
+            'updated' => $updated,
+            'skipped' => $skipped,
+        ]);
     }
 
 }
