@@ -4,14 +4,14 @@ if (!defined('ABSPATH'))
 
 // Category slugs => display names
 $cdt_categories = [
-    'ambiguity-tolerance' => 'Ambiguity Tolerance',
-    'value-conflict-navigation' => 'Value Conflict Navigation',
+    'ambiguity-tolerance'         => 'Ambiguity Tolerance',
+    'value-conflict-navigation'   => 'Value Conflict Navigation',
     'self-confrontation-capacity' => 'Self-Confrontation Capacity',
-    'discomfort-regulation' => 'Discomfort Regulation',
-    'conflict-resolution-tolerance' => 'Conflict Resolution Tolerance',
-    'si-rumination' => 'Decision Dynamics (R)',
-    'si-avoidance' => 'Decision Dynamics (A)',
-    'si-emotional-flood' => 'Decision Dynamics (F)',
+    'discomfort-regulation'       => 'Discomfort Regulation',
+    'growth-orientation'          => 'Growth Orientation',
+    'si-rumination'               => 'Decision Dynamics (R)',
+    'si-avoidance'                => 'Decision Dynamics (A)',
+    'si-emotional-flood'          => 'Decision Dynamics (F)',
 ];
 
 // Since questions are the same for all age groups, we define them once.
@@ -65,7 +65,7 @@ $cdt_questions_base = [
         ['text' => 'I can disagree without needing to win or be right.', 'reverse' => false],
         ['text' => 'I don’t panic when people expect different things from me.', 'reverse' => false],
     ],
-    'conflict-resolution-tolerance' => [
+    'growth-orientation' => [
         ['text' => 'I see inner tension as a sign that I’m learning.', 'reverse' => false],
         ['text' => 'I seek out ideas that challenge my assumptions.', 'reverse' => false],
         ['text' => 'I view cognitive dissonance as a sign to pay attention—not shut down.', 'reverse' => false],

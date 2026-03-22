@@ -287,7 +287,7 @@
             sortedScores: [],
             ageGroup: 'adult'
         };
-        const cdtCats = ['ambiguity-tolerance', 'value-conflict-navigation', 'self-confrontation-capacity', 'discomfort-regulation', 'conflict-resolution-tolerance'];
+        const cdtCats = ['ambiguity-tolerance', 'value-conflict-navigation', 'self-confrontation-capacity', 'discomfort-regulation', 'growth-orientation'];
         cdtCats.forEach(cat => cdtData.scores[cat] = 15); // Dummy score
         cdtData.scores['si-rumination'] = 3 * baseScore;
         cdtData.scores['si-avoidance'] = 4 * baseScore;
