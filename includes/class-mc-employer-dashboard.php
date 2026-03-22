@@ -12,6 +12,7 @@ class MC_Employer_Dashboard
         add_shortcode('mc_employer_dashboard', [__CLASS__, 'render_dashboard']);
         wp_enqueue_style('mc-employer-dashboard-css', plugin_dir_url(__FILE__) . '../assets/employer-dashboard.css', [], time());
         add_action('wp_ajax_mc_save_employee_context', [__CLASS__, 'ajax_save_employee_context']);
+        add_action('wp_ajax_mc_employer_toggle_type', [__CLASS__, 'ajax_employer_toggle_type']);
     }
 
     public static function render_modals()
@@ -777,6 +778,16 @@ class MC_Employer_Dashboard
                                                     <?php endif; ?>
 
                                                     <?php if ($status !== 'Pending' && $status !== 'Archived'): ?>
+                                                        <!-- 0. Toggle Employee/Candidate type -->
+                                                        <button class="mc-action-btn mc-tooltip mc-btn-employer-toggle-type"
+                                                            data-user-id="<?php echo $employee_user->ID; ?>"
+                                                            data-current-type="<?php echo esc_attr($item['type']); ?>"
+                                                            title="<?php echo $item['type'] === 'potential' ? 'Mark as Employee' : 'Mark as Candidate'; ?>">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 3M21 7.5H7.5" />
+                                                            </svg>
+                                                            <span class="tooltiptext"><?php echo $item['type'] === 'potential' ? 'Mark as Employee' : 'Mark as Candidate'; ?></span>
+                                                        </button>
                                                         <!-- Active user actions in logical order -->
 
                                                         <!-- 1. Manage Role -->
@@ -1324,6 +1335,48 @@ class MC_Employer_Dashboard
         <script>    const ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
             const MC_COMPANY_NAME = '<?php echo esc_js($company_name); ?>';
             const MC_IS_ADMIN = <?php echo (current_user_can('manage_options') || (function_exists('current_user_switched') && current_user_switched())) ? 'true' : 'false'; ?>;
+            const MC_EMPLOYER_TOGGLE_NONCE = '<?php echo wp_create_nonce('mc_employer_dashboard_nonce'); ?>';
+
+            // Employee ↔ Candidate type toggle
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.mc-btn-employer-toggle-type');
+                if (!btn) return;
+                const userId = btn.dataset.userId;
+                const currentType = btn.dataset.currentType;
+                const newLabel = currentType === 'potential' ? 'Employee' : 'Candidate';
+                if (!confirm('Mark this person as a ' + newLabel + '?')) return;
+
+                btn.disabled = true;
+                const formData = new FormData();
+                formData.append('action', 'mc_employer_toggle_type');
+                formData.append('nonce', MC_EMPLOYER_TOGGLE_NONCE);
+                formData.append('user_id', userId);
+
+                fetch(ajaxurl, { method: 'POST', body: formData })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update button state
+                            btn.dataset.currentType = data.data.new_type;
+                            btn.title = data.data.new_tooltip;
+                            btn.querySelector('.tooltiptext').textContent = data.data.new_tooltip;
+                            // Update the type badge in the same row
+                            const row = btn.closest('tr');
+                            if (row) {
+                                const badge = row.querySelector('.mc-type-badge');
+                                if (badge) {
+                                    badge.className = 'mc-type-badge ' + data.data.new_type;
+                                    badge.textContent = data.data.new_label;
+                                }
+                                row.dataset.type = data.data.new_type;
+                            }
+                        } else {
+                            alert('Error: ' + (data.data && data.data.message ? data.data.message : 'Unknown error'));
+                        }
+                        btn.disabled = false;
+                    })
+                    .catch(() => { alert('Request failed.'); btn.disabled = false; });
+            });
 
             function downloadReportPDF(btn) {
                 const element = document.getElementById('mc-report-content');
@@ -2529,5 +2582,53 @@ class MC_Employer_Dashboard
         update_user_meta($emp_id, 'mc_employment_type', $type);
 
         wp_send_json_success(['message' => 'Context saved.']);
+    }
+
+    /**
+     * AJAX: Toggle employment type between 'current' and 'potential' (employer-scoped).
+     */
+    public static function ajax_employer_toggle_type()
+    {
+        check_ajax_referer('mc_employer_dashboard_nonce', 'nonce');
+
+        if (!current_user_can(MC_Roles::CAP_MANAGE_EMPLOYEES)) {
+            wp_send_json_error(['message' => 'Permission denied.'], 403);
+        }
+
+        $current_user_id = get_current_user_id();
+        $emp_id = intval($_POST['user_id'] ?? 0);
+        if (!$emp_id) {
+            wp_send_json_error(['message' => 'Invalid user ID.']);
+        }
+
+        // Verify the employee belongs to this employer
+        $linked_employer = get_user_meta($emp_id, 'mc_linked_employer_id', true);
+        if (intval($linked_employer) !== $current_user_id && !current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Not authorized to manage this employee.'], 403);
+        }
+
+        $current_type = get_user_meta($emp_id, 'mc_employment_type', true) ?: 'current';
+        $new_type = ($current_type === 'current') ? 'potential' : 'current';
+        update_user_meta($emp_id, 'mc_employment_type', $new_type);
+
+        // Also update the invited employees list entry
+        $invited = get_user_meta($current_user_id, 'mc_invited_employees', true);
+        if (is_array($invited)) {
+            $emp_email = get_userdata($emp_id)->user_email;
+            foreach ($invited as &$entry) {
+                $entry_email = is_array($entry) ? $entry['email'] : $entry;
+                if ($entry_email === $emp_email && is_array($entry)) {
+                    $entry['type'] = $new_type;
+                    break;
+                }
+            }
+            update_user_meta($current_user_id, 'mc_invited_employees', $invited);
+        }
+
+        wp_send_json_success([
+            'new_type'    => $new_type,
+            'new_label'   => $new_type === 'potential' ? 'Candidate' : 'Employee',
+            'new_tooltip' => $new_type === 'potential' ? 'Mark as Employee' : 'Mark as Candidate',
+        ]);
     }
 }

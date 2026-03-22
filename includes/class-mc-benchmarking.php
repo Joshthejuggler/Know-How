@@ -83,32 +83,45 @@ class MC_Benchmarking {
         $user_id = get_current_user_id();
         $is_global_admin = current_user_can('manage_options');
 
+        // Current employees: type is 'current' OR meta not set at all (legacy users)
         $args_current = [
-            'meta_key'   => 'mc_employment_type',
-            'meta_value' => 'current',
-            'fields'     => ['ID', 'display_name', 'user_email']
+            'fields'     => ['ID', 'display_name', 'user_email'],
+            'meta_query' => [
+                'relation' => 'OR',
+                [
+                    'key'     => 'mc_employment_type',
+                    'value'   => 'current',
+                    'compare' => '='
+                ],
+                [
+                    'key'     => 'mc_employment_type',
+                    'compare' => 'NOT EXISTS'
+                ]
+            ]
         ];
 
+        // Candidates: type must explicitly be 'potential'
         $args_candidates = [
-            'meta_key'   => 'mc_employment_type',
-            'meta_value' => 'potential',
-            'fields'     => ['ID', 'display_name', 'user_email']
+            'fields'     => ['ID', 'display_name', 'user_email'],
+            'meta_query' => [
+                [
+                    'key'     => 'mc_employment_type',
+                    'value'   => 'potential',
+                    'compare' => '='
+                ]
+            ]
         ];
 
         // Scope to current employer if they are not a global admin
         if (!$is_global_admin) {
-            $args_current['meta_query'] = [
-                [
-                    'key'   => 'mc_linked_employer_id',
-                    'value' => $user_id
-                ]
+            $employer_scope = [
+                'key'   => 'mc_linked_employer_id',
+                'value' => $user_id
             ];
-            $args_candidates['meta_query'] = [
-                [
-                    'key'   => 'mc_linked_employer_id',
-                    'value' => $user_id
-                ]
-            ];
+            $args_current['meta_query'][] = $employer_scope;
+            $args_candidates['meta_query'][] = $employer_scope;
+            // For candidates, require 'relation' because we have two meta conditions
+            $args_candidates['meta_query']['relation'] = 'AND';
         }
 
         $current_employees = get_users($args_current);
