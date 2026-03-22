@@ -378,29 +378,23 @@ class MC_Helpers {
             return $scores;
         }
 
-        // Rank multipliers: index 0 = 1st place, etc.
-        $multipliers = [ 1.30, 1.15, 1.05, 0.90, 0.80, 0.75, 0.70, 0.65 ];
-
-        // Sort descending to assign ranks (preserves slug association)
-        arsort( $scores );
-        $ranked_slugs = array_keys( $scores );
-
-        // Apply per-rank multiplier
-        $weighted = [];
-        foreach ( $ranked_slugs as $rank => $slug ) {
-            $m = $multipliers[ min( $rank, count( $multipliers ) - 1 ) ];
-            $weighted[ $slug ] = $scores[ $slug ] * $m;
+        $max_raw = max( $scores );
+        if ( $max_raw <= 0 ) {
+            return $scores;
         }
-
-        // Re-normalise: if the boosted top value exceeds 100, scale everything
-        // down proportionally so the ceiling stays at 100.
-        $max_val = max( $weighted );
-        $scale   = ( $max_val > 100 ) ? ( 100 / $max_val ) : 1.0;
 
         $result = [];
-        foreach ( $weighted as $slug => $val ) {
-            $result[ $slug ] = (int) min( 100, round( $val * $scale ) );
+        foreach ( $scores as $slug => $val ) {
+            // Anchor the curve to their own actual highest score.
+            // Using a power of 2.5 expands the gap aggressively downward without
+            // artificially pinning the top score to 100.
+            $ratio = $val / $max_raw;
+            $curved_val = pow( $ratio, 2.5 ) * $max_raw;
+            $result[ $slug ] = (int) round( $curved_val );
         }
+
+        // Sort descending so the caller still gets ranked order
+        arsort( $result );
 
         return $result;
     }
