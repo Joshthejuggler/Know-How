@@ -38,7 +38,7 @@ class MC_Landing_Pages
             wp_send_json_error(['message' => 'Please fill in all required fields.']);
         }
 
-        $admin_email = get_option('admin_email');
+        $admin_email = 'zac@akminitiatives.com';
         $subject = '[Employer Access Request] ' . $company . ' — ' . $name;
 
         $body = "New employer access request:\n\n";
@@ -50,7 +50,11 @@ class MC_Landing_Pages
         }
         $body .= "\n---\nSubmitted from the employer landing page.";
 
-        $sent = wp_mail($admin_email, $subject, $body, ['Reply-To: ' . $name . ' <' . $email . '>']);
+        $headers = [
+            'Reply-To: ' . $name . ' <' . $email . '>',
+            'Bcc: josh@digitalworkhorse.ca',
+        ];
+        $sent = wp_mail($admin_email, $subject, $body, $headers);
 
         if ($sent) {
             wp_send_json_success(['message' => 'Your request has been submitted. We\'ll be in touch soon!']);
