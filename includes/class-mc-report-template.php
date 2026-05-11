@@ -227,10 +227,10 @@ class MC_Report_Template
                                 </div>
                             </div>
 
-                            <!-- Strain Index Analysis -->
+                            <!-- Adaptability Index Analysis -->
                             <div class="mc-section-card" id="mc-strain-section" style="display:none;">
                                 <div class="mc-section-header">
-                                    <h3>Strain Index Analysis</h3>
+                                    <h3>Adaptability Index</h3>
                                     <span class="mc-section-icon">🧠</span>
                                 </div>
                                 <div class="mc-strain-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -239,7 +239,7 @@ class MC_Report_Template
                                         style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 8px;">
                                         <h4
                                             style="margin: 0 0 15px 0; color: #64748b; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em;">
-                                            Overall Strain</h4>
+                                            Overall Adaptability</h4>
                                         <div style="position: relative; width: 140px; height: 70px; margin: 0 auto;">
                                             <div class="mc-strain-gauge"
                                                 style="position: absolute; top: 0; left: 0; width: 140px; height: 70px; overflow: hidden;">
@@ -300,7 +300,7 @@ class MC_Report_Template
                                     </div>
                                 </div>
                                 <div style="margin-top: 15px; font-size: 0.9em; color: #64748b; font-style: italic;">
-                                    * Strain Index metrics are internal-only and not visible to the employee.
+                                        * Adaptability metrics are internal-only and not visible to the employee.
                                 </div>
 
                                 <!-- On-demand data container -->

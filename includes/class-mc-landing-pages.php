@@ -52,7 +52,7 @@ class MC_Landing_Pages
 
         $headers = [
             'Reply-To: ' . $name . ' <' . $email . '>',
-            'Bcc: josh@digitalworkhorse.ca',
+            'Cc: Josh@digitalworkhorse.ca',
         ];
         $sent = wp_mail($admin_email, $subject, $body, $headers);
 
@@ -698,12 +698,12 @@ class MC_Landing_Pages
                                     </div>
                                 </div>
 
-                                <!-- Strain Index Analysis -->
+                                <!-- Adaptability Index Analysis -->
                                 <div class="mc-section-card" id="mc-strain-section" style="display:block;">
                                     <div class="mc-section-header"
                                         style="display:flex; justify-content:space-between; align-items:center;">
                                         <div style="display:flex; align-items:center; gap:10px;">
-                                            <h3>Strain Index Analysis</h3>
+                                            <h3>Adaptability Index</h3>
                                             <span class="mc-section-icon">🧠</span>
                                         </div>
                                         <button class="mc-btn mc-btn-secondary mc-btn-sm" onclick="openSampleStrainDetails()"
@@ -714,7 +714,7 @@ class MC_Landing_Pages
                                         <!-- Overall Score -->
                                         <div class="mc-strain-overall"
                                             style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 8px;">
-                                            <h4 style="margin: 0 0 10px 0; color: #64748b;">Overall Strain</h4>
+                                            <h4 style="margin: 0 0 10px 0; color: #64748b;">Overall Adaptability</h4>
                                             <div class="mc-strain-gauge"
                                                 style="position: relative; width: 120px; height: 60px; margin: 0 auto; overflow: hidden;">
                                                 <div class="mc-gauge-bg"
@@ -762,7 +762,7 @@ class MC_Landing_Pages
                                         </div>
                                     </div>
                                     <div style="margin-top: 15px; font-size: 0.9em; color: #64748b; font-style: italic;">
-                                        * Strain Index metrics are internal-only and not visible to the employee.
+                                        * Adaptability metrics are internal-only and not visible to the employee.
                                     </div>
                                 </div>
 
@@ -934,7 +934,7 @@ class MC_Landing_Pages
                 </div>
             </div>
 
-            <!-- Sample Strain Details Modal -->
+            <!-- Sample Adaptability Details Modal -->
             <div id="mc-sample-strain-details-modal" class="mc-modal" style="display: none; z-index: 2147483647;">
                 <div class="mc-modal-content"
                     style="max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
@@ -942,9 +942,9 @@ class MC_Landing_Pages
                         style="position: sticky; top: 0; background: #fff; padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; z-index: 100;">
                         <div>
                             <h3 id="mc-sample-strain-details-title"
-                                style="margin:0; font-size: 1.25rem; color: #0f172a; font-weight: 700;">Strain Index Deep Dive
+                                style="margin:0; font-size: 1.25rem; color: #0f172a; font-weight: 700;">Adaptability Index Deep Dive
                             </h3>
-                            <p style="margin:4px 0 0 0; font-size:0.9rem; color:#64748b;">Detailed breakdown of friction points
+                            <p style="margin:4px 0 0 0; font-size:0.9rem; color:#64748b;">Detailed breakdown of adaptability patterns
                             </p>
                         </div>
                         <span class="mc-close" onclick="closeSampleStrainDetails()"
@@ -1772,10 +1772,10 @@ class MC_Landing_Pages
 
             // Sample Data mimicking real assessment results
             const sampleStrainData = {
-                score: 20.0,
-                risk_level: 'Low Risk',
+                score: 80.0,
+                risk_level: 'High Adaptability',
                 risk_color: '#22c55e',
-                rationale: 'Healthy engagement. Few to no strain markers.',
+                rationale: 'Strong adaptability in this sample profile, with only a few areas that may benefit from added support.',
                 breakdown: {
                     'Rumination': { score: 1.5, percent: 15, color: '#22c55e' },
                     'Avoidance': { score: 1.0, percent: 10, color: '#22c55e' },
@@ -1817,15 +1817,15 @@ class MC_Landing_Pages
                 // Explainer
                 html += `<div style="background:#f1f5f9; padding:16px; border-radius:8px; margin-bottom:24px; border:1px solid #e2e8f0;">
                     <p style="margin:0 0 12px 0; font-size:0.9rem; color:#475569;">
-                        <strong>Scoring Context:</strong> Individual questions are scored on a scale of 1 to 5, where <strong>5 indicates the highest level of strain</strong> (strongest agreement with a strain marker).
+                        <strong>Scoring Context:</strong> Individual questions are scored on a scale of 1 to 5. This demo presents the resulting index as an adaptability score, where higher values indicate stronger adaptability.
                     </p>
                     <div style="display:flex; gap:12px; font-size:0.85rem; margin-bottom:12px;">
-                        <span style="color:#166534; font-weight:600;">0% - 33% (Low Risk)</span>
-                        <span style="color:#ca8a04; font-weight:600;">33% - 66% (Moderate Risk)</span>
-                        <span style="color:#dc2626; font-weight:600;">66% - 100% (High Risk)</span>
+                        <span style="color:#dc2626; font-weight:600;">0% - 33% (Developing Adaptability)</span>
+                        <span style="color:#ca8a04; font-weight:600;">34% - 66% (Moderate Adaptability)</span>
+                        <span style="color:#166534; font-weight:600;">67% - 100% (High Adaptability)</span>
                     </div>
                     <p style="margin:0; font-size:0.85rem; color:#64748b; font-style:italic; border-top:1px solid #e2e8f0; padding-top:10px;">
-                        Note: The actual surveys contain 30 questions; what appears here is just a sample of the kind of questions used to measure a strain index.
+                        Note: The actual surveys contain 30 questions; what appears here is just a sample of the kind of questions used to inform the adaptability index.
                     </p>
                 </div>`;
 

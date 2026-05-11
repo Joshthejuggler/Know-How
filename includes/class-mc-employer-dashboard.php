@@ -1684,14 +1684,15 @@ class MC_Employer_Dashboard
                 // --- STRAIN INDEX SECTION ---
                 const strainSection = document.getElementById('mc-strain-section');
                 try {
-                    console.log('DEBUG: Strain Index Logic Start', data.strain_results);
+                    console.log('DEBUG: Adaptability Index Logic Start', data.strain_results);
 
                     if (data.strain_results && data.strain_results.strain_index) {
                         const si = data.strain_results.strain_index;
                         const norm = si.normalized || {};
                         const overall = si.overall_strain !== undefined ? si.overall_strain : 0;
+                        const adaptability = Math.max(0, Math.min(1, 1 - overall));
 
-                        console.log('DEBUG: Strain Index Data Found', { si, norm, overall });
+                        console.log('DEBUG: Adaptability Index Data Found', { si, norm, overall, adaptability });
 
                         if (strainSection) {
                             strainSection.style.display = 'block';
@@ -1702,32 +1703,31 @@ class MC_Employer_Dashboard
 
                         // Update Overall Score
                         const overallScoreEl = document.getElementById('mc-strain-overall-score');
-                        if (overallScoreEl) overallScoreEl.textContent = (overall * 100).toFixed(1);
+                        if (overallScoreEl) overallScoreEl.textContent = (adaptability * 100).toFixed(1);
 
                         // Update Gauge
                         const gaugeFill = document.getElementById('mc-strain-gauge-fill');
                         if (gaugeFill) {
                             // Map 0-1 to 0-180 degrees
                             // 0 = -180deg (empty), 1 = 0deg (full)
-                            const rotation = -180 + (overall * 180);
+                            const rotation = -180 + (adaptability * 180);
                             gaugeFill.style.transform = `rotate(${rotation}deg)`;
 
-                            // Color based on severity
-                            if (overall < 0.33) gaugeFill.style.backgroundColor = '#22c55e'; // Green (Low Strain)
-                            else if (overall < 0.66) gaugeFill.style.backgroundColor = '#f59e0b'; // Yellow (Med Strain)
-                            else gaugeFill.style.backgroundColor = '#ef4444'; // Red (High Strain)
+                            if (adaptability >= 0.67) gaugeFill.style.backgroundColor = '#22c55e';
+                            else if (adaptability >= 0.34) gaugeFill.style.backgroundColor = '#f59e0b';
+                            else gaugeFill.style.backgroundColor = '#ef4444';
                         }
 
                         // Update Sub-Indices
                         const updateBar = (key, val) => {
+                            const displayVal = Math.max(0, Math.min(1, 1 - val));
                             const valEl = document.getElementById(`mc-strain-${key}-val`);
                             const barEl = document.getElementById(`mc-strain-${key}-bar`);
-                            if (valEl) valEl.textContent = (val * 100).toFixed(0) + '%';
+                            if (valEl) valEl.textContent = (displayVal * 100).toFixed(0) + '%';
                             if (barEl) {
-                                barEl.style.width = (val * 100) + '%';
-                                // Color logic
-                                if (val < 0.33) barEl.style.backgroundColor = '#22c55e';
-                                else if (val < 0.66) barEl.style.backgroundColor = '#f59e0b';
+                                barEl.style.width = (displayVal * 100) + '%';
+                                if (displayVal >= 0.67) barEl.style.backgroundColor = '#22c55e';
+                                else if (displayVal >= 0.34) barEl.style.backgroundColor = '#f59e0b';
                                 else barEl.style.backgroundColor = '#ef4444';
                             }
                         };
@@ -1737,11 +1737,11 @@ class MC_Employer_Dashboard
                         updateBar('flood', norm.emotional_flood || 0);
 
                     } else {
-                        console.log('DEBUG: No Strain Index Data');
+                        console.log('DEBUG: No Adaptability Index Data');
                         if (strainSection) strainSection.style.display = 'none';
                     }
                 } catch (e) {
-                    console.error('DEBUG: Error in Strain Index Logic', e);
+                    console.error('DEBUG: Error in Adaptability Index Logic', e);
                     // Ensure it doesn't stay in a broken state if possible, or maybe hide it?
                     // if (strainSection) strainSection.style.display = 'none'; 
                 }
@@ -2349,7 +2349,7 @@ class MC_Employer_Dashboard
                 style="max-width:800px; margin:50px auto; padding:0; border-radius:12px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
                 <div class="mc-modal-header"
                     style="background:#fff; padding:20px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-                    <h2 id="mc-strain-details-title" style="margin:0; font-size:18px; color:#1e293b;">Strain Index Details</h2>
+                    <h2 id="mc-strain-details-title" style="margin:0; font-size:18px; color:#1e293b;">Adaptability Index Details</h2>
                     <span class="mc-close" onclick="closeStrainDetailsModal()"
                         style="cursor:pointer; font-size:24px; color:#94a3b8;">&times;</span>
                 </div>
@@ -2371,7 +2371,7 @@ class MC_Employer_Dashboard
                 const body = document.getElementById('mc-strain-details-body');
                 const title = document.getElementById('mc-strain-details-title');
 
-                if (title) title.textContent = 'Strain Index Analysis: ' + (data.name || 'Employee');
+                if (title) title.textContent = 'Adaptability Index: ' + (data.name || 'Employee');
 
                 // Check if data contains detailed answers. If not, fetch them.
                 if (!data.detailed_answers) {
@@ -2414,27 +2414,28 @@ class MC_Employer_Dashboard
                 // Overall Score Rationale
                 const si = data.strain_results?.strain_index || {};
                 const overall = si.overall_strain !== undefined ? si.overall_strain : 0;
-                const scorePct = (overall * 100).toFixed(1);
+                const adaptability = Math.max(0, Math.min(1, 1 - overall));
+                const scorePct = (adaptability * 100).toFixed(1);
 
                 let color = '#22c55e';
-                let level = 'Low Risk';
-                let rationale = 'This score indicates the employee is showing healthy levels of engagement and resilience.';
+                let level = 'High Adaptability';
+                let rationale = 'This score suggests the employee typically stays flexible, decisive, and composed when demands increase.';
 
-                if (overall >= 0.66) {
+                if (adaptability < 0.34) {
                     color = '#dc2626';
-                    level = 'High Risk';
-                    rationale = 'This score indicates significant strain markers. The employee is likely experiencing high levels of rumination, avoidance, or emotional flooding which may lead to burnout.';
-                } else if (overall >= 0.33) {
+                    level = 'Developing Adaptability';
+                    rationale = 'This score suggests adaptability may depend more heavily on structure, pacing, and support in demanding conditions.';
+                } else if (adaptability < 0.67) {
                     color = '#ca8a04';
-                    level = 'Moderate Risk';
-                    rationale = 'This score indicates emerging strain markers. While not critical, monitor for signs of increased stress or disengagement.';
+                    level = 'Moderate Adaptability';
+                    rationale = 'This score suggests solid adaptability with a few pressure points that may benefit from coaching or environmental support.';
                 }
 
                 html += `
                     <div style="display:flex; align-items:center; gap:20px; padding:20px; background:#f8fafc; border-radius:8px; margin-bottom:24px; border-left:4px solid ${color};">
                         <div style="text-align:center;">
                             <div style="font-size:32px; font-weight:800; color:${color};">${scorePct}%</div>
-                            <div style="font-size:12px; font-weight:600; text-transform:uppercase; color:#64748b;">Strain Index</div>
+                            <div style="font-size:12px; font-weight:600; text-transform:uppercase; color:#64748b;">Adaptability Index</div>
                         </div>
                         <div>
                             <h3 style="margin:0 0 8px; color:${color};">${level}</h3>
@@ -2446,13 +2447,13 @@ class MC_Employer_Dashboard
                 // Scoring Explanation Legend
                 html += `
                     <div style="margin-bottom:20px; padding:15px; background:#fff; border:1px solid #e2e8f0; border-radius:6px; font-size:13px; color:#64748b;">
-                        <h4 style="margin:0 0 8px; color:#475569; font-size:13px; text-transform:uppercase;">About Strain Scoring</h4>
-                        <p style="margin:0 0 8px;">The Strain Index measures <strong>cognitive and emotional friction</strong>—the mental effort required to maintain engagement. It is an aggregate score derived from 30 specific questions across the MI, CDT, and Bartle assessments.</p>
-                        <p style="margin:0 0 8px;"><strong>Scoring Context:</strong> Individual questions are scored on a scale of 1 to 5, where <strong>5 indicates the highest level of strain</strong> (strongest agreement with a strain marker).</p>
+                        <h4 style="margin:0 0 8px; color:#475569; font-size:13px; text-transform:uppercase;">About Adaptability Scoring</h4>
+                        <p style="margin:0 0 8px;">The Adaptability Index is an internal summary of how flexibly the employee is likely to respond under pressure. It is derived from existing assessment response patterns distributed across the MI, CDT, and Bartle assessments.</p>
+                        <p style="margin:0 0 8px;"><strong>Scoring Context:</strong> Individual questions are still captured on the original 1 to 5 response scale, and the resulting report score is presented so higher percentages indicate stronger adaptability.</p>
                         <ul style="margin:0; padding-left:16px; line-height:1.5;">
-                            <li><span style="color:#22c55e; font-weight:bold;">0% - 33% (Low Risk):</span> Healthy engagement. Few to no strain markers.</li>
-                            <li><span style="color:#ca8a04; font-weight:bold;">33% - 66% (Moderate Risk):</span> Emerging strain. Some conflicting motivations or avoidance behaviors present.</li>
-                            <li><span style="color:#dc2626; font-weight:bold;">66% - 100% (High Risk):</span> Significant strain. High potential for burnout or disengagement.</li>
+                            <li><span style="color:#22c55e; font-weight:bold;">67% - 100% (High Adaptability):</span> Usually stays flexible and composed when complexity rises.</li>
+                            <li><span style="color:#ca8a04; font-weight:bold;">34% - 66% (Moderate Adaptability):</span> Generally steady, with a few conditions where additional support can help.</li>
+                            <li><span style="color:#dc2626; font-weight:bold;">0% - 33% (Developing Adaptability):</span> More likely to benefit from structure, pacing, and clearer support in demanding conditions.</li>
                         </ul>
                     </div>
                 `;
@@ -2460,9 +2461,9 @@ class MC_Employer_Dashboard
                 // Detailed Answers Breakdown
                 const details = data.detailed_answers || {};
                 const cats = {
-                    'rumination': 'Processing Style (Rumination)',
-                    'avoidance': 'Decision Dynamics (Avoidance)',
-                    'flood': 'Engagement Style (Emotional Flood)'
+                    'rumination': 'Processing Flexibility',
+                    'avoidance': 'Decision Clarity',
+                    'flood': 'Composure Under Pressure'
                 };
 
                 html += '<div class="mc-strain-accordion">';

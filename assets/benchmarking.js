@@ -317,6 +317,48 @@ jQuery(document).ready(function($) {
                 </div>
             `);
         }
+
+        renderMiRecommendations(data);
+    }
+
+    function renderMiRecommendations(data) {
+        const intro = $('#mc-mi-recommendations-intro');
+        const list = $('#mc-mi-recommendations-list');
+        const recommendations = Array.isArray(data.mi_recommendations) ? data.mi_recommendations : [];
+
+        intro.text(data.mi_recommendation_intro || '');
+        list.empty();
+
+        if (!recommendations.length) {
+            list.html(`
+                <div class="mc-mi-recommendation-empty">
+                    MI-based team recommendations will appear here once the selected scorecard includes completed intelligence results.
+                </div>
+            `);
+            return;
+        }
+
+        recommendations.forEach(item => {
+            const activities = (item.activities || []).map(activity => `<li>${escapeHtml(activity)}</li>`).join('');
+            const rationale = escapeHtml(item.ai_rationale || item.why_it_matters || '');
+
+            list.append(`
+                <article class="mc-mi-recommendation-card intelligence-${escapeHtml(item.slug)}">
+                    <div class="mc-mi-card-head">
+                        <div>
+                            <div class="mc-mi-card-label">${escapeHtml(item.label)}</div>
+                            <div class="mc-mi-card-score">${Math.round(item.score)} / 100</div>
+                        </div>
+                        <span class="mc-mi-card-badge">Top Team Signal</span>
+                    </div>
+                    <p class="mc-mi-card-rationale">${rationale}</p>
+                    <div class="mc-mi-card-subhead">Suggested team activities</div>
+                    <ul class="mc-mi-card-activities">
+                        ${activities}
+                    </ul>
+                </article>
+            `);
+        });
     }
 
     function initCultureRadar(chartData) {
@@ -387,6 +429,199 @@ jQuery(document).ready(function($) {
                 }
             }
         });
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function getBandTone(status, isFriction = false) {
+        if (isFriction) {
+            if (status === 'high') return { bg: '#fee2e2', fg: '#991b1b' };
+            if (status === 'moderate') return { bg: '#fef3c7', fg: '#92400e' };
+            return { bg: '#dcfce7', fg: '#166534' };
+        }
+
+        if (status === 'high') return { bg: '#dcfce7', fg: '#166534' };
+        if (status === 'moderate') return { bg: '#fef3c7', fg: '#92400e' };
+        return { bg: '#fee2e2', fg: '#991b1b' };
+    }
+
+    function renderComparisonSection(title, description, comparisons, accentColor, options = {}) {
+        if (!comparisons || !comparisons.length) return '';
+
+        const isFriction = !!options.isFriction;
+        const rows = comparisons.map(comparison => {
+            const tone = getBandTone(comparison.status, isFriction);
+            const scenario = comparison.scenario ? `
+                <div class="mc-report-scenario">${escapeHtml(comparison.scenario)}</div>
+            ` : '';
+
+            return `
+                <div class="mc-report-comparison-row">
+                    <div class="mc-report-row-head">
+                        <div>
+                            <h4>${escapeHtml(comparison.label)}</h4>
+                            <p>${escapeHtml(comparison.band_label)} • Gap ${Math.round(comparison.gap)} points</p>
+                        </div>
+                        <span class="mc-report-pill" style="background:${tone.bg}; color:${tone.fg};">${escapeHtml(comparison.band_label)}</span>
+                    </div>
+                    <div class="mc-report-bars">
+                        <div class="mc-report-bar-line">
+                            <span>Scorecard Avg</span>
+                            <div class="mc-report-bar-track">
+                                <div class="mc-report-bar-fill mc-report-bar-team" style="width:${comparison.team_score}%;"></div>
+                            </div>
+                            <strong>${Math.round(comparison.team_score)}</strong>
+                        </div>
+                        <div class="mc-report-bar-line">
+                            <span>Candidate</span>
+                            <div class="mc-report-bar-track">
+                                <div class="mc-report-bar-fill mc-report-bar-candidate" style="width:${comparison.candidate_score}%; background:${accentColor};"></div>
+                            </div>
+                            <strong>${Math.round(comparison.candidate_score)}</strong>
+                        </div>
+                    </div>
+                    ${scenario}
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <section class="mc-report-section">
+                <div class="mc-report-section-header">
+                    <h3>${escapeHtml(title)}</h3>
+                    <p>${escapeHtml(description)}</p>
+                </div>
+                <div class="mc-report-comparison-list">
+                    ${rows}
+                </div>
+            </section>
+        `;
+    }
+
+    function renderListCard(title, items, toneClass = '') {
+        if (!items || !items.length) return '';
+        const rows = items.map(item => `<li>${escapeHtml(item)}</li>`).join('');
+        return `
+            <div class="mc-report-list-card ${toneClass}">
+                <h4>${escapeHtml(title)}</h4>
+                <ul>${rows}</ul>
+            </div>
+        `;
+    }
+
+    function renderAdaptabilitySection(adaptability) {
+        if (!adaptability) return '';
+
+        const tone = getBandTone(
+            adaptability.band?.status === 'developing' ? 'low' : adaptability.band?.status,
+            false
+        );
+
+        const subIndices = Object.values(adaptability.sub_indices || {}).map(sub => `
+            <div class="mc-report-adapt-row">
+                <div class="mc-report-row-head">
+                    <div>
+                        <h4>${escapeHtml(sub.label)}</h4>
+                        <p>${escapeHtml(sub.description || '')}</p>
+                    </div>
+                    <div class="mc-report-adapt-values">
+                        <strong>${Math.round(sub.display_score)} / 100</strong>
+                        <span>Scorecard Avg ${Math.round(sub.scorecard_average ?? 0)} / 100</span>
+                    </div>
+                </div>
+                <div class="mc-report-bars">
+                    <div class="mc-report-bar-line">
+                        <span>Candidate</span>
+                        <div class="mc-report-bar-track">
+                            <div class="mc-report-bar-fill" style="width:${sub.display_score}%; background:#0f172a;"></div>
+                        </div>
+                        <strong>${Math.round(sub.display_score)} / 100</strong>
+                    </div>
+                    <div class="mc-report-bar-line">
+                        <span>Scorecard Avg</span>
+                        <div class="mc-report-bar-track">
+                            <div class="mc-report-bar-fill mc-report-bar-team" style="width:${sub.scorecard_average ?? 0}%;"></div>
+                        </div>
+                        <strong>${Math.round(sub.scorecard_average ?? 0)} / 100</strong>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        return `
+            <section class="mc-report-section">
+                <div class="mc-report-section-header">
+                    <h3>Adaptability Index</h3>
+                    <p>Internal-only summary derived from existing assessment response patterns. Higher scores indicate stronger adaptability capacity.</p>
+                </div>
+                <div class="mc-report-adapt-hero" style="border-left-color:${tone.fg};">
+                    <div class="mc-report-adapt-score">
+                        <span>${Math.round(adaptability.score)}</span>
+                        <small>/ 100</small>
+                    </div>
+                    <div class="mc-report-adapt-copy">
+                        <h4 style="color:${tone.fg};">${escapeHtml(adaptability.band?.label || 'Adaptability')}</h4>
+                        <p>${escapeHtml(adaptability.summary || '')}</p>
+                        <div class="mc-report-adapt-meta">Target scorecard average: <strong>${Math.round(adaptability.scorecard_average ?? 0)} / 100</strong></div>
+                    </div>
+                </div>
+                <div class="mc-report-adapt-grid">
+                    ${subIndices}
+                </div>
+            </section>
+        `;
+    }
+
+    function renderIntegratedReportBody(cultureData, targetName) {
+        const onboarding = cultureData.recommendations?.onboarding_modifications || [];
+        const dynamics = cultureData.recommendations?.cultural_dynamics || [];
+        const cultureSection = `
+            <section class="mc-report-section">
+                <div class="mc-report-section-header">
+                    <h3>Culture Fit</h3>
+                    <p>Detailed readout for ${escapeHtml(cultureData.candidate_name)} against the ${escapeHtml(cultureData.scorecard_label || targetName)} baseline.</p>
+                </div>
+                <div class="mc-report-callout">
+                    <strong>${escapeHtml(cultureData.fit_label || 'Culture Fit')}</strong>
+                    <p>${escapeHtml(cultureData.bartle?.fit_narrative || '')}</p>
+                </div>
+                <div class="mc-report-list-grid">
+                    ${renderListCard('Onboarding Modifications', onboarding, 'tone-blue')}
+                    ${renderListCard('Cultural Dynamics To Watch', dynamics, 'tone-slate')}
+                </div>
+            </section>
+        `;
+
+        return `
+            ${cultureSection}
+            ${renderComparisonSection(
+                'Intelligences Comparison',
+                'Compare the candidate’s intelligence profile against the selected scorecard average to see where they mirror the team and where they expand it.',
+                cultureData.mi_comparisons,
+                '#0f766e'
+            )}
+            ${renderComparisonSection(
+                'Growth Strengths Comparison',
+                'Review the candidate’s CDT dimensions against the team average to identify likely friction zones and onboarding considerations.',
+                cultureData.cdt_comparisons,
+                '#7c3aed',
+                { isFriction: true }
+            )}
+            ${renderComparisonSection(
+                'Motivators Comparison',
+                'Compare the candidate’s player-type pattern to the scorecard baseline to understand where motivation styles align or diverge.',
+                cultureData.bartle_comparisons,
+                '#b45309'
+            )}
+            ${renderAdaptabilitySection(cultureData.adaptability_index)}
+        `;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -513,24 +748,8 @@ jQuery(document).ready(function($) {
         renderSection('Moderate Alignment (60-84%)', midMatches, '#d97706'); // amber-600
         renderSection('Low Alignment (<60%)', lowMatches, '#dc2626'); // red-600
 
-        // Culture Fit Narrative (The text payload)
         const body = $('#mc-fit-report-body');
-        body.empty();
-        
-        if (cultureData.onboarding_mods) {
-            body.append(`<h3>Strategic Onboarding & Reframing</h3><p>${cultureData.onboarding_mods}</p>`);
-        }
-        if (cultureData.cultural_synergy) {
-            body.append(`<h3>Cultural Synergy Analysis</h3><p>${cultureData.cultural_synergy}</p>`);
-        }
-        if (cultureData.recommendations && cultureData.recommendations.length > 0) {
-            let recHtml = '<h3>Key Recommendations</h3><ul class="mc-rec-list">';
-            cultureData.recommendations.forEach(rec => {
-                recHtml += `<li><strong>${rec.title}:</strong> ${rec.desc}</li>`;
-            });
-            recHtml += '</ul>';
-            body.append(recHtml);
-        }
+        body.html(renderIntegratedReportBody(cultureData, targetName));
     }
 
     function initTalentRadar(chartData) {

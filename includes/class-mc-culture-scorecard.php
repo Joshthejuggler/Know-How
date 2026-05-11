@@ -40,6 +40,73 @@ class MC_Culture_Scorecard {
         'naturalistic'         => 'Naturalistic',
     ];
 
+    const MI_RECOMMENDATION_LIBRARY = [
+        'linguistic' => [
+            'why_it_matters' => 'Teams with strong linguistic intelligence tend to connect through conversation, storytelling, and shared language. Activities that invite dialogue and expression usually feel energizing rather than forced.',
+            'activities' => [
+                'Host a team storytelling dinner where people share career moments, wins, or lessons learned.',
+                'Book a spoken-word event, author talk, or live theatre outing as a culture activity.',
+                'Run a collaborative book, podcast, or article club tied to your team values or industry themes.',
+            ],
+        ],
+        'logical-mathematical' => [
+            'why_it_matters' => 'Teams high in logical-mathematical intelligence often enjoy structure, puzzles, systems, and strategic problem solving. The best activities give them something meaningful to crack together.',
+            'activities' => [
+                'Plan an escape room, strategy challenge, or team problem-solving event.',
+                'Run a data-themed team challenge or innovation sprint with a clear scorecard and goals.',
+                'Book a workshop built around design thinking, analytics, or systems mapping.',
+            ],
+        ],
+        'spatial' => [
+            'why_it_matters' => 'Teams with strong spatial intelligence usually respond well to visual environments, design-forward experiences, and activities that involve making, imagining, or arranging things together.',
+            'activities' => [
+                'Book a collaborative art, pottery, or design workshop for the team.',
+                'Run a visual planning retreat using whiteboards, journey maps, and mood boards.',
+                'Choose an immersive exhibit, gallery event, or architecture-focused outing.',
+            ],
+        ],
+        'bodily-kinesthetic' => [
+            'why_it_matters' => 'Teams high in bodily-kinesthetic intelligence often bond through movement, hands-on action, and experiences that feel active rather than passive.',
+            'activities' => [
+                'Organize an active team outing such as bowling, climbing, curling, or a sports-based event.',
+                'Plan a volunteer build day or hands-on service activity where the team can make something tangible.',
+                'Choose an interactive workshop like cooking, woodworking, or maker-space collaboration.',
+            ],
+        ],
+        'musical' => [
+            'why_it_matters' => 'Teams with strong musical intelligence often pick up on rhythm, tone, and atmosphere quickly. Shared experiences with sound, cadence, and live energy can create a strong culture memory.',
+            'activities' => [
+                'Book a concert, live music night, or local festival outing.',
+                'Create a collaborative team playlist for milestones, wins, or events.',
+                'Plan a rhythm, drumming, or music-based workshop as a team-building experience.',
+            ],
+        ],
+        'interpersonal' => [
+            'why_it_matters' => 'Teams high in interpersonal intelligence usually thrive on connection, collaboration, and relationship-building. The strongest recommendations help people mix, talk, and create social trust.',
+            'activities' => [
+                'Host a dinner, off-site social, or facilitated mixer designed around real conversation.',
+                'Plan a team volunteering day with shared responsibilities and community interaction.',
+                'Run a workshop focused on collaboration, communication, or peer appreciation.',
+            ],
+        ],
+        'intrapersonal' => [
+            'why_it_matters' => 'Teams with strong intrapersonal intelligence often value reflection, self-awareness, and meaningful experiences over loud or highly stimulating events. The best activities give space for insight as well as connection.',
+            'activities' => [
+                'Plan a retreat with guided reflection, journaling, and small-group discussion.',
+                'Choose a quiet wellness activity such as a nature retreat, mindfulness session, or restorative off-site.',
+                'Create a values and strengths workshop that helps the team reflect on how they work best together.',
+            ],
+        ],
+        'naturalistic' => [
+            'why_it_matters' => 'Teams high in naturalistic intelligence often respond well to outdoor settings, ecosystems thinking, and experiences that feel grounded in the real world. Fresh-air activities can feel especially natural for this mix.',
+            'activities' => [
+                'Organize an outdoor team outing such as a fishing trip, hike, or park-based off-site.',
+                'Plan a conservation, gardening, or community clean-up activity with a shared purpose.',
+                'Choose a nature-linked experience such as camping, canoeing, or a guided outdoor excursion.',
+            ],
+        ],
+    ];
+
     // ─── CDT friction scenario map ─────────────────────────────────────────────
     // Each dimension has text for [below_team, above_team]
     const CDT_SCENARIOS = [
@@ -157,26 +224,38 @@ class MC_Culture_Scorecard {
 
     /**
      * Compute the full Culture Scorecard from an array of employee user IDs.
-     * Returns CDT averages, Bartle averages, distribution, blind spots, member names.
+     * Returns MI, CDT, and Bartle averages plus composition metadata.
      */
     public static function compute_scorecard($employee_ids) {
         if (empty($employee_ids)) {
             return null;
         }
 
+        $mi_totals     = array_fill_keys(array_keys(self::MI_LABELS),     0);
         $cdt_totals    = array_fill_keys(array_keys(self::CDT_LABELS),    0);
         $bartle_totals = array_fill_keys(array_keys(self::BARTLE_LABELS), 0);
         $bartle_dominant_counts = array_fill_keys(array_keys(self::BARTLE_LABELS), 0);
         $member_dominant_types  = [];
+        $mi_valid_count = 0;
         $valid_count = 0;
 
         foreach ($employee_ids as $uid) {
             $uid   = intval($uid);
+            $mi    = get_user_meta($uid, 'miq_quiz_results',     true);
             $cdt   = get_user_meta($uid, 'cdt_quiz_results',    true);
             $bartle = get_user_meta($uid, 'bartle_quiz_results', true);
 
             if (empty($cdt) || empty($bartle)) continue;
             $valid_count++;
+
+            if (!empty($mi['part1Scores'])) {
+                $mi_valid_count++;
+                foreach ($mi['part1Scores'] as $slug => $raw) {
+                    if (isset($mi_totals[$slug])) {
+                        $mi_totals[$slug] += round($raw / 40 * 100);
+                    }
+                }
+            }
 
             // --- CDT scores (max 50 per dimension → normalise to 0-100) ---
             if (!empty($cdt['sortedScores'])) {
@@ -221,6 +300,18 @@ class MC_Culture_Scorecard {
         }
 
         // --- Compute averages ---
+        $mi_averages = [];
+        if ($mi_valid_count > 0) {
+            foreach ($mi_totals as $slug => $total) {
+                $mi_averages[$slug] = round($total / $mi_valid_count, 1);
+            }
+            $mi_averages = MC_Helpers::apply_ipsative($mi_averages);
+        } else {
+            foreach ($mi_totals as $slug => $total) {
+                $mi_averages[$slug] = 0;
+            }
+        }
+
         $cdt_averages    = [];
         foreach ($cdt_totals as $slug => $total) {
             $cdt_averages[$slug] = round($total / $valid_count, 1);
@@ -258,14 +349,444 @@ class MC_Culture_Scorecard {
             }
         }
 
+        $mi_recommendation_bundle = self::build_mi_recommendation_bundle($mi_averages, $valid_count);
+
         return [
+            'mi'                     => $mi_averages,
             'cdt'                    => $cdt_averages,
             'bartle'                 => $bartle_averages,
+            'adaptability'           => self::compute_scorecard_adaptability($employee_ids),
+            'mi_recommendation_intro' => $mi_recommendation_bundle['intro'],
+            'mi_recommendations'      => $mi_recommendation_bundle['recommendations'],
             'player_type_distribution' => $distribution,
             'member_dominant_types'  => $member_dominant_types,
             'blind_spots'            => $blind_spots,
             'member_count'           => $valid_count,
+            'mi_member_count'        => $mi_valid_count,
             'computed_at'            => time(),
+        ];
+    }
+
+    private static function get_top_mi_dimensions($mi_averages, $limit = 3) {
+        if (empty($mi_averages) || !is_array($mi_averages)) {
+            return [];
+        }
+
+        $filtered = array_filter($mi_averages, function ($score, $slug) {
+            return isset(self::MI_LABELS[$slug]) && floatval($score) > 0;
+        }, ARRAY_FILTER_USE_BOTH);
+
+        arsort($filtered);
+        return array_slice($filtered, 0, $limit, true);
+    }
+
+    private static function build_mi_recommendation_intro_fallback($top_mi, $member_count) {
+        if (empty($top_mi)) {
+            return '';
+        }
+
+        $labels = array_map(function ($slug) {
+            return self::MI_LABELS[$slug] ?? ucfirst(str_replace('-', ' ', $slug));
+        }, array_keys($top_mi));
+
+        if (count($labels) === 1) {
+            $mix_text = $labels[0];
+        } elseif (count($labels) === 2) {
+            $mix_text = $labels[0] . ' and ' . $labels[1];
+        } else {
+            $mix_text = $labels[0] . ', ' . $labels[1] . ', and ' . $labels[2];
+        }
+
+        return "This scorecard's strongest collective intelligences are {$mix_text}. For a {$member_count}-person team, culture activities will land best when they reinforce how this group naturally connects, thinks, and recharges together.";
+    }
+
+    private static function maybe_generate_ai_mi_recommendation_copy($top_mi, $base_recommendations, $member_count) {
+        if (empty($top_mi) || empty($base_recommendations) || !class_exists('Micro_Coach_AI')) {
+            return null;
+        }
+
+        $api_key = Micro_Coach_AI::get_openai_api_key();
+        if (empty($api_key)) {
+            return null;
+        }
+
+        $cache_payload = [
+            'member_count' => intval($member_count),
+            'top_mi' => $top_mi,
+        ];
+        $cache_key = 'mc_mi_mix_' . md5(wp_json_encode($cache_payload));
+        $cached = get_transient($cache_key);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $prompt_payload = [
+            'member_count' => intval($member_count),
+            'top_intelligences' => array_map(function ($slug, $score) use ($base_recommendations) {
+                return [
+                    'slug' => $slug,
+                    'label' => self::MI_LABELS[$slug] ?? $slug,
+                    'score' => round(floatval($score), 1),
+                    'baseline_summary' => $base_recommendations[$slug]['why_it_matters'] ?? '',
+                    'activities' => $base_recommendations[$slug]['activities'] ?? [],
+                ];
+            }, array_keys($top_mi), array_values($top_mi)),
+        ];
+
+        $system = "You write concise employer-facing team culture recommendations based on a team's top multiple intelligences.\n" .
+            "Return only valid JSON with this shape:\n" .
+            "{\n" .
+            "  \"intro\": \"2 sentences max\",\n" .
+            "  \"rationales\": {\n" .
+            "    \"slug\": \"2 sentences max\"\n" .
+            "  }\n" .
+            "}\n" .
+            "Guidelines:\n" .
+            "- Keep the tone practical, specific, and upbeat.\n" .
+            "- Do not mention psychology, diagnostics, or therapy.\n" .
+            "- Do not invent activities; only explain why the curated activities fit this team's mix.\n" .
+            "- Make each rationale distinct and tied to the intelligence in question.";
+
+        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', [
+            'timeout' => 12,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type' => 'application/json',
+            ],
+            'body' => wp_json_encode([
+                'model' => Micro_Coach_AI::get_selected_model(),
+                'messages' => [
+                    ['role' => 'system', 'content' => $system],
+                    ['role' => 'user', 'content' => wp_json_encode($prompt_payload)],
+                ],
+                'temperature' => 0.4,
+                'response_format' => ['type' => 'json_object'],
+            ]),
+        ]);
+
+        if (is_wp_error($response)) {
+            return null;
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $content = $body['choices'][0]['message']['content'] ?? '';
+        if (!is_string($content) || $content === '') {
+            return null;
+        }
+
+        $parsed = json_decode($content, true);
+        if (!is_array($parsed)) {
+            return null;
+        }
+
+        $result = [
+            'intro' => sanitize_textarea_field($parsed['intro'] ?? ''),
+            'rationales' => [],
+        ];
+
+        foreach (($parsed['rationales'] ?? []) as $slug => $text) {
+            $slug = sanitize_key($slug);
+            if (!isset(self::MI_LABELS[$slug])) {
+                continue;
+            }
+            $result['rationales'][$slug] = sanitize_textarea_field($text);
+        }
+
+        set_transient($cache_key, $result, 12 * HOUR_IN_SECONDS);
+        return $result;
+    }
+
+    private static function build_mi_recommendation_bundle($mi_averages, $member_count) {
+        $top_mi = self::get_top_mi_dimensions($mi_averages, 3);
+        if (empty($top_mi)) {
+            return [
+                'intro' => '',
+                'recommendations' => [],
+            ];
+        }
+
+        $base = [];
+        foreach ($top_mi as $slug => $score) {
+            $library = self::MI_RECOMMENDATION_LIBRARY[$slug] ?? null;
+            if (!$library) {
+                continue;
+            }
+
+            $base[$slug] = [
+                'slug' => $slug,
+                'label' => self::MI_LABELS[$slug] ?? ucfirst(str_replace('-', ' ', $slug)),
+                'score' => round(floatval($score), 1),
+                'why_it_matters' => $library['why_it_matters'],
+                'activities' => array_slice($library['activities'], 0, 3),
+                'ai_rationale' => null,
+                'source' => 'curated-fallback',
+            ];
+        }
+
+        $ai_copy = self::maybe_generate_ai_mi_recommendation_copy($top_mi, $base, $member_count);
+        $intro = self::build_mi_recommendation_intro_fallback($top_mi, $member_count);
+        if (is_array($ai_copy) && !empty($ai_copy['intro'])) {
+            $intro = $ai_copy['intro'];
+        }
+
+        if (is_array($ai_copy)) {
+            foreach ($base as $slug => &$item) {
+                if (!empty($ai_copy['rationales'][$slug])) {
+                    $item['ai_rationale'] = $ai_copy['rationales'][$slug];
+                    $item['source'] = 'hybrid-ai';
+                }
+            }
+            unset($item);
+        }
+
+        return [
+            'intro' => $intro,
+            'recommendations' => array_values($base),
+        ];
+    }
+
+    private static function normalize_mi_scores($mi_raw) {
+        $scores = [];
+        if (empty($mi_raw['part1Scores']) || !is_array($mi_raw['part1Scores'])) {
+            return $scores;
+        }
+
+        foreach ($mi_raw['part1Scores'] as $slug => $raw) {
+            if (isset(self::MI_LABELS[$slug])) {
+                $scores[$slug] = round($raw / 40 * 100);
+            }
+        }
+
+        return !empty($scores) ? MC_Helpers::apply_ipsative($scores) : [];
+    }
+
+    private static function normalize_cdt_scores($cdt_raw) {
+        $scores = [];
+        if (empty($cdt_raw['sortedScores']) || !is_array($cdt_raw['sortedScores'])) {
+            return $scores;
+        }
+
+        foreach ($cdt_raw['sortedScores'] as $pair) {
+            $slug = $pair[0] ?? '';
+            $raw  = $pair[1] ?? null;
+            if (isset(self::CDT_LABELS[$slug]) && $raw !== null) {
+                $scores[$slug] = round($raw / 50 * 100);
+            }
+        }
+
+        return !empty($scores) ? MC_Helpers::apply_ipsative($scores) : [];
+    }
+
+    private static function normalize_bartle_scores($bartle_raw) {
+        $scores = [];
+        if (empty($bartle_raw['sortedScores']) || !is_array($bartle_raw['sortedScores'])) {
+            return $scores;
+        }
+
+        foreach ($bartle_raw['sortedScores'] as $pair) {
+            $slug = $pair[0] ?? '';
+            $raw  = $pair[1] ?? null;
+            if (isset(self::BARTLE_LABELS[$slug]) && $raw !== null) {
+                $scores[$slug] = round($raw / 50 * 100);
+            }
+        }
+
+        return !empty($scores) ? MC_Helpers::apply_ipsative($scores) : [];
+    }
+
+    private static function build_dimension_comparisons($labels, $scorecard_scores, $candidate_scores, $mode = 'alignment', $scenarios = []) {
+        $comparisons = [];
+
+        foreach ($labels as $slug => $label) {
+            $team_score      = round(floatval($scorecard_scores[$slug] ?? 0), 1);
+            $candidate_score = round(floatval($candidate_scores[$slug] ?? 0), 1);
+            $gap             = round(abs($team_score - $candidate_score), 1);
+            $direction       = $candidate_score < $team_score ? 'below' : ($candidate_score > $team_score ? 'above' : 'aligned');
+
+            if ($mode === 'friction') {
+                if ($gap >= 30) {
+                    $status = 'high';
+                    $band_label = 'High friction';
+                } elseif ($gap >= 15) {
+                    $status = 'moderate';
+                    $band_label = 'Moderate friction';
+                } else {
+                    $status = 'low';
+                    $band_label = 'Low friction';
+                }
+            } else {
+                if ($gap < 15) {
+                    $status = 'high';
+                    $band_label = 'High alignment';
+                } elseif ($gap < 30) {
+                    $status = 'moderate';
+                    $band_label = 'Moderate alignment';
+                } else {
+                    $status = 'low';
+                    $band_label = 'Low alignment';
+                }
+            }
+
+            $comparison = [
+                'slug'            => $slug,
+                'label'           => $label,
+                'team_score'      => $team_score,
+                'candidate_score' => $candidate_score,
+                'gap'             => $gap,
+                'direction'       => $direction,
+                'status'          => $status,
+                'band_label'      => $band_label,
+            ];
+
+            if (!empty($scenarios[$slug]) && isset($scenarios[$slug][$direction])) {
+                $comparison['scenario'] = $scenarios[$slug][$direction];
+            }
+
+            $comparisons[] = $comparison;
+        }
+
+        return $comparisons;
+    }
+
+    private static function summarize_adaptability_score($display_score) {
+        $status = 'developing';
+        $label = 'Developing Adaptability';
+        $summary = 'This profile suggests adaptability may depend more heavily on structure, pacing, and support in demanding conditions.';
+
+        if ($display_score >= 67) {
+            $status = 'high';
+            $label = 'High Adaptability';
+            $summary = 'This profile suggests the candidate typically stays flexible, decisive, and composed when demands increase.';
+        } elseif ($display_score >= 34) {
+            $status = 'moderate';
+            $label = 'Moderate Adaptability';
+            $summary = 'This profile suggests solid adaptability with a few pressure points that may benefit from coaching or environmental support.';
+        }
+
+        return [
+            'status' => $status,
+            'label' => $label,
+            'summary' => $summary,
+        ];
+    }
+
+    private static function build_adaptability_index_from_results($strain_results) {
+        if (empty($strain_results['strain_index'])) {
+            return null;
+        }
+
+        $si = $strain_results['strain_index'];
+        $overall_raw = floatval($si['overall_strain'] ?? 0);
+        $display_score = round((1 - $overall_raw) * 100, 1);
+        $display_score = max(0, min(100, $display_score));
+
+        $score_summary = self::summarize_adaptability_score($display_score);
+
+        $normalized = $si['normalized'] ?? [];
+        $sub_indices = [
+            'rumination' => [
+                'label' => 'Processing Flexibility',
+                'description' => 'How easily the person can stay mentally flexible, shift perspective, and avoid getting stuck replaying the same problem.',
+                'raw_score' => round(floatval($normalized['rumination'] ?? 0) * 100, 1),
+                'display_score' => round((1 - floatval($normalized['rumination'] ?? 0)) * 100, 1),
+            ],
+            'avoidance' => [
+                'label' => 'Decision Clarity',
+                'description' => 'How readily the person can move toward decisions instead of stalling, deferring, or circling around difficult choices.',
+                'raw_score' => round(floatval($normalized['avoidance'] ?? 0) * 100, 1),
+                'display_score' => round((1 - floatval($normalized['avoidance'] ?? 0)) * 100, 1),
+            ],
+            'emotional_flood' => [
+                'label' => 'Composure Under Pressure',
+                'description' => 'How well the person is likely to stay steady, focused, and functional when pressure or emotional intensity rises.',
+                'raw_score' => round(floatval($normalized['emotional_flood'] ?? 0) * 100, 1),
+                'display_score' => round((1 - floatval($normalized['emotional_flood'] ?? 0)) * 100, 1),
+            ],
+        ];
+
+        return [
+            'score' => $display_score,
+            'raw_score' => round($overall_raw * 100, 1),
+            'band' => [
+                'status' => $score_summary['status'],
+                'label' => $score_summary['label'],
+            ],
+            'summary' => $score_summary['summary'],
+            'sub_indices' => $sub_indices,
+            'raw_scores' => $si['raw_scores'] ?? [],
+            'generated_at' => $si['generated_at'] ?? '',
+        ];
+    }
+
+    private static function build_adaptability_index($candidate_id) {
+        $strain_results = get_user_meta($candidate_id, 'strain_index_results', true);
+
+        if (empty($strain_results) && class_exists('MC_Strain_Index_Scorer')) {
+            $strain_results = MC_Strain_Index_Scorer::calculate_from_user_meta($candidate_id);
+        }
+
+        return self::build_adaptability_index_from_results($strain_results);
+    }
+
+    private static function compute_scorecard_adaptability($user_ids) {
+        $overall_total = 0;
+        $sub_totals = [
+            'rumination' => 0,
+            'avoidance' => 0,
+            'emotional_flood' => 0,
+        ];
+        $count = 0;
+
+        foreach ($user_ids as $uid) {
+            $strain_results = get_user_meta($uid, 'strain_index_results', true);
+            if (empty($strain_results) && class_exists('MC_Strain_Index_Scorer')) {
+                $strain_results = MC_Strain_Index_Scorer::calculate_from_user_meta($uid);
+            }
+
+            $adapt = self::build_adaptability_index_from_results($strain_results);
+            if (empty($adapt)) {
+                continue;
+            }
+
+            $count++;
+            $overall_total += floatval($adapt['score'] ?? 0);
+            $sub_totals['rumination'] += floatval($adapt['sub_indices']['rumination']['display_score'] ?? 0);
+            $sub_totals['avoidance'] += floatval($adapt['sub_indices']['avoidance']['display_score'] ?? 0);
+            $sub_totals['emotional_flood'] += floatval($adapt['sub_indices']['emotional_flood']['display_score'] ?? 0);
+        }
+
+        if ($count === 0) {
+            return null;
+        }
+
+        $overall_score = round($overall_total / $count, 1);
+        $summary = self::summarize_adaptability_score($overall_score);
+
+        return [
+            'score' => $overall_score,
+            'member_count' => $count,
+            'band' => [
+                'status' => $summary['status'],
+                'label' => $summary['label'],
+            ],
+            'summary' => $summary['summary'],
+            'sub_indices' => [
+                'rumination' => [
+                    'label' => 'Processing Flexibility',
+                    'description' => 'How easily the group tends to stay mentally flexible, shift perspective, and avoid getting stuck replaying the same problem.',
+                    'display_score' => round($sub_totals['rumination'] / $count, 1),
+                ],
+                'avoidance' => [
+                    'label' => 'Decision Clarity',
+                    'description' => 'How readily the group tends to move toward decisions instead of stalling, deferring, or circling around difficult choices.',
+                    'display_score' => round($sub_totals['avoidance'] / $count, 1),
+                ],
+                'emotional_flood' => [
+                    'label' => 'Composure Under Pressure',
+                    'description' => 'How well the group tends to stay steady, focused, and functional when pressure or emotional intensity rises.',
+                    'display_score' => round($sub_totals['emotional_flood'] / $count, 1),
+                ],
+            ],
         ];
     }
 
@@ -292,6 +813,7 @@ class MC_Culture_Scorecard {
      * @return array|null
      */
     public static function calculate_culture_fit($candidate_id, $scorecard, $report_config = []) {
+        $mi_raw     = get_user_meta($candidate_id, 'miq_quiz_results',     true);
         $cdt_raw    = get_user_meta($candidate_id, 'cdt_quiz_results',    true);
         $bartle_raw = get_user_meta($candidate_id, 'bartle_quiz_results', true);
 
@@ -302,26 +824,13 @@ class MC_Culture_Scorecard {
         $framing      = $report_config['framing']      ?? 'executive';
         $cdt_low_flag = $report_config['cdt_low_flag'] ?? 40;
 
+        $candidate_mi = self::normalize_mi_scores($mi_raw);
+
         // --- Build candidate CDT scores (0-100) ---
-        $candidate_cdt = [];
-        if (!empty($cdt_raw['sortedScores'])) {
-            foreach ($cdt_raw['sortedScores'] as $pair) {
-                $candidate_cdt[$pair[0]] = round($pair[1] / 50 * 100);
-            }
-        }
-        $candidate_cdt = MC_Helpers::apply_ipsative($candidate_cdt);
+        $candidate_cdt = self::normalize_cdt_scores($cdt_raw);
 
         // --- Build candidate Bartle scores (0-100) ---
-        $candidate_bartle = [];
-        if (!empty($bartle_raw['sortedScores'])) {
-            foreach ($bartle_raw['sortedScores'] as $pair) {
-                $slug = $pair[0];
-                if (in_array($slug, array_keys(self::BARTLE_LABELS))) {
-                    $candidate_bartle[$slug] = round($pair[1] / 50 * 100);
-                }
-            }
-        }
-        $candidate_bartle = MC_Helpers::apply_ipsative($candidate_bartle);
+        $candidate_bartle = self::normalize_bartle_scores($bartle_raw);
 
         // ── CDT Gap Analysis ──────────────────────────────────────────────────
         $cdt_gaps         = [];
@@ -359,6 +868,20 @@ class MC_Culture_Scorecard {
             : 0;
 
         $cdt_low_alert = $cdt_alignment_score < $cdt_low_flag;
+        $mi_comparisons = self::build_dimension_comparisons(self::MI_LABELS, $scorecard['mi'] ?? [], $candidate_mi, 'alignment');
+        $cdt_comparisons = self::build_dimension_comparisons(self::CDT_LABELS, $scorecard['cdt'] ?? [], $candidate_cdt, 'friction', self::CDT_SCENARIOS);
+        $bartle_comparisons = self::build_dimension_comparisons(self::BARTLE_LABELS, $scorecard['bartle'] ?? [], $candidate_bartle, 'alignment');
+        $adaptability_index = self::build_adaptability_index($candidate_id);
+        if (!empty($adaptability_index)) {
+            $adaptability_index['scorecard_average'] = $scorecard['adaptability']['score'] ?? null;
+            $adaptability_index['scorecard_band'] = $scorecard['adaptability']['band'] ?? null;
+            $adaptability_index['scorecard_member_count'] = $scorecard['adaptability']['member_count'] ?? null;
+
+            foreach (array_keys($adaptability_index['sub_indices'] ?? []) as $sub_key) {
+                $adaptability_index['sub_indices'][$sub_key]['scorecard_average'] =
+                    $scorecard['adaptability']['sub_indices'][$sub_key]['display_score'] ?? null;
+            }
+        }
 
         // ── Bartle Type Fit ───────────────────────────────────────────────────
         arsort($candidate_bartle);
@@ -420,6 +943,10 @@ class MC_Culture_Scorecard {
             'cdt_alignment_score' => $cdt_alignment_score,
             'cdt_low_alert'       => $cdt_low_alert,
             'cdt_gaps'            => $cdt_gaps,
+            'mi_comparisons'      => $mi_comparisons,
+            'cdt_comparisons'     => $cdt_comparisons,
+            'bartle_comparisons'  => $bartle_comparisons,
+            'adaptability_index'  => $adaptability_index,
             'bartle' => [
                 'dominant_type'  => $dominant_type,
                 'secondary_type' => $secondary_type,
@@ -733,6 +1260,7 @@ class MC_Culture_Scorecard {
         }
 
         // Label constants for frontend
+        $scorecard['mi_labels']     = self::MI_LABELS;
         $scorecard['cdt_labels']    = self::CDT_LABELS;
         $scorecard['bartle_labels'] = self::BARTLE_LABELS;
 
@@ -786,6 +1314,7 @@ class MC_Culture_Scorecard {
         $fit['candidate_id']      = $candidate_id;
         $fit['candidate_name']    = $candidate_info ? $candidate_info->display_name : 'Candidate';
         $fit['scorecard_label']   = $sc_data['label'] ?? 'Company Baseline';
+        $fit['mi_labels']         = self::MI_LABELS;
         $fit['cdt_labels']        = self::CDT_LABELS;
         $fit['bartle_labels']     = self::BARTLE_LABELS;
 
@@ -884,6 +1413,7 @@ class MC_Culture_Scorecard {
         .section-mi       { background: #0f766e; }
         .section-cdt      { background: #7c3aed; }
         .section-bartle   { background: #b45309; }
+        .section-adapt    { background: #0f172a; }
         .section-divider  { border-top: 2px dashed #cbd5e1; margin: 48px 0 32px; text-align: center; }
         .section-divider span { background: #fff; padding: 0 16px; color: #64748b; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; position: relative; top: -10px; }
         .score-hero { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
@@ -1010,48 +1540,34 @@ class MC_Culture_Scorecard {
         // ── Section 3: Intelligences (MI) ─────────────────────────────────────
         $html .= '<div class="section-header section-mi">Intelligences (MI)</div>';
         if (!empty($mi_raw['part1Scores'])) {
-            foreach ($mi_raw['part1Scores'] as $slug => $raw) { // Filter out any non-MI slugs that might have bled into the data structure
-                if (isset(self::MI_LABELS[$slug])) {
-                    $mi_scores[$slug] = round($raw / 40 * 100);
-                }
-            }
-            // Apply ipsative normalization (display-only — emphasises top 3, de-emphasises the rest)
-            $mi_scores = MC_Helpers::apply_ipsative($mi_scores);
+            $mi_scores = self::normalize_mi_scores($mi_raw);
             arsort($mi_scores);
 
-            // Top 3
+            if (!empty($culture_fit['mi_comparisons'])) {
+                $html .= '<p style="color:#475569;line-height:1.6;margin-bottom:14px;">Compares the candidate\'s intelligence profile to the selected scorecard baseline so hiring teams can see where the person matches the team\'s natural working mix and where they expand it.</p>';
+                $html .= self::render_pdf_comparison_rows($culture_fit['mi_comparisons'], '#0f766e');
+            }
+
             $top3 = array_slice($mi_scores, 0, 3, true);
-            $html .= '<p style="font-weight:bold;margin-bottom:8px;">Top Intelligences</p>';
+            $html .= '<p style="font-weight:bold;margin:16px 0 8px;">Top Intelligences</p>';
             $html .= '<ul class="rec-list">';
             foreach ($top3 as $slug => $score) {
                 $label = self::MI_LABELS[$slug] ?? $slug;
                 $html .= '<li><strong>' . esc_html($label) . '</strong> (' . $score . '/100)</li>';
             }
             $html .= '</ul>';
-
-            // Full breakdown bars
-            $html .= '<p style="font-weight:bold;margin:16px 0 8px;">Full Profile</p>';
-            foreach ($mi_scores as $slug => $score) {
-                $label = self::MI_LABELS[$slug] ?? $slug;
-                $html .= '<div class="dim-row"><table class="dims"><tr>';
-                $html .= '<td style="width:140px;font-size:11px;">' . esc_html($label) . '</td>';
-                $html .= '<td><div class="dim-bar-wrap"><div class="dim-bar" style="width:' . $score . '%;background:#0f766e;"></div></div></td>';
-                $html .= '<td style="width:30px;font-size:11px;text-align:right;">' . $score . '</td>';
-                $html .= '</tr></table></div>';
-            }
         } else {
             $html .= '<p style="color:#64748b;font-style:italic;">MI assessment not completed.</p>';
         }
 
         // ── Section 4: Growth Strengths (CDT) ─────────────────────────────────
         $html .= '<div class="section-header section-cdt">Growth Strengths (CDT)</div>';
-        if (!empty($cdt_raw['sortedScores'])) {
-            $cdt_scores_sorted = [];
-            foreach ($cdt_raw['sortedScores'] as $pair) {
-                $cdt_scores_sorted[$pair[0]] = round($pair[1] / 50 * 100);
-            }
+        if (!empty($culture_fit['cdt_comparisons'])) {
+            $html .= '<p style="color:#475569;line-height:1.6;margin-bottom:14px;">Shows where the candidate\'s growth-strength profile sits above or below the team average across each CDT dimension. Higher gap levels indicate where onboarding or management style may need to adapt.</p>';
+            $html .= self::render_pdf_comparison_rows($culture_fit['cdt_comparisons'], '#7c3aed', true);
+        } elseif (!empty($cdt_raw['sortedScores'])) {
+            $cdt_scores_sorted = self::normalize_cdt_scores($cdt_raw);
             arsort($cdt_scores_sorted);
-
             foreach ($cdt_scores_sorted as $slug => $score) {
                 $label  = self::CDT_LABELS[$slug] ?? $slug;
                 $html .= '<div class="dim-row"><table class="dims"><tr>';
@@ -1067,30 +1583,68 @@ class MC_Culture_Scorecard {
         // ── Section 5: Motivators (Bartle) ────────────────────────────────────
         $html .= '<div class="section-header section-bartle">Motivators (Player Types)</div>';
         if (!empty($bartle_raw['sortedScores'])) {
-            $b_scores = [];
-            foreach ($bartle_raw['sortedScores'] as $pair) {
-                $slug = $pair[0];
-                if (isset(self::BARTLE_LABELS[$slug])) {
-                    $b_scores[$slug] = round($pair[1] / 50 * 100);
-                }
-            }
+            $b_scores = self::normalize_bartle_scores($bartle_raw);
             arsort($b_scores);
             $b_dominant  = array_key_first($b_scores);
             $b_dom_label = self::BARTLE_LABELS[$b_dominant] ?? $b_dominant;
             $b_desc      = self::BARTLE_DESCRIPTIONS[$b_dominant] ?? '';
 
             $html .= '<p style="margin-bottom:12px;">Dominant type: <strong>' . esc_html($b_dom_label) . '</strong> — ' . esc_html($b_desc) . '.</p>';
-
-            foreach ($b_scores as $slug => $score) {
-                $label = self::BARTLE_LABELS[$slug] ?? $slug;
-                $html .= '<div class="dim-row"><table class="dims"><tr>';
-                $html .= '<td style="width:100px;font-size:11px;">' . esc_html($label) . '</td>';
-                $html .= '<td><div class="dim-bar-wrap"><div class="dim-bar" style="width:' . $score . '%;background:#b45309;"></div></div></td>';
-                $html .= '<td style="width:30px;font-size:11px;text-align:right;">' . $score . '</td>';
-                $html .= '</tr></table></div>';
+            if (!empty($culture_fit['bartle']['fit_narrative'])) {
+                $html .= '<p style="color:#475569;line-height:1.6;margin-bottom:14px;">' . esc_html($culture_fit['bartle']['fit_narrative']) . '</p>';
+            }
+            if (!empty($culture_fit['bartle_comparisons'])) {
+                $html .= self::render_pdf_comparison_rows($culture_fit['bartle_comparisons'], '#b45309');
             }
         } else {
             $html .= '<p style="color:#64748b;font-style:italic;">Bartle assessment not completed.</p>';
+        }
+
+        // ── Section 6: Adaptability Index ─────────────────────────────────────
+        $html .= '<div class="section-header section-adapt">Adaptability Index</div>';
+        if (!empty($culture_fit['adaptability_index'])) {
+            $adapt = $culture_fit['adaptability_index'];
+            $band_color = '#64748b';
+            if (($adapt['band']['status'] ?? '') === 'high') {
+                $band_color = '#166534';
+            } elseif (($adapt['band']['status'] ?? '') === 'moderate') {
+                $band_color = '#92400e';
+            }
+
+            $html .= '<div class="score-hero"><table width="100%"><tr>';
+            $html .= '<td width="35%"><p style="color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;">Adaptability Score</p>';
+            $html .= '<h2 style="margin:0;font-size:32px;color:' . $band_color . ';">' . esc_html($adapt['score']) . '<span style="font-size:16px;color:#94a3b8;"> / 100</span></h2></td>';
+            $html .= '<td width="65%"><p style="margin:0;font-size:18px;font-weight:bold;color:' . $band_color . ';">' . esc_html($adapt['band']['label'] ?? 'Adaptability') . '</p>';
+            $html .= '<p style="margin:8px 0 0;color:#475569;line-height:1.6;">' . esc_html($adapt['summary'] ?? '') . '</p>';
+            if (isset($adapt['scorecard_average'])) {
+                $html .= '<p style="margin:10px 0 0;color:#64748b;font-size:12px;">Target scorecard average: <strong>' . esc_html(round(floatval($adapt['scorecard_average']))) . ' / 100</strong></p>';
+            }
+            $html .= '</td>';
+            $html .= '</tr></table></div>';
+
+            $html .= '<p style="color:#475569;line-height:1.6;margin-bottom:12px;">This index is a neutral internal summary derived from the same underlying assessment patterns already captured in the assessments. Higher values indicate stronger adaptability capacity.</p>';
+
+            foreach (($adapt['sub_indices'] ?? []) as $sub) {
+                $label = $sub['label'] ?? 'Adaptability Dimension';
+                $score = floatval($sub['display_score'] ?? 0);
+                $scorecard_avg = floatval($sub['scorecard_average'] ?? 0);
+                $html .= '<div class="gap-row">';
+                $html .= '<div class="gap-label">' . esc_html($label) . '</div>';
+                $html .= '<table class="dims" style="margin-bottom:2px;"><tr>';
+                $html .= '<td style="width:78px;font-size:10px;color:#64748b;">Scorecard avg</td>';
+                $html .= '<td><div class="bar-track"><div class="bar-team" style="width:' . $scorecard_avg . '%;background:#94a3b8;"></div></div></td>';
+                $html .= '<td style="width:36px;font-size:10px;text-align:right;">' . esc_html(round($scorecard_avg)) . '</td>';
+                $html .= '</tr><tr>';
+                $html .= '<td style="width:78px;font-size:10px;color:#64748b;">Candidate</td>';
+                $html .= '<td><div class="bar-track"><div class="bar-candidate" style="width:' . $score . '%;background:#0f172a;"></div></div></td>';
+                $html .= '<td style="width:36px;font-size:10px;text-align:right;">' . esc_html(round($score)) . '</td>';
+                $html .= '</tr></table></div>';
+                if (!empty($sub['description'])) {
+                    $html .= '<p style="margin:0 0 12px 0; color:#64748b; font-size:11px; line-height:1.5; padding-left:6px;">' . esc_html($sub['description']) . '</p>';
+                }
+            }
+        } else {
+            $html .= '<p style="color:#64748b;font-style:italic;">Adaptability data is not available for this candidate yet.</p>';
         }
 
         $html .= '</div></body></html>';
@@ -1110,6 +1664,39 @@ class MC_Culture_Scorecard {
         if ($score >= 70) return '#166534';
         if ($score >= 50) return '#92400e';
         return '#991b1b';
+    }
+
+    private static function render_pdf_comparison_rows($comparisons, $candidate_colour, $show_scenarios = false) {
+        $html = '';
+
+        foreach ($comparisons as $comparison) {
+            $band_color = '#16a34a';
+            if (($comparison['status'] ?? '') === 'moderate') {
+                $band_color = '#d97706';
+            } elseif (($comparison['status'] ?? '') === 'high' && $show_scenarios) {
+                $band_color = '#dc2626';
+            } elseif (($comparison['status'] ?? '') === 'low' && !$show_scenarios) {
+                $band_color = '#dc2626';
+            }
+
+            $html .= '<div class="gap-row">';
+            $html .= '<div class="gap-label">' . esc_html($comparison['label'] ?? 'Dimension') . ' <span style="color:' . $band_color . ';font-size:10px;">(' . esc_html($comparison['band_label'] ?? '') . ')</span></div>';
+            $html .= '<table class="dims" style="margin-bottom:2px;"><tr>';
+            $html .= '<td style="width:60px;font-size:10px;color:#64748b;">Team avg</td>';
+            $html .= '<td><div class="bar-track"><div class="bar-team" style="width:' . floatval($comparison['team_score'] ?? 0) . '%;background:#94a3b8;"></div></div></td>';
+            $html .= '<td style="width:36px;font-size:10px;text-align:right;">' . esc_html(round(floatval($comparison['team_score'] ?? 0))) . '</td>';
+            $html .= '</tr><tr>';
+            $html .= '<td style="width:60px;font-size:10px;color:#64748b;">Candidate</td>';
+            $html .= '<td><div class="bar-track"><div class="bar-candidate" style="width:' . floatval($comparison['candidate_score'] ?? 0) . '%;background:' . esc_attr($candidate_colour) . ';"></div></div></td>';
+            $html .= '<td style="width:36px;font-size:10px;text-align:right;">' . esc_html(round(floatval($comparison['candidate_score'] ?? 0))) . '</td>';
+            $html .= '</tr></table>';
+            if ($show_scenarios && !empty($comparison['scenario'])) {
+                $html .= '<div class="scenario-box">' . esc_html($comparison['scenario']) . '</div>';
+            }
+            $html .= '</div>';
+        }
+
+        return $html;
     }
 
     // ─────────────────────────────────────────────────────────────────────────

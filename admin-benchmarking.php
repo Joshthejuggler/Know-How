@@ -119,6 +119,16 @@
                             <!-- Populated by JS -->
                         </div>
                     </div>
+
+                    <div class="mc-mi-recommendations-area">
+                        <div class="mc-scorecard-section-head">
+                            <h3>Team Recommendations From Intelligence Mix</h3>
+                            <p id="mc-mi-recommendations-intro" class="mc-section-copy"></p>
+                        </div>
+                        <div id="mc-mi-recommendations-list" class="mc-mi-recommendations-grid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
                 </div>
                 
                 <div id="mc-culture-empty" class="mc-panel-empty">
@@ -207,7 +217,7 @@
 
                     <!-- Radar & Trait Alignment (Formerly Talent Comparison) -->
                     <div class="mc-charts-grid" style="margin-bottom:24px;">
-                        <div class="mc-chart-card">
+                        <div class="mc-chart-card mc-chart-card-overlay">
                             <h3>Archetype Overlay</h3>
                             <p style="font-size: 13px; color: #64748b; margin: 8px 0 24px 0; line-height: 1.4;">
                                 Visualizes the candidate's holistic footprint (solid blue) plotted directly against the target scorecard's average baseline (dashed grey).
@@ -221,7 +231,7 @@
                             </div>
                         </div>
 
-                        <div class="mc-breakdown-card">
+                        <div class="mc-breakdown-card mc-breakdown-card-traits">
                             <h3>Trait Alignment Index</h3>
                             <p style="font-size: 13px; color: #64748b; margin: 8px 0 24px 0; line-height: 1.4;">
                                 Compares the candidate's absolute trait scores against the benchmark, determining the percentage of mutual alignment.
