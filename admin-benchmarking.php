@@ -11,7 +11,7 @@
                 <span class="dashicons dashicons-groups"></span> Manage Scorecards
             </button>
             <button class="mc-bench-tab-btn" data-tab="candidate-evaluation">
-                <span class="dashicons dashicons-chart-area"></span> Person Evaluation
+                <span class="dashicons dashicons-chart-area"></span> Alignment Review
             </button>
         </div>
     </div>
@@ -147,7 +147,7 @@
         </div>
     </div>
 
-    <!-- Person Evaluation Tab -->
+    <!-- Alignment Review Tab -->
     <div id="tab-candidate-evaluation" class="mc-tab-content">
         <div class="mc-layout-grid">
             <!-- Left: Sidebar -->
