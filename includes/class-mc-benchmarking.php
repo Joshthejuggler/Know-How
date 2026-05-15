@@ -164,6 +164,18 @@ class MC_Benchmarking {
         $current_employees = get_users($args_current);
         $candidates = get_users($args_candidates);
 
+        // Comparison should work for any active profile, not only people marked as candidates.
+        // Merge both lists so the evaluation selector includes current employees as well.
+        $comparison_users = [];
+
+        foreach (array_merge($current_employees, $candidates) as $user) {
+            if (!isset($comparison_users[$user->ID])) {
+                $comparison_users[$user->ID] = $user;
+            }
+        }
+
+        $candidates = array_values($comparison_users);
+
         // Fetch Culture Scorecards
         $scorecards = [];
         if (class_exists('MC_Culture_Scorecard')) {

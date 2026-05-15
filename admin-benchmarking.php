@@ -168,12 +168,12 @@
 
                     <div class="mc-card-header" style="margin-top:24px;">
                         <span class="step-num">2</span>
-                        <h3>Select Candidate</h3>
+                        <h3>Select Person</h3>
                     </div>
-                    <p class="description">Choose the candidate you wish to evaluate.</p>
+                    <p class="description">Choose the person you wish to evaluate.</p>
                     <div class="mc-select-wrapper">
                         <select id="mc-eval-candidate-select" class="mc-premium-select">
-                            <option value="">Select a Candidate...</option>
+                            <option value="">Select a Person...</option>
                             <?php foreach ($candidates as $user): ?>
                                 <option value="<?php echo $user->ID; ?>"><?php echo esc_html($user->display_name); ?> (<?php echo esc_html($user->user_email); ?>)</option>
                             <?php endforeach; ?>
@@ -255,7 +255,7 @@
                         <span class="dashicons dashicons-chart-area"></span>
                     </div>
                     <h2>Start Evaluation</h2>
-                    <p>Select a Candidate and a Target Scorecard to generate a comprehensive cultural and trait alignment report.</p>
+                    <p>Select a person and a target scorecard to generate a comprehensive cultural and trait alignment report.</p>
                 </div>
 
                 <!-- Loading State -->
