@@ -194,7 +194,8 @@
                     <div class="mc-fit-report-header" style="margin-bottom: 24px;">
                         <div class="mc-fit-hero-score">
                             <div class="score-circle-mini">
-                                <span id="mc-fit-pct">0%</span>
+                                <span class="score-circle-mini__label">Overall Alignment</span>
+                                <span class="score-circle-mini__value" id="mc-fit-band">Band</span>
                             </div>
                             <div class="mc-fit-header-info">
                                 <h2 id="mc-eval-candidate-name" style="color: #ffffff; margin: 0 0 6px; font-size: 24px;">Person Name</h2>

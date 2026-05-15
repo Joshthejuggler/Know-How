@@ -866,6 +866,9 @@ class MC_Culture_Scorecard {
         $cdt_alignment_score = $alignment_count > 0
             ? round($alignment_sum / $alignment_count)
             : 0;
+        $cdt_alignment_band = class_exists('MC_Helpers')
+            ? MC_Helpers::get_alignment_band($cdt_alignment_score)
+            : ['status' => 'medium', 'label' => 'Medium'];
 
         $cdt_low_alert = $cdt_alignment_score < $cdt_low_flag;
         $mi_comparisons = self::build_dimension_comparisons(self::MI_LABELS, $scorecard['mi'] ?? [], $candidate_mi, 'alignment');
@@ -941,6 +944,8 @@ class MC_Culture_Scorecard {
             'fit_percent'         => $total_fit_pct,
             'fit_label'           => $fit_label,
             'cdt_alignment_score' => $cdt_alignment_score,
+            'cdt_alignment_band'  => $cdt_alignment_band['status'],
+            'cdt_alignment_band_label' => $cdt_alignment_band['label'],
             'cdt_low_alert'       => $cdt_low_alert,
             'cdt_gaps'            => $cdt_gaps,
             'mi_comparisons'      => $mi_comparisons,
@@ -1475,19 +1480,21 @@ class MC_Culture_Scorecard {
 
         if ($culture_fit && !isset($culture_fit['error'])) {
             $cdt_score  = $culture_fit['cdt_alignment_score'];
+            $cdt_band_label = $culture_fit['cdt_alignment_band_label'] ?? 'Medium';
+            $cdt_band_status = $culture_fit['cdt_alignment_band'] ?? 'medium';
             $fit_label  = $culture_fit['bartle']['fit_label'];
             $fit_class  = 'fit-' . strtolower(str_replace(' ', '-', $fit_label));
 
             // Hero scores
             $html .= '<div class="score-hero"><table width="100%"><tr>';
             $html .= '<td width="50%"><p style="color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;">CDT Alignment</p>';
-            $html .= '<h2 style="margin:0;font-size:32px;color:' . self::score_colour($cdt_score) . ';">' . $cdt_score . '<span style="font-size:16px;color:#94a3b8;"> / 100</span></h2></td>';
+            $html .= '<h2 style="margin:0;font-size:32px;color:' . self::alignment_band_colour($cdt_band_status) . ';">' . esc_html($cdt_band_label) . '</h2></td>';
             $html .= '<td width="50%"><p style="color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;">Player Type Fit</p>';
             $html .= '<p style="margin:0;font-size:18px;font-weight:bold;">' . $fit_label . '</p></td>';
             $html .= '</tr></table></div>';
 
             if ($culture_fit['cdt_low_alert']) {
-                $html .= '<div class="alert-low"><strong>⚠ Low CDT Alignment:</strong> Score below 40 indicates significant growth-style gaps across multiple dimensions. Review the dimension breakdown carefully — this may not be a dealbreaker but warrants explicit onboarding planning.</div>';
+                $html .= '<div class="alert-low"><strong>⚠ Low CDT Alignment:</strong> This profile sits materially below the team baseline across multiple growth-style dimensions. Review the breakdown carefully — this may not be a dealbreaker, but it does warrant explicit onboarding planning.</div>';
             }
 
             // Bartle narrative
@@ -1663,6 +1670,12 @@ class MC_Culture_Scorecard {
     private static function score_colour($score) {
         if ($score >= 70) return '#166534';
         if ($score >= 50) return '#92400e';
+        return '#991b1b';
+    }
+
+    private static function alignment_band_colour($band_status) {
+        if ($band_status === 'high') return '#166534';
+        if ($band_status === 'medium') return '#92400e';
         return '#991b1b';
     }
 

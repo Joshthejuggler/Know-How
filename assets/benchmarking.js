@@ -689,17 +689,41 @@ jQuery(document).ready(function($) {
         });
     });
 
+    function getAlignmentBandStatus(score) {
+        if (score >= 85) return 'high';
+        if (score >= 60) return 'medium';
+        return 'low';
+    }
+
+    function getAlignmentBandLabel(status) {
+        if (status === 'high') return 'High';
+        if (status === 'medium') return 'Medium';
+        return 'Low';
+    }
+
+    function getFitBadgeTone(fitLabel) {
+        if (fitLabel === 'Resonant') {
+            return { background: '#dcfce7', color: '#166534' };
+        }
+
+        if (fitLabel === 'Divergent') {
+            return { background: '#fef3c7', color: '#92400e' };
+        }
+
+        return { background: '#dbeafe', color: '#1d4ed8' };
+    }
+
     function renderUnifiedEvaluation(talentData, cultureData, targetName) {
         // Hero Update
         $('#mc-eval-candidate-name').text(cultureData.candidate_name);
         $('#mc-eval-target-name').text(targetName);
-        $('#mc-fit-pct').text(talentData.match_percent + '%'); // Use Talent % as main
+        const matchBand = talentData.match_band || getAlignmentBandStatus(talentData.match_percent);
+        const matchBandLabel = talentData.match_band_label || getAlignmentBandLabel(matchBand);
+        $('#mc-fit-band').text(matchBandLabel);
         
         const tag = $('#mc-fit-label');
         tag.text(cultureData.fit_label);
-        if (talentData.match_percent > 80) tag.css({'background':'#dcfce7', 'color':'#166534'});
-        else if (talentData.match_percent > 60) tag.css({'background':'#fef9c3', 'color':'#854d0e'});
-        else tag.css({'background':'#fee2e2', 'color':'#991b1b'});
+        tag.css(getFitBadgeTone(cultureData.fit_label));
 
         // Radar Chart (MI/CDT Overlay)
         initTalentRadar(talentData.chart_data);
@@ -744,9 +768,9 @@ jQuery(document).ready(function($) {
             });
         };
 
-        renderSection('High Alignment (85%+)', highMatches, '#0d9488'); // teal-600
-        renderSection('Moderate Alignment (60-84%)', midMatches, '#d97706'); // amber-600
-        renderSection('Low Alignment (<60%)', lowMatches, '#dc2626'); // red-600
+        renderSection('High Alignment', highMatches, '#0d9488'); // teal-600
+        renderSection('Medium Alignment', midMatches, '#d97706'); // amber-600
+        renderSection('Low Alignment', lowMatches, '#dc2626'); // red-600
 
         const body = $('#mc-fit-report-body');
         body.html(renderIntegratedReportBody(cultureData, targetName));

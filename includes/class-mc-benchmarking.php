@@ -221,6 +221,9 @@ class MC_Benchmarking {
         }
 
         $match_percent = $this->calculate_match_percent($benchmark, $candidate_data);
+        $match_band = class_exists('MC_Helpers')
+            ? MC_Helpers::get_alignment_band($match_percent)
+            : ['status' => 'medium', 'label' => 'Medium'];
         
         // Build Labels mapping
         $labels_map = [
@@ -271,6 +274,8 @@ class MC_Benchmarking {
             'rockstar_count' => count($rockstar_ids),
             'match_percent' => $match_percent,
             'match_label' => $match_label,
+            'match_band' => $match_band['status'],
+            'match_band_label' => $match_band['label'],
             'trait_breakdown' => $trait_breakdown,
             'chart_data' => [
                 'labels' => $chart_labels,

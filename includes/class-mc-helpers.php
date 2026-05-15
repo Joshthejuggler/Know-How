@@ -172,6 +172,35 @@ class MC_Helpers {
         
         return ($total_quizzes > 0) ? round(($completed_quizzes / $total_quizzes) * 100) : 0;
     }
+
+    /**
+     * Map an internal numeric alignment score to a user-facing qualitative band.
+     *
+     * @param float|int $score Alignment score on a 0-100 scale.
+     * @return array{status:string,label:string}
+     */
+    public static function get_alignment_band($score) {
+        $score = floatval($score);
+
+        if ($score >= 85) {
+            return [
+                'status' => 'high',
+                'label'  => 'High',
+            ];
+        }
+
+        if ($score >= 60) {
+            return [
+                'status' => 'medium',
+                'label'  => 'Medium',
+            ];
+        }
+
+        return [
+            'status' => 'low',
+            'label'  => 'Low',
+        ];
+    }
     
     /**
      * Get next incomplete quiz
