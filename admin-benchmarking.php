@@ -4,14 +4,14 @@
     <div class="mc-bench-header">
         <div class="mc-bench-title-group">
             <h1>Scorecard Management & Evaluation</h1>
-            <p class="mc-bench-subtitle">Manage your cultural baselines and evaluate candidate alignment with premium analytics.</p>
+            <p class="mc-bench-subtitle">Manage your cultural baselines and evaluate person-to-team alignment with premium analytics.</p>
         </div>
         <div class="mc-bench-tabs">
             <button class="mc-bench-tab-btn active" data-tab="manage-scorecards">
                 <span class="dashicons dashicons-groups"></span> Manage Scorecards
             </button>
             <button class="mc-bench-tab-btn" data-tab="candidate-evaluation">
-                <span class="dashicons dashicons-chart-area"></span> Candidate Evaluation
+                <span class="dashicons dashicons-chart-area"></span> Person Evaluation
             </button>
         </div>
     </div>
@@ -147,7 +147,7 @@
         </div>
     </div>
 
-    <!-- Candidate Evaluation Tab -->
+    <!-- Person Evaluation Tab -->
     <div id="tab-candidate-evaluation" class="mc-tab-content">
         <div class="mc-layout-grid">
             <!-- Left: Sidebar -->
@@ -190,14 +190,14 @@
             <div class="mc-main-panel">
                 <div id="mc-eval-results" style="display:none;">
                     
-                    <!-- Candidate Fit Summary Hero -->
+                    <!-- Person Fit Summary Hero -->
                     <div class="mc-fit-report-header" style="margin-bottom: 24px;">
                         <div class="mc-fit-hero-score">
                             <div class="score-circle-mini">
                                 <span id="mc-fit-pct">0%</span>
                             </div>
                             <div class="mc-fit-header-info">
-                                <h2 id="mc-eval-candidate-name" style="color: #ffffff; margin: 0 0 6px; font-size: 24px;">Candidate Name</h2>
+                                <h2 id="mc-eval-candidate-name" style="color: #ffffff; margin: 0 0 6px; font-size: 24px;">Person Name</h2>
                                 <p style="margin:4px 0 8px; font-size:13px; color:rgba(255,255,255,0.8);">Evaluated against: <strong id="mc-eval-target-name" style="color:#ffffff;">Scorecard</strong></p>
                                 <div class="mc-fit-badge-premium" id="mc-fit-label">Culture Addition</div>
                             </div>
@@ -220,21 +220,21 @@
                         <div class="mc-chart-card mc-chart-card-overlay">
                             <h3>Archetype Overlay</h3>
                             <p style="font-size: 13px; color: #64748b; margin: 8px 0 24px 0; line-height: 1.4;">
-                                Visualizes the candidate's holistic footprint (solid blue) plotted directly against the target scorecard's average baseline (dashed grey).
+                                Visualizes the person's holistic footprint (solid blue) plotted directly against the target scorecard's average baseline (dashed grey).
                             </p>
                             <div class="mc-chart-canvas-wrap">
                                 <canvas id="mc-bench-radar"></canvas>
                             </div>
                             <div class="mc-custom-legend">
                                 <span class="legend-dot benchmark"></span> Benchmark
-                                <span class="legend-dot candidate"></span> Candidate
+                                <span class="legend-dot candidate"></span> Person
                             </div>
                         </div>
 
                         <div class="mc-breakdown-card mc-breakdown-card-traits">
                             <h3>Trait Alignment Index</h3>
                             <p style="font-size: 13px; color: #64748b; margin: 8px 0 24px 0; line-height: 1.4;">
-                                Compares the candidate's absolute trait scores against the benchmark, determining the percentage of mutual alignment.
+                                Compares the person's absolute trait scores against the benchmark, determining the percentage of mutual alignment.
                             </p>
                             <div id="mc-traits-list" class="mc-trait-alignment-list">
                                 <!-- Populated by JS -->

@@ -480,7 +480,7 @@ jQuery(document).ready(function($) {
                             <strong>${Math.round(comparison.team_score)}</strong>
                         </div>
                         <div class="mc-report-bar-line">
-                            <span>Candidate</span>
+                            <span>Person</span>
                             <div class="mc-report-bar-track">
                                 <div class="mc-report-bar-fill mc-report-bar-candidate" style="width:${comparison.candidate_score}%; background:${accentColor};"></div>
                             </div>
@@ -538,7 +538,7 @@ jQuery(document).ready(function($) {
                 </div>
                 <div class="mc-report-bars">
                     <div class="mc-report-bar-line">
-                        <span>Candidate</span>
+                        <span>Person</span>
                         <div class="mc-report-bar-track">
                             <div class="mc-report-bar-fill" style="width:${sub.display_score}%; background:#0f172a;"></div>
                         </div>
@@ -603,20 +603,20 @@ jQuery(document).ready(function($) {
             ${cultureSection}
             ${renderComparisonSection(
                 'Intelligences Comparison',
-                'Compare the candidate’s intelligence profile against the selected scorecard average to see where they mirror the team and where they expand it.',
+                'Compare the person’s intelligence profile against the selected scorecard average to see where they mirror the team and where they expand it.',
                 cultureData.mi_comparisons,
                 '#0f766e'
             )}
             ${renderComparisonSection(
                 'Growth Strengths Comparison',
-                'Review the candidate’s CDT dimensions against the team average to identify likely friction zones and onboarding considerations.',
+                'Review the person’s CDT dimensions against the team average to identify likely friction zones and onboarding considerations.',
                 cultureData.cdt_comparisons,
                 '#7c3aed',
                 { isFriction: true }
             )}
             ${renderComparisonSection(
                 'Motivators Comparison',
-                'Compare the candidate’s player-type pattern to the scorecard baseline to understand where motivation styles align or diverge.',
+                'Compare the person’s player-type pattern to the scorecard baseline to understand where motivation styles align or diverge.',
                 cultureData.bartle_comparisons,
                 '#b45309'
             )}
@@ -632,7 +632,7 @@ jQuery(document).ready(function($) {
         const scId = $('#mc-eval-scorecard-select').val();
         
         if (!candidateId || !scId) {
-            alert('Please select a Target Scorecard and a Candidate.');
+            alert('Please select a Target Scorecard and a Person.');
             return;
         }
 
@@ -679,7 +679,7 @@ jQuery(document).ready(function($) {
                 renderUnifiedEvaluation(rTalent.data, rCulture.data, targetName);
                 $('#mc-eval-results').fadeIn(400);
             } else {
-                alert('Analysis failed. Check if all selected benchmark employees and candidates hold valid assessment data.');
+                alert('Analysis failed. Check if all selected benchmark employees and people hold valid assessment data.');
                 $('#mc-bench-empty').show();
             }
         }).fail(function() {
@@ -729,7 +729,7 @@ jQuery(document).ready(function($) {
                                  <span class="mc-trait-val" style="margin-right:16px; font-size:12px; color:#64748b; font-weight:500;">
                                      Team Avg: <strong style="color:#94a3b8;">${Math.round(trait.benchmark)}</strong> 
                                      <span style="margin:0 6px; opacity:0.3;">|</span> 
-                                     Candidate: <strong style="color:var(--mc-primary);">${Math.round(trait.candidate)}</strong>
+                                     Person: <strong style="color:var(--mc-primary);">${Math.round(trait.candidate)}</strong>
                                  </span>
                                  <span class="mc-trait-val" style="color:${colorHex}; font-weight:700;">${trait.match}% Match</span>
                             </div>
@@ -775,7 +775,7 @@ jQuery(document).ready(function($) {
                         pointRadius: 0
                     },
                     {
-                        label: 'Candidate',
+                        label: 'Person',
                         data: chartData.candidate,
                         fill: true,
                         backgroundColor: 'rgba(37, 99, 235, 0.2)',
