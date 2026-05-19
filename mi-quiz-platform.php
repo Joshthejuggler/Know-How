@@ -308,5 +308,3 @@ function mc_enqueue_landing_page_styles()
 }
 add_action('wp_enqueue_scripts', 'mc_enqueue_landing_page_styles');
 
-
-
