@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Custom Request Debug Test</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        textarea { width: 400px; height: 100px; }
+        button { margin: 10px 5px; padding: 8px 15px; }
+        .disabled { opacity: 0.5; cursor: not-allowed; }
+        #debug-output { background: #f0f0f0; padding: 10px; margin-top: 10px; white-space: pre-line; }
+    </style>
+</head>
+<body>
+    <h1>Custom Request Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Basic Text Input Handling</h2>
+        <textarea id="test-textarea" placeholder="Enter custom request..."></textarea>
+        <div>Character count: <span id="char-count">0</span>/500</div>
+        <button id="test-button" class="disabled" disabled>Apply Custom Change</button>
+        
+        <div id="debug-output"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Simulate Custom Request Processing</h2>
+        <button id="simulate-request">Simulate Custom Request</button>
+        <div id="simulation-output"></div>
+    </div>
+    
+    <script>
+    $(document).ready(function() {
+        let debugOutput = $('#debug-output');
+        let simulationOutput = $('#simulation-output');
+        
+        function log(message) {
+            debugOutput.append(new Date().toLocaleTimeString() + ': ' + message + '\n');
+            console.log(message);
+        }
+        
+        // Test 1: Basic input handling (mimicking the plugin code)
+        $('#test-textarea').on('input keyup paste', function(e) {
+            setTimeout(() => {
+                const text = $(e.target).val();
+                const charCount = text.length;
+                $('#char-count').text(charCount);
+                
+                log('Text updated: ' + charCount + ' characters');
+                
+                const button = $('#test-button');
+                if (charCount > 0 && charCount <= 500) {
+                    button.prop('disabled', false).removeClass('disabled');
+                    log('Button enabled');
+                } else {
+                    button.prop('disabled', true).addClass('disabled');
+                    log('Button disabled, char count: ' + charCount);
+                }
+            }, 0);
+        });
+        
+        $('#test-button').on('click', function(e) {
+            e.preventDefault();
+            const customText = $('#test-textarea').val().trim();
+            
+            log('Button clicked with text: "' + customText + '"');
+            
+            if (!customText) {
+                log('ERROR: No custom text provided');
+                return;
+            }
+            
+            if (customText.length > 500) {
+                log('ERROR: Custom text too long: ' + customText.length + ' characters');
+                return;
+            }
+            
+            // Create modifier object (same as plugin)
+            const modifier = {
+                kind: 'Custom',
+                value: customText
+            };
+            
+            log('Created modifier: ' + JSON.stringify(modifier, null, 2));
+            
+            // Clear textarea (same as plugin)
+            $('#test-textarea').val('');
+            $('#char-count').text('0');
+            $(this).prop('disabled', true).addClass('disabled');
+            
+            log('Input cleared after submission');
+        });
+        
+        // Test 2: Simulate the AJAX request that would be sent
+        $('#simulate-request').on('click', function() {
+            simulationOutput.html('<p>Simulating custom request...</p>');
+            
+            const mockExperiment = {
+                title: "Test Experiment",
+                steps: ["Step 1", "Step 2"],
+                successCriteria: ["Success 1", "Success 2"],
+                effort: { timeHours: 2, budgetUSD: 0 }
+            };
+            
+            const modifier = {
+                kind: 'Custom',
+                value: 'Make this experiment more collaborative'
+            };
+            
+            const userContext = {
+                mi_top3: [],
+                cdt_bottom2: [],
+                curiosities: [],
+                roleModels: []
+            };
+            
+            const requestData = {
+                action: 'mc_lab_iterate',
+                currentExperiment: JSON.stringify(mockExperiment),
+                modifier: JSON.stringify(modifier),
+                userContext: JSON.stringify(userContext),
+                includeDebug: true
+            };
+            
+            simulationOutput.html('<h3>Would send request with data:</h3><pre>' + 
+                JSON.stringify(requestData, null, 2) + '</pre>');
+        });
+        
+        log('Debug test initialized');
+    });
+    </script>
+</body>
+</html>
